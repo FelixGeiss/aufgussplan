@@ -242,9 +242,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     </span>
                                 </div>
                                 <div>
-                                    <h2 class="text-2xl font-bold text-gray-900"><?php echo htmlspecialchars($plan['name'] ?? ''); ?></h2>
+                                    <h2 class="text-3xl font-bold text-gray-900"><?php echo htmlspecialchars($plan['name'] ?? ''); ?></h2>
                                     <?php if ($plan['beschreibung']): ?>
-                                        <p class="text-sm text-gray-600 mt-1"><?php echo htmlspecialchars($plan['beschreibung'] ?? ''); ?></p>
+                                        <p class="text-lg text-gray-600 mt-1"><?php echo htmlspecialchars($plan['beschreibung'] ?? ''); ?></p>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -344,12 +344,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                 <!-- Bearbeitungs-Modus -->
                                                                 <div class="edit-mode hidden flex flex-col gap-2">
                                                                     <div class="flex items-center gap-2">
-                                                                        <label class="text-xs text-gray-600 w-12">Anfang:</label>
+                                                                        <label class="text-sm font-semibold text-gray-900 w-12">Anfang:</label>
                                                                         <input type="time" name="zeit_anfang" value="<?php echo $zeitAnfang ? date('H:i', strtotime($zeitAnfang)) : ''; ?>"
                                                                             class="rounded px-2 py-1 text-sm border border-gray-300">
                                                                     </div>
                                                                     <div class="flex items-center gap-2">
-                                                                        <label class="text-xs text-gray-600 w-12">Ende:</label>
+                                                                        <label class="text-sm font-semibold text-gray-900 w-12">Ende:</label>
                                                                         <input type="time" name="zeit_ende" value="<?php echo $zeitEnde ? date('H:i', strtotime($zeitEnde)) : ''; ?>"
                                                                             class="rounded px-2 py-1 text-sm border border-gray-300">
                                                                     </div>
@@ -373,14 +373,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                 <!-- Bearbeitungs-Modus -->
                                                                 <div class="edit-mode hidden flex flex-col gap-2" data-aufguss-id="<?php echo $aufguss['id']; ?>">
                                                                     <div>
-                                                                        <label class="block text-xs text-gray-600 mb-1">Aufguss eingeben:</label>
+                                                                        <label class="block text-sm font-semibold text-gray-900 mb-1">Aufguss eingeben:</label>
                                                                         <input type="text" name="aufguss_name" value="<?php echo htmlspecialchars($aufguss['name'] ?? ''); ?>"
                                                                             placeholder="Aufguss eingeben" class="rounded px-2 py-1 text-sm border border-gray-300 w-full"
                                                                             oninput="handleFieldInput(<?php echo $aufguss['id']; ?>, 'aufguss')">
                                                                     </div>
 
                                                                     <div>
-                                                                        <label class="block text-xs text-gray-600 mb-1">Vorhandenen Aufguss wählen:</label>
+                                                                        <label class="block text-sm font-semibold text-gray-900 mb-1">Vorhandenen Aufguss wählen:</label>
                                                                         <select name="select_aufguss_id" class="rounded px-2 py-1 text-sm border border-gray-300 w-full"
                                                                             onchange="handleFieldSelect(<?php echo $aufguss['id']; ?>, 'aufguss')">
                                                                             <option value="">-- Aufguss wählen --</option>
@@ -521,14 +521,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                 <!-- Bearbeitungs-Modus -->
                                                                 <div class="edit-mode hidden flex flex-col gap-2">
                                                                     <div>
-                                                                        <label class="block text-xs text-gray-600 mb-1">Name eingeben:</label>
+                                                                        <label class="block text-sm font-semibold text-gray-900 mb-1">Name eingeben:</label>
                                                                         <input type="text" name="aufgieser_name" value="<?php echo htmlspecialchars($aufguss['aufgieser_name'] ?? ''); ?>"
                                                                             placeholder="Name eingeben" class="rounded px-2 py-1 text-sm border border-gray-300 w-full"
                                                                             oninput="handleFieldInput(<?php echo $aufguss['id']; ?>, 'mitarbeiter')">
                                                                     </div>
 
                                                                     <div>
-                                                                        <label class="block text-xs text-gray-600 mb-1">Mitarbeiter wählen:</label>
+                                                                        <label class="block text-sm font-semibold text-gray-900 mb-1">Mitarbeiter wählen:</label>
                                                                         <select name="mitarbeiter_id" class="rounded px-2 py-1 text-sm border border-gray-300 w-full"
                                                                             onchange="handleFieldSelect(<?php echo $aufguss['id']; ?>, 'mitarbeiter')">
                                                                             <option value="">-- Mitarbeiter wählen --</option>
@@ -541,7 +541,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                     </div>
                                                                     <div class="border-t border-gray-200 pt-2">
                                                                         <div class="text-center text-gray-400 text-xs mb-2">oder mehrere</div>
-                                                                        <label class="block text-xs text-gray-600 mb-1">Mehrere Mitarbeiter:</label>
+                                                                        <label class="block text-sm font-semibold text-gray-900 mb-1">Mehrere Mitarbeiter:</label>
                                                                         <select name="mitarbeiter_ids[]" multiple class="rounded px-2 py-1 text-sm border border-gray-300 w-full">
                                                                             <?php foreach ($mitarbeiter as $m): ?>
                                                                                 <option value="<?php echo $m['id']; ?>"><?php echo htmlspecialchars($m['name'] ?? ''); ?></option>
@@ -583,14 +583,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                 <!-- Bearbeitungs-Modus -->
                                                                 <div class="edit-mode hidden flex flex-col gap-2">
                                                                     <div>
-                                                                        <label class="block text-xs text-gray-600 mb-1">Sauna eingeben:</label>
+                                                                        <label class="block text-sm font-semibold text-gray-900 mb-1">Sauna eingeben:</label>
                                                                         <input type="text" name="sauna_name" value="<?php echo htmlspecialchars($aufguss['sauna_name'] ?? ''); ?>"
                                                                             placeholder="Sauna eingeben" class="rounded px-2 py-1 text-sm border border-gray-300 w-full"
                                                                             oninput="handleFieldInput(<?php echo $aufguss['id']; ?>, 'sauna')">
                                                                     </div>
 
                                                                     <div>
-                                                                        <label class="block text-xs text-gray-600 mb-1">Sauna wählen:</label>
+                                                                        <label class="block text-sm font-semibold text-gray-900 mb-1">Sauna wählen:</label>
                                                                         <select name="sauna_id" class="rounded px-2 py-1 text-sm border border-gray-300 w-full"
                                                                             onchange="handleFieldSelect(<?php echo $aufguss['id']; ?>, 'sauna')">
                                                                             <option value="">-- Sauna wählen --</option>
@@ -628,14 +628,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                 <!-- Bearbeitungs-Modus -->
                                                                 <div class="edit-mode hidden flex flex-col gap-2">
                                                                     <div>
-                                                                        <label class="block text-xs text-gray-600 mb-1">Duftmittel eingeben:</label>
+                                                                        <label class="block text-sm font-semibold text-gray-900 mb-1">Duftmittel eingeben:</label>
                                                                         <input type="text" name="duftmittel_name" value="<?php echo htmlspecialchars($aufguss['duftmittel_name'] ?? ''); ?>"
                                                                             placeholder="Duftmittel eingeben" class="rounded px-2 py-1 text-sm border border-gray-300 w-full"
                                                                             oninput="handleFieldInput(<?php echo $aufguss['id']; ?>, 'duftmittel')">
                                                                     </div>
 
                                                                     <div>
-                                                                        <label class="block text-xs text-gray-600 mb-1">Duftmittel wählen:</label>
+                                                                        <label class="block text-sm font-semibold text-gray-900 mb-1">Duftmittel wählen:</label>
                                                                         <select name="duftmittel_id" class="rounded px-2 py-1 text-sm border border-gray-300 w-full"
                                                                             onchange="handleFieldSelect(<?php echo $aufguss['id']; ?>, 'duftmittel')">
                                                                             <option value="">-- Duftmittel wählen --</option>
@@ -731,7 +731,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     <label class="block text-sm font-medium text-gray-900 mb-2">Zeitbereich des Aufgusses</label>
                                                     <div class="flex justify-center items-center gap-4">
                                                         <div class="flex flex-col items-center">
-                                                            <label for="zeit_anfang-<?php echo $plan['id']; ?>" class="text-xs text-gray-600 mb-1">Anfang</label>
+                                                            <label for="zeit_anfang-<?php echo $plan['id']; ?>" class="text-sm font-semibold text-gray-900 mb-1">Anfang</label>
                                                             <input type="time" id="zeit_anfang-<?php echo $plan['id']; ?>" name="zeit_anfang"
                                                                 class="rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid w-32"
                                                                 style="border-color: var(--border-color)">
@@ -740,7 +740,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                             <span class="text-sm">bis</span>
                                                         </div>
                                                         <div class="flex flex-col items-center">
-                                                            <label for="zeit_ende-<?php echo $plan['id']; ?>" class="text-xs text-gray-600 mb-1">Ende</label>
+                                                            <label for="zeit_ende-<?php echo $plan['id']; ?>" class="text-sm font-semibold text-gray-900 mb-1">Ende</label>
                                                             <input type="time" id="zeit_ende-<?php echo $plan['id']; ?>" name="zeit_ende"
                                                                 class="rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid w-32"
                                                                 style="border-color: var(--border-color)">
@@ -845,7 +845,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                     <svg viewBox="0 0 24 24" fill="currentColor" data-slot="icon" aria-hidden="true" class="mx-auto size-8 text-gray-300">
                                                                         <path d="M1.5 6a2.25 2.25 0 0 1 2.25-2.25h16.5A2.25 2.25 0 0 1 22.5 6v12a2.25 2.25 0 0 1-2.25 2.25H3.75A2.25 2.25 0 0 1 1.5 18V6ZM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0 0 21 18v-1.94l-2.69-2.689a1.5 1.5 0 0 0-2.12 0l-.88.879.97.97a.75.75 0 1 1-1.06 1.06l-5.16-5.159a1.5 1.5 0 0 0-2.12 0L3 16.061Zm10.125-7.81a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Z" clip-rule="evenodd" fill-rule="evenodd" />
                                                                     </svg>
-                                                                    <div class="mt-2 flex flex-col text-sm text-gray-600">
+                                                                    <div class="mt-2 flex flex-col text-lg text-gray-600">
                                                                         <span class="relative rounded-md bg-transparent font-semibold text-indigo-600 hover:text-indigo-500">Sauna-Bild hochladen</span>
                                                                         <input id="sauna-bild-<?php echo $plan['id']; ?>" name="sauna_bild" type="file" accept="image/*" class="sr-only" onchange="updateFileName('sauna', <?php echo $plan['id']; ?>)" />
                                                                         <!-- Dateiname-Anzeige -->
@@ -859,7 +859,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                         </div>
                                                                         <p class="pl-1 flex">oder ziehen und ablegen</p>
                                                                     </div>
-                                                                    <p class="text-xs text-gray-600">PNG, JPG, GIF bis zu 10MB</p>
+                                                                    <p class="text-sm font-semibold text-gray-900">PNG, JPG, GIF bis zu 10MB</p>
                                                                 </div>
                                                             </label>
                                                         </div>
@@ -872,7 +872,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                     <svg viewBox="0 0 24 24" fill="currentColor" data-slot="icon" aria-hidden="true" class="mx-auto size-8 text-gray-300">
                                                                         <path d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" clip-rule="evenodd" fill-rule="evenodd" />
                                                                     </svg>
-                                                                    <div class="mt-2 flex flex-col text-sm text-gray-600">
+                                                                    <div class="mt-2 flex flex-col text-lg text-gray-600">
                                                                         <span class="relative rounded-md bg-transparent font-semibold text-indigo-600 hover:text-indigo-500">Mitarbeiter-Bild hochladen</span>
                                                                         <input id="mitarbeiter-bild-<?php echo $plan['id']; ?>" name="mitarbeiter_bild" type="file" accept="image/*" class="sr-only" onchange="updateFileName('mitarbeiter', <?php echo $plan['id']; ?>)" />
                                                                         <!-- Dateiname-Anzeige -->
@@ -886,7 +886,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                         </div>
                                                                         <p class="pl-1 flex">oder ziehen und ablegen</p>
                                                                     </div>
-                                                                    <p class="text-xs text-gray-600">PNG, JPG, GIF bis zu 10MB</p>
+                                                                    <p class="text-sm font-semibold text-gray-900">PNG, JPG, GIF bis zu 10MB</p>
                                                                 </div>
                                                             </label>
                                                         </div>
@@ -898,7 +898,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     <div class="w-full bg-gray-200 rounded-full h-2">
                                                         <div class="bg-indigo-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
                                                     </div>
-                                                    <p class="text-xs text-gray-600 mt-1 text-center">Laedt...</p>
+                                                    <p class="text-sm font-semibold text-gray-900 mt-1 text-center">Laedt...</p>
                                                 </div>
 
                                                 <!-- Buttons -->
@@ -932,7 +932,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <svg viewBox="0 0 24 24" fill="currentColor" data-slot="icon" aria-hidden="true" class="mx-auto size-8 text-gray-300">
                                                     <path d="M1.5 6a2.25 2.25 0 0 1 2.25-2.25h16.5A2.25 2.25 0 0 1 22.5 6v12a2.25 2.25 0 0 1-2.25 2.25H3.75A2.25 2.25 0 0 1 1.5 18V6ZM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0 0 21 18v-1.94l-2.69-2.689a1.5 1.5 0 0 0-2.12 0l-.88.879.97.97a.75.75 0 1 1-1.06 1.06l-5.16-5.159a1.5 1.5 0 0 0-2.12 0L3 16.061Zm10.125-7.81a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Z" clip-rule="evenodd" fill-rule="evenodd" />
                                                 </svg>
-                                                <div class="mt-2 flex flex-col text-sm text-gray-600">
+                                                <div class="mt-2 flex flex-col text-lg text-gray-600">
                                                     <span class="relative rounded-md bg-transparent font-semibold text-indigo-600 hover:text-indigo-500">Hintergrundbild hochladen</span>
                                                     <input id="plan-bild-<?php echo $plan['id']; ?>" name="plan_bild" type="file" accept="image/*" class="sr-only" onchange="updateFileName('plan', <?php echo $plan['id']; ?>)" />
                                                     <div id="plan-filename-<?php echo $plan['id']; ?>" class="mt-2 text-xs text-green-600 font-medium hidden flex items-center justify-between">
@@ -945,7 +945,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     </div>
                                                     <p class="pl-1 flex">oder ziehen und ablegen</p>
                                                 </div>
-                                                <p class="text-xs text-gray-600">PNG, JPG, GIF bis zu 10MB</p>
+                                                <p class="text-sm font-semibold text-gray-900">PNG, JPG, GIF bis zu 10MB</p>
                                             </div>
                                         </label>
 
@@ -1030,7 +1030,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                             <svg viewBox="0 0 24 24" fill="currentColor" data-slot="icon" aria-hidden="true" class="mx-auto size-8 text-gray-300">
                                                                 <path d="M1.5 6a2.25 2.25 0 0 1 2.25-2.25h16.5A2.25 2.25 0 0 1 22.5 6v12a2.25 2.25 0 0 1-2.25 2.25H3.75A2.25 2.25 0 0 1 1.5 18V6ZM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0 0 21 18v-1.94l-2.69-2.689a1.5 1.5 0 0 0-2.12 0l-.88.879.97.97a.75.75 0 1 1-1.06 1.06l-5.16-5.159a1.5 1.5 0 0 0-2.12 0L3 16.061Zm10.125-7.81a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Z" clip-rule="evenodd" fill-rule="evenodd" />
                                                             </svg>
-                                                            <div class="mt-2 flex flex-col text-sm text-gray-600">
+                                                            <div class="mt-2 flex flex-col text-lg text-gray-600">
                                                                 <span class="relative rounded-md bg-transparent font-semibold text-indigo-600 hover:text-indigo-500">Werbung hochladen</span>
                                                                 <input id="plan-ad-file-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="file" accept="image/*,video/*" class="sr-only" onchange="updateAdFileName(<?php echo $plan['id']; ?>)" />
                                                                 <div id="plan-ad-filename-<?php echo $plan['id']; ?>" class="mt-2 text-xs text-green-600 font-medium hidden flex items-center justify-between">
@@ -1043,11 +1043,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                 </div>
                                                                 <p class="pl-1 flex">oder ziehen und ablegen</p>
                                                             </div>
-                                                            <p class="text-xs text-gray-600">PNG, JPG, GIF, MP4, WEBM, OGG bis zu 50MB</p>
+                                                            <p class="text-sm font-semibold text-gray-900">PNG, JPG, GIF, MP4, WEBM, OGG bis zu 50MB</p>
                                                         </div>
                                                     </label>
                                                     <?php if (!empty($plan['werbung_media'])): ?>
-                                                        <div id="plan-ad-file-info-<?php echo $plan['id']; ?>" class="text-xs text-gray-600">
+                                                        <div id="plan-ad-file-info-<?php echo $plan['id']; ?>" class="text-sm font-semibold text-gray-900">
                                                             Aktuelle Datei: <?php echo htmlspecialchars(basename($plan['werbung_media'])); ?>
                                                         </div>
                                                     <?php else: ?>
@@ -1099,7 +1099,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <!-- Übersicht aller gespeicherten Daten -->
         <div class="bg-white rounded-lg shadow-md mt-8">
             <div class="p-6">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">Datenbank-Übersicht</h2>
+                <h2 class="text-3xl font-bold text-gray-900 mb-6">Datenbank-Übersicht</h2>
 
                 <!-- Tabs für verschiedene Datenarten -->
                 <div class="mb-6">
@@ -1246,7 +1246,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                             <!-- Beschreibung (editierbar) -->
                                             <td class="px-6 py-4 whitespace-nowrap sauna-desc-cell">
-                                                <div class="display-mode text-sm text-gray-600 cursor-pointer hover:bg-purple-50 transition-colors duration-150 rounded px-2 py-1 group" onclick="toggleSaunaEdit(<?php echo $sauna['id']; ?>, 'beschreibung')">
+                                                <div class="display-mode text-lg text-gray-600 cursor-pointer hover:bg-purple-50 transition-colors duration-150 rounded px-2 py-1 group" onclick="toggleSaunaEdit(<?php echo $sauna['id']; ?>, 'beschreibung')">
                                                     <span><?php echo htmlspecialchars($sauna['beschreibung'] ?? 'Keine Beschreibung'); ?></span>
                                                     <svg class="inline-block w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150" fill="currentColor" viewBox="0 0 20 20">
                                                         <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
@@ -1335,7 +1335,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                             <!-- Beschreibung (editierbar) -->
                                             <td class="px-6 py-4 whitespace-nowrap duftmittel-desc-cell">
-                                                <div class="display-mode text-sm text-gray-600 cursor-pointer hover:bg-purple-50 transition-colors duration-150 rounded px-2 py-1 group" onclick="toggleDuftmittelEdit(<?php echo $dm['id']; ?>, 'beschreibung')">
+                                                <div class="display-mode text-lg text-gray-600 cursor-pointer hover:bg-purple-50 transition-colors duration-150 rounded px-2 py-1 group" onclick="toggleDuftmittelEdit(<?php echo $dm['id']; ?>, 'beschreibung')">
                                                     <span><?php echo htmlspecialchars($dm['beschreibung'] ?? 'Keine Beschreibung'); ?></span>
                                                     <svg class="inline-block w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150" fill="currentColor" viewBox="0 0 20 20">
                                                         <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
@@ -1488,7 +1488,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <svg viewBox="0 0 24 24" fill="currentColor" data-slot="icon" aria-hidden="true" class="mx-auto size-8 text-gray-300">
                                     <path d="M1.5 6a2.25 2.25 0 0 1 2.25-2.25h16.5A2.25 2.25 0 0 1 22.5 6v12a2.25 2.25 0 0 1-2.25 2.25H3.75A2.25 2.25 0 0 1 1.5 18V6ZM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0 0 21 18v-1.94l-2.69-2.689a1.5 1.5 0 0 0-2.12 0l-.88.879.97.97a.75.75 0 1 1-1.06 1.06l-5.16-5.159a1.5 1.5 0 0 0-2.12 0L3 16.061Zm10.125-7.81a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Z" clip-rule="evenodd" fill-rule="evenodd" />
                                 </svg>
-                                <div class="mt-2 flex flex-col text-sm text-gray-600">
+                                <div class="mt-2 flex flex-col text-lg text-gray-600">
                                     <label for="modalImageInput" class="relative cursor-pointer rounded-md bg-transparent font-semibold text-indigo-600 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-600 hover:text-indigo-500">
                                         <span>Bild auswaehlen</span>
                                         <input id="modalImageInput" name="bild" type="file" accept="image/*" class="sr-only" onchange="updateModalFileName()" />
@@ -1504,7 +1504,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     </div>
                                     <p class="pl-1 flex">oder ziehen und ablegen</p>
                                 </div>
-                                <p class="text-xs text-gray-600">PNG, JPG, GIF bis zu 10MB</p>
+                                <p class="text-sm font-semibold text-gray-900">PNG, JPG, GIF bis zu 10MB</p>
                             </div>
                         </div>
                     </div>
@@ -1514,7 +1514,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="w-full bg-gray-200 rounded-full h-2">
                             <div class="bg-indigo-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
                         </div>
-                        <p class="text-xs text-gray-600 mt-1 text-center">Laedt...</p>
+                        <p class="text-sm font-semibold text-gray-900 mt-1 text-center">Laedt...</p>
                     </div>
 
                     <!-- Buttons -->
@@ -2234,36 +2234,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 const name = parts[0] ? parts[0].trim() : 'Aufgieser';
                 const bild = parts[1] ? parts[1].trim() : '';
                 const img = bild
-                    ? `<img src="../uploads/${bild}" alt="${name}" class="w-full h-28 object-cover rounded-lg">`
-                    : `<div class="w-full h-28 rounded-lg bg-gray-100 flex items-center justify-center text-xs text-gray-500">Kein Bild</div>`;
-                return `<div class="flex flex-col gap-1 text-center"><div>${img}</div><div class="text-xs text-gray-600">${name}</div></div>`;
+                    ? `<img src="../uploads/${bild}" alt="${name}" class="w-full h-40 object-contain rounded-lg bg-gray-100">`
+                    : `<div class="w-full h-40 rounded-lg bg-gray-100 flex items-center justify-center text-xs text-gray-500">Kein Bild</div>`;
+                return `<div class="flex flex-col gap-2 text-center"><div>${img}</div><div class="text-sm font-semibold text-gray-900">${name}</div></div>`;
             });
 
             const mitarbeiterImg = aufgieserImages.length > 0
-                ? `<div class="grid grid-cols-2 gap-3">${aufgieserImages.join('')}</div>`
+                ? `<div class="flex flex-col gap-3">${aufgieserImages.join('')}</div>`
                 : (data.mitarbeiter_bild
-                    ? `<img src="../uploads/${data.mitarbeiter_bild}" alt="Aufgieser" class="w-full h-56 object-cover rounded-lg">`
-                    : `<div class="w-full h-56 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500">Kein Aufgieser-Bild</div>`);
+                    ? `<img src="../uploads/${data.mitarbeiter_bild}" alt="Aufgieser" class="w-full h-72 object-contain rounded-lg bg-gray-100">`
+                    : `<div class="w-full h-72 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500">Kein Aufgieser-Bild</div>`);
 
             const saunaImg = data.sauna_bild ?
-                `<img src="../uploads/${data.sauna_bild}" alt="Sauna" class="w-full h-56 object-cover rounded-lg">` :
-                `<div class="w-full h-56 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500">Kein Sauna-Bild</div>`;
+                `<img src="../uploads/${data.sauna_bild}" alt="Sauna" class="w-full h-72 object-contain rounded-lg bg-gray-100">` :
+                `<div class="w-full h-72 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500">Kein Sauna-Bild</div>`;
 
             return `
-                <div class="flex flex-col gap-4">
-                    <div class="flex flex-col gap-1">
-                        <div class="text-2xl font-bold text-gray-900">${aufgussName}</div>
-                        <div class="text-sm text-gray-600">${staerke}</div>
-                        <div class="text-sm text-gray-600">Aufgieser:<br>${aufgieser}</div>
-                        <div class="text-sm text-gray-600">Sauna: ${saunaName}</div>
-                        <div class="text-sm text-gray-600">Duftmittel: ${duftmittel}</div>
+                <div class="relative flex flex-col gap-4">
+                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div class="text-8xl font-bold text-gray-900 bg-white/80 border border-white/80 rounded-full px-10 py-4 shadow-lg" id="next-aufguss-countdown">--</div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>${mitarbeiterImg}</div>
-                        <div>${saunaImg}</div>
-                    </div>
-                    <div class="text-sm text-gray-600">
-                        Countdown: <span id="next-aufguss-countdown" class="font-semibold text-gray-900">--</span>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 min-h-[70vh]">
+                        <div class="flex flex-col gap-3">
+                            <div class="flex flex-col gap-1">
+                                <div class="text-3xl font-bold text-gray-900">${aufgussName}</div>
+                                <div class="text-lg text-gray-600">${staerke}</div>
+                                                                <div class="text-lg text-gray-600">Duftmittel: ${duftmittel}</div>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                ${saunaImg}
+                                <div class="text-sm font-semibold text-gray-900 text-center">${saunaName}</div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-3">
+                            ${mitarbeiterImg}
+                        </div>
                     </div>
                 </div>
             `;
