@@ -512,7 +512,7 @@ function renderPlanRow(aufguss) {
 
     return `
         <tr class="bg-white/35" data-aufguss-id="${escapeHtml(aufguss.id)}" data-start-ts="${startTs || ''}">
-            <td class="px-6 py-4 whitespace-normal break-words text-lg font-bold text-blue-600">${escapeHtml(timeText)}</td>
+            <td class="px-6 py-4 whitespace-normal break-words text-lg font-bold text-gray-900">${escapeHtml(timeText)}</td>
             <td class="px-6 py-4 whitespace-normal break-words text-sm font-medium text-gray-900">${escapeHtml(nameText)}</td>
             <td class="px-6 py-4 whitespace-nowrap">
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${staerke.bgClass} ${staerke.textClass}">
@@ -527,26 +527,55 @@ function renderPlanRow(aufguss) {
 }
 
 function renderPlanRowDiv(aufguss) {
-    const timeText = formatAufgussTime(aufguss);
+    const timeParts = formatAufgussTimeParts(aufguss);
     const nameText = aufguss.name || aufguss.aufguss_name || 'Aufguss';
     const staerke = formatStaerke(aufguss.staerke);
     const aufgiesserHtml = formatAufgiesserHtml(aufguss);
-    const saunaHtml = formatSaunaHtml(aufguss);
+    const saunaHtml = formatSaunaHtmlStacked(aufguss);
     const duftmittel = aufguss.duftmittel_name || aufguss.duftmittel || '-';
     const startTs = getAufgussStartTimestamp(aufguss);
+    const timeHtml = timeParts.end
+        ? `<div class="plan-list-time"><span>${escapeHtml(timeParts.start)}</span><span>${escapeHtml(timeParts.end)}</span></div>`
+        : `<div class="plan-list-time"><span>${escapeHtml(timeParts.start)}</span></div>`;
 
     return `
         <div class="plan-list-row" data-aufguss-id="${escapeHtml(aufguss.id)}" data-start-ts="${startTs || ''}">
-            <div class="plan-list-cell text-lg font-bold text-blue-600">${escapeHtml(timeText)}</div>
-            <div class="plan-list-cell text-sm font-medium text-gray-900">${escapeHtml(nameText)}</div>
+            <div class="plan-list-cell text-lg font-bold text-gray-900">${timeHtml}</div>
+            <div class="plan-list-cell text-sm font-bold text-gray-900">${escapeHtml(nameText)}</div>
             <div class="plan-list-cell">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${staerke.bgClass} ${staerke.textClass}">
+                <span class="plan-strength-badge inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${staerke.bgClass} ${staerke.textClass}">
                     ${escapeHtml(staerke.text)}
                 </span>
             </div>
-            <div class="plan-list-cell text-sm text-gray-900">${aufgiesserHtml}</div>
+            <div class="plan-list-cell text-sm text-gray-900"><div class="plan-list-people">${aufgiesserHtml}</div></div>
             <div class="plan-list-cell text-sm text-gray-900">${saunaHtml}</div>
             <div class="plan-list-cell text-sm text-gray-900">${escapeHtml(duftmittel)}</div>
+        </div>
+    `;
+}
+
+function formatAufgussTimeParts(aufguss) {
+    const start = aufguss.zeit_anfang || aufguss.zeit || '';
+    const end = aufguss.zeit_ende || '';
+    if (start && end) {
+        return { start: formatTime(start), end: formatTime(end) };
+    }
+    if (start) {
+        return { start: formatTime(start), end: '' };
+    }
+    return { start: '--:--', end: '' };
+}
+
+function formatSaunaHtmlStacked(aufguss) {
+    const name = aufguss.sauna_name || aufguss.sauna || '-';
+    const image = aufguss.sauna_bild || '';
+    if (!image) {
+        return `<div class="plan-media-stack"><span>${escapeHtml(name)}</span></div>`;
+    }
+    return `
+        <div class="plan-media-stack">
+            <img src="uploads/${image}" alt="${escapeHtml(name)}" class="h-12 w-12 rounded-full object-cover border border-gray-200">
+            <span class="text-sm font-bold text-gray-900">${escapeHtml(name)}</span>
         </div>
     `;
 }
@@ -640,7 +669,7 @@ function formatAufgiesserHtml(aufguss) {
             return `
                 <div class="flex flex-col items-center">
                     <img src="uploads/${person.image}" alt="${escapeHtml(name)}" class="h-10 w-10 rounded-full object-cover border border-gray-200">
-                    <div class="mt-2 text-sm font-medium text-gray-900 text-center">${escapeHtml(name)}</div>
+                    <div class="mt-2 text-sm font-bold text-gray-900 text-center">${escapeHtml(name)}</div>
                 </div>
             `;
         }
@@ -650,7 +679,7 @@ function formatAufgiesserHtml(aufguss) {
                 <div class="h-10 w-10 bg-gray-300 rounded-full flex items-center justify-center">
                     <span class="text-gray-700 font-semibold text-sm">${escapeHtml(initial)}</span>
                 </div>
-                <div class="mt-2 text-sm font-medium text-gray-900 text-center">${escapeHtml(name)}</div>
+                <div class="mt-2 text-sm font-bold text-gray-900 text-center">${escapeHtml(name)}</div>
             </div>
         `;
     });
@@ -693,7 +722,7 @@ function formatSaunaHtml(aufguss) {
     return `
         <div class="flex items-center gap-3">
             <img src="uploads/${image}" alt="${escapeHtml(name)}" class="h-10 w-10 rounded-full object-cover border border-gray-200">
-            <span class="text-sm font-medium text-gray-900">${escapeHtml(name)}</span>
+            <span class="text-sm font-bold text-gray-900">${escapeHtml(name)}</span>
         </div>
     `;
 }

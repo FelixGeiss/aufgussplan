@@ -65,7 +65,7 @@ require_once __DIR__ . '/../src/config/config.php';
     </style>
 </head>
 
-<body class="bg-gray-100">
+<body class="bg-gray-100 kiosk-view">
     <nav id="kiosk-admin-nav" class="kiosk-admin-nav bg-blue-600 text-white p-4">
         <div class="container mx-auto flex justify-between items-center">
             <h1 class="text-xl font-bold">Aufgussplan Admin</h1>

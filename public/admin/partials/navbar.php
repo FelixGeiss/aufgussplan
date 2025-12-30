@@ -3,6 +3,7 @@
         <h1 class="text-xl font-bold">Aufgussplan Admin</h1>
         <div>
             <a href="index.php" class="mr-4 hover:underline">Dashboard</a>
+            <a href="../index.php" class="mr-4 hover:underline">Anzeige</a>
             <a href="mitarbeiter.php" class="mr-4 hover:underline">Mitarbeiter</a>
             <a href="aufguesse.php" class="mr-4 hover:underline">Aufgüsse</a>
             <a href="mitarbeiter.php" class="mr-4 hover:underline">Statistiken</a>
