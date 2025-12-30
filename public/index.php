@@ -82,13 +82,14 @@ require_once __DIR__ . '/../src/config/config.php';
     </script>
 
     <!-- NAECHSTER AUFGUSS POPUP -->
-    <div id="next-aufguss-overlay" class="next-aufguss-overlay hidden">
-        <div class="next-aufguss-card">
-            <div class="next-aufguss-header">Naechster Aufguss</div>
-            <div id="next-aufguss-title" class="next-aufguss-title">--</div>
-            <div id="next-aufguss-time" class="next-aufguss-time">--:--</div>
-            <div id="next-aufguss-sauna" class="next-aufguss-sauna">--</div>
-            <div id="next-aufguss-countdown" class="next-aufguss-countdown">--</div>
+    <div id="next-aufguss-overlay" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-3xl mx-4">
+            <div class="flex items-center justify-between px-5 py-3 border-b">
+                <h3 class="text-lg font-semibold text-gray-900">Naechster Aufguss</h3>
+            </div>
+            <div id="next-aufguss-body" class="p-5">
+                <div class="text-sm text-gray-500">Laedt...</div>
+            </div>
         </div>
     </div>
 </body>

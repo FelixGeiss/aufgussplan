@@ -369,7 +369,7 @@ function renderPlanView(planId, plaene, aufguesse) {
                     <div class="plan-table-wrap">
                         ${tableHtml}
                     </div>
-                    <div id="plan-ad-wrap" class="plan-ad-wrap${adMediaPath ? '' : ' is-hidden'}">
+                    <div id="plan-ad-wrap" class="plan-ad-wrap is-fullscreen${adMediaPath ? '' : ' is-hidden'}">
                         <div id="plan-ad-media" class="plan-ad-media"></div>
                     </div>
                 </div>
@@ -835,6 +835,56 @@ function getNextAufgussSettings(planId) {
     };
 }
 
+function buildNextAufgussHtml(aufguss) {
+    const aufgussName = aufguss.name || aufguss.aufguss_name || 'Aufguss';
+    const staerkeText = aufguss.staerke ? `Staerke: ${aufguss.staerke}` : 'Staerke: -';
+    const saunaName = aufguss.sauna_name || aufguss.sauna || '-';
+    const duftmittel = aufguss.duftmittel_name || aufguss.duftmittel || '-';
+    const people = parseAufgiesserItems(aufguss);
+
+    const personCards = people.map(person => {
+        const name = person.name || 'Aufgiesser';
+        const img = person.image
+            ? `<img src="uploads/${person.image}" alt="${escapeHtml(name)}" class="w-full h-40 object-contain rounded-lg bg-gray-100">`
+            : `<div class="w-full h-40 rounded-lg bg-gray-100 flex items-center justify-center text-xs text-gray-500">Kein Bild</div>`;
+        return `<div class="flex flex-col gap-2 text-center"><div>${img}</div><div class="text-sm font-semibold text-gray-900">${escapeHtml(name)}</div></div>`;
+    });
+
+    const mitarbeiterImg = personCards.length > 0
+        ? `<div class="flex flex-col gap-3">${personCards.join('')}</div>`
+        : (aufguss.mitarbeiter_bild
+            ? `<img src="uploads/${aufguss.mitarbeiter_bild}" alt="Aufgiesser" class="w-full h-72 object-contain rounded-lg bg-gray-100">`
+            : `<div class="w-full h-72 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500">Kein Aufgiesser-Bild</div>`);
+
+    const saunaImg = aufguss.sauna_bild
+        ? `<img src="uploads/${aufguss.sauna_bild}" alt="${escapeHtml(saunaName)}" class="w-full h-72 object-contain rounded-lg bg-gray-100">`
+        : `<div class="w-full h-72 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500">Kein Sauna-Bild</div>`;
+
+    return `
+        <div class="relative flex flex-col gap-4">
+            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div class="text-8xl font-bold text-gray-900 bg-white/80 border border-white/80 rounded-full px-10 py-4 shadow-lg" id="next-aufguss-countdown">--</div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 min-h-[70vh]">
+                <div class="flex flex-col gap-3">
+                    <div class="flex flex-col gap-1">
+                        <div class="text-3xl font-bold text-gray-900">${escapeHtml(aufgussName)}</div>
+                        <div class="text-lg text-gray-600">${escapeHtml(staerkeText)}</div>
+                        <div class="text-lg text-gray-600">Duftmittel: ${escapeHtml(duftmittel)}</div>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        ${saunaImg}
+                        <div class="text-sm font-semibold text-gray-900 text-center">Sauna: ${escapeHtml(saunaName)}</div>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-3">
+                    ${mitarbeiterImg}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
 function showNextAufgussPopup(aufguss, startTs) {
     if (nextAufgussActive && nextAufgussActivePlanId !== String(selectedPlanId)) {
         return;
@@ -844,17 +894,9 @@ function showNextAufgussPopup(aufguss, startTs) {
     nextAufgussActivePlanId = String(selectedPlanId);
 
     const overlay = document.getElementById('next-aufguss-overlay');
-    const title = document.getElementById('next-aufguss-title');
-    const time = document.getElementById('next-aufguss-time');
-    const sauna = document.getElementById('next-aufguss-sauna');
-    const countdown = document.getElementById('next-aufguss-countdown');
-
-    if (!overlay || !title || !time || !sauna || !countdown) return;
-
-    const nameText = aufguss.name || aufguss.aufguss_name || 'Aufguss';
-    title.textContent = nameText;
-    time.textContent = formatAufgussTime(aufguss);
-    sauna.textContent = aufguss.sauna_name || aufguss.sauna || '--';
+    const body = document.getElementById('next-aufguss-body');
+    if (!overlay || !body) return;
+    body.innerHTML = buildNextAufgussHtml(aufguss);
 
     overlay.classList.remove('hidden');
     nextAufgussCountdownTarget = startTs;
