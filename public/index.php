@@ -41,10 +41,7 @@ require_once __DIR__ . '/../src/config/config.php';
 
 <body class="bg-gray-100">
     <!-- HAUPTCONTAINER -->
-    <div class="container mx-auto px-4 py-8">
-        <!-- SEITENTITEL -->
-        <h1 class="text-3xl font-bold text-center mb-8">Aufgussplan</h1>
-
+    <div class="w-full px-6 py-8">
         <!-- AUFGUSSPLAN-CONTAINER -->
         <!-- Hier wird der dynamische Inhalt über JavaScript geladen -->
         <div id="aufgussplan" class="bg-white rounded-lg shadow-md p-6">
@@ -56,5 +53,16 @@ require_once __DIR__ . '/../src/config/config.php';
     <!-- JAVASCRIPT -->
     <!-- Haupt-JavaScript für die öffentliche Anzeige -->
     <script src="assets/js/app.js"></script>
+
+    <!-- NAECHSTER AUFGUSS POPUP -->
+    <div id="next-aufguss-overlay" class="next-aufguss-overlay hidden">
+        <div class="next-aufguss-card">
+            <div class="next-aufguss-header">Naechster Aufguss</div>
+            <div id="next-aufguss-title" class="next-aufguss-title">--</div>
+            <div id="next-aufguss-time" class="next-aufguss-time">--:--</div>
+            <div id="next-aufguss-sauna" class="next-aufguss-sauna">--</div>
+            <div id="next-aufguss-countdown" class="next-aufguss-countdown">--</div>
+        </div>
+    </div>
 </body>
 </html>

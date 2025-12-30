@@ -249,6 +249,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
                             </div>
                             <div class="text-right">
+                                <button type="button"
+                                    class="plan-select-btn"
+                                    data-plan-select="<?php echo (int)$plan['id']; ?>">
+                                    Plan auswaehlen
+                                </button>
                                 <div class="text-sm text-gray-500">Erstellt am</div>
                                 <div class="text-sm font-medium text-gray-900">
                                     <?php echo date('d.m.Y', strtotime($plan['erstellt_am'])); ?>
@@ -2322,6 +2327,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             });
             updateNextAufgussControls(planId);
             updateNextAufgussRowHighlight();
+            notifyPublicPlanChange();
 
             if (!enabled) {
                 for (let i = nextAufgussQueue.length - 1; i >= 0; i -= 1) {
@@ -2522,6 +2528,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     removeAdFile(planId);
                 }
                 schedulePlanAd(planId);
+                notifyPublicPlanChange();
             } catch (error) {
                 alert('Netzwerkfehler beim Speichern der Werbung.');
             }
@@ -2565,6 +2572,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 getPlanAdSettings(planId);
                 updatePlanAdControls(planId);
                 schedulePlanAd(planId);
+                notifyPublicPlanChange();
             } catch (error) {
                 alert('Netzwerkfehler beim Loeschen der Werbung.');
             }
@@ -2785,6 +2793,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             });
 
+            initPlanSelectButtons();
             updateNextAufgussRowHighlight();
             setInterval(() => {
                 const rows = document.querySelectorAll('tr[data-aufguss-id]');
@@ -2815,6 +2824,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 updateNextAufgussRowHighlight();
             }, 1000);
         });
+
+        function initPlanSelectButtons() {
+            const buttons = document.querySelectorAll('[data-plan-select]');
+            if (!buttons.length) return;
+
+            const storageKey = 'aufgussplanSelectedPlan';
+            const stored = localStorage.getItem(storageKey);
+
+            const setActive = (planId) => {
+                buttons.forEach(button => {
+                    const isActive = button.getAttribute('data-plan-select') === String(planId);
+                    button.classList.toggle('is-active', isActive);
+                    button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+                });
+            };
+
+            if (stored) {
+                setActive(stored);
+            }
+
+            buttons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const planId = button.getAttribute('data-plan-select');
+                    if (!planId) return;
+                    setActive(planId);
+                    localStorage.setItem(storageKey, String(planId));
+                    notifyPublicPlanChange();
+                });
+            });
+        }
+
+        function notifyPublicPlanChange() {
+            localStorage.setItem('aufgussplanPlanChanged', String(Date.now()));
+        }
     </script>
 </body>
 
