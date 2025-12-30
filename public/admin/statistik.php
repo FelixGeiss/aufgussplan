@@ -284,14 +284,25 @@ foreach ($saunaRows as $row) {
 
 // Aufguesse nach Staerke
 $staerkeRows = $db->query(
-    "SELECT COALESCE(CAST(staerke AS CHAR), 'Ohne Staerke') AS label, COUNT(*) AS cnt
+    "SELECT staerke, COUNT(*) AS cnt
      FROM aufguesse
-     GROUP BY COALESCE(CAST(staerke AS CHAR), 'Ohne Staerke')
-     ORDER BY cnt DESC, label ASC"
+     GROUP BY staerke"
 )->fetchAll();
-$staerkeItems = [];
+$staerkeMap = [];
+$ohneStaerkeCount = 0;
 foreach ($staerkeRows as $row) {
-    $staerkeItems[] = ['label' => $row['label'], 'value' => (int)$row['cnt']];
+    if ($row['staerke'] === null) {
+        $ohneStaerkeCount = (int)$row['cnt'];
+        continue;
+    }
+    $staerkeMap[(int)$row['staerke']] = (int)$row['cnt'];
+}
+$staerkeItems = [];
+for ($s = 0; $s <= 6; $s++) {
+    $staerkeItems[] = ['label' => 'St ' . $s, 'value' => $staerkeMap[$s] ?? 0];
+}
+if ($ohneStaerkeCount > 0) {
+    $staerkeItems[] = ['label' => 'Ohne Staerke', 'value' => $ohneStaerkeCount];
 }
 
 $datasets = [
@@ -376,9 +387,11 @@ function renderDataAccordion($id, $title, array $items) {
     <div class="container mx-auto px-4 py-8">
         <h2 class="text-2xl font-bold mb-6">Statistiken</h2>
 
-        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-            <div class="flex flex-wrap items-center gap-4">
-                <span class="text-sm font-semibold text-gray-700">Zeitreihen anzeigen:</span>
+        <div class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-3">Zeitreihen (ein-/ausblenden)</h3>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex flex-wrap items-center gap-4">
+                    <span class="text-sm font-semibold text-gray-700">Zeitreihen anzeigen:</span>
                 <button type="button" class="plan-select-btn" data-toggle-target="chart-days" aria-pressed="true">
                     Tage
                 </button>
@@ -391,6 +404,7 @@ function renderDataAccordion($id, $title, array $items) {
                 <button type="button" class="plan-select-btn" data-toggle-target="chart-years" aria-pressed="true">
                     Jahre
                 </button>
+                </div>
             </div>
         </div>
 
@@ -425,6 +439,9 @@ function renderDataAccordion($id, $title, array $items) {
             </div>
         </div>
 
+        <div class="my-8 border-t border-gray-200"></div>
+
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Weitere Statistiken (immer sichtbar)</h3>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="bg-white rounded-lg shadow-md p-6">
                 <h3 class="text-lg font-semibold mb-4">Aufguesse nach Staerke</h3>
