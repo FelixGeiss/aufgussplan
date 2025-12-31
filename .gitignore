@@ -30,6 +30,9 @@ logs/*.log
 *.sqlite
 *.db
 
+# Datenbank-Ordner
+Datenbank/
+
 # Node.js (falls später verwendet)
 node_modules/
 npm-debug.log*

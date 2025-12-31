@@ -171,7 +171,7 @@ function testDatabaseConnection() {
 
         // AUFGÜSSE TABELLE
         echo "<h3>Aufgüsse-Tabelle:</h3>";
-        $aufguesse = $db->query("SELECT id, name FROM aufguesse LIMIT 3")->fetchAll();
+        $aufguesse = $db->query("SELECT id, name FROM aufguss_namen LIMIT 3")->fetchAll();
 
         if ($aufguesse) {
             echo "<p class='success'>✅ Aufguss-Daten gefunden:</p>";

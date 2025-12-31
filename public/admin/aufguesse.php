@@ -48,7 +48,7 @@ $plaene = $aufgussModel->getAllPlans();
 $mitarbeiter = $db->query("SELECT id, name, bild FROM mitarbeiter ORDER BY name")->fetchAll();
 $saunen = $db->query("SELECT id, name, bild, beschreibung FROM saunen ORDER BY name")->fetchAll();
 $duftmittel = $db->query("SELECT id, name, beschreibung FROM duftmittel ORDER BY name")->fetchAll();
-$aufguss_optionen = $db->query("SELECT id, name FROM aufguesse ORDER BY name")->fetchAll();
+$aufguss_optionen = $db->query("SELECT id, name FROM aufguss_namen ORDER BY name")->fetchAll();
 // #region agent log - hypothesis A: Check if aufguss_optionen is loaded correctly
 file_put_contents('c:\xampp\htdocs\aufgussplan\.cursor\debug.log', json_encode([
     'timestamp' => time() * 1000,
@@ -457,7 +457,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                             onchange="handleFieldSelect(<?php echo $aufguss['id']; ?>, 'aufguss')">
                                                                             <option value="">-- Aufguss wählen --</option>
                                                                             <?php foreach ($aufguss_optionen as $a): ?>
-                                                                                <option value="<?php echo $a['id']; ?>" <?php echo ($aufguss['id'] == $a['id']) ? 'selected' : ''; ?>>
+                                                                                <option value="<?php echo $a['id']; ?>" <?php echo ((int)($aufguss['aufguss_name_id'] ?? 0) === (int)$a['id']) ? 'selected' : ''; ?>>
                                                                                     <?php echo htmlspecialchars($a['name'] ?? ''); ?>
                                                                                 </option>
                                                                             <?php endforeach; ?>

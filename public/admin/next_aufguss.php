@@ -17,9 +17,8 @@ if ($id <= 0) {
 
 $sql = "SELECT
             a.id,
-            a.name,
+            an.name AS name,
             a.staerke,
-            a.aufgieser_name,
             aa_list.aufgieser_namen,
             aa_list.aufgieser_items,
             a.zeit_anfang,
@@ -38,6 +37,7 @@ $sql = "SELECT
             LEFT JOIN mitarbeiter m2 ON aa.mitarbeiter_id = m2.id
             GROUP BY aa.aufguss_id
         ) aa_list ON aa_list.aufguss_id = a.id
+        LEFT JOIN aufguss_namen an ON an.id = a.aufguss_name_id
         LEFT JOIN saunen s ON s.id = a.sauna_id
         LEFT JOIN duftmittel d ON d.id = a.duftmittel_id
         LEFT JOIN mitarbeiter m ON m.id = a.mitarbeiter_id
@@ -56,7 +56,7 @@ if (!$row) {
     exit;
 }
 
-$aufgieser = $row['aufgieser_namen'] ?: ($row['mitarbeiter_name'] ?: $row['aufgieser_name']);
+$aufgieser = $row['aufgieser_namen'] ?: ($row['mitarbeiter_name'] ?: null);
 
 echo json_encode([
     'success' => true,

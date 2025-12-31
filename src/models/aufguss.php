@@ -80,25 +80,24 @@ class Aufguss {
          * Die Bilder-Spalten wurden aus der aufguesse-Tabelle entfernt!
          */
         $sql = "INSERT INTO aufguesse
-                (name, datum, zeit, zeit_anfang, zeit_ende, duftmittel_id, sauna_id, aufgieser_name, mitarbeiter_id,
+                (aufguss_name_id, datum, zeit, zeit_anfang, zeit_ende, duftmittel_id, sauna_id, mitarbeiter_id,
                  staerke, plan_id)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         // Prepared Statement vorbereiten
         $stmt = $this->db->prepare($sql);
 
         // Abfrage ausführen mit den bereinigten Daten
         $success = $stmt->execute([
-            $data['aufguss_name'],           // Name des Aufgusses
+            $data['aufguss_name_id'],        // ID des Aufgussnamens (kann NULL sein)
             $data['datum'] ?? date('Y-m-d'),  // Datum (heute falls nicht angegeben)
             $data['zeit'] ?? date('H:i'),     // Uhrzeit (jetzt falls nicht angegeben) - für Abwärtskompatibilität
             $data['zeit_anfang'] ?? $data['zeit'] ?? date('H:i'), // Anfangsuhrzeit
             $data['zeit_ende'] ?? null,       // Enduhrzeit (kann NULL sein)
             $data['duftmittel_id'],           // ID des Duftmittels (kann NULL sein)
             $data['sauna_id'],                // ID der Sauna (kann NULL sein)
-            $data['aufgieser_name'],          // Name des Aufgießers (falls kein Mitarbeiter ausgewählt)
             $data['mitarbeiter_id'],          // ID des Mitarbeiters (kann NULL sein)
-            $data['staerke'],                 // Stärke (1-6)
+            $data['staerke'],                 // Staerke (1-6)
             $data['plan_id'] ?? null          // ID des Plans (kann NULL sein)
         ]);
 
@@ -166,23 +165,19 @@ class Aufguss {
         /**
          * AUFGUSS-NAME: Textfeld hat Vorrang vor Auswahl
          *
-         * Priorität:
+         * Prioritaet:
          * 1. Freitext-Eingabe (aufguss_name)
-         * 2. Auswahl aus vorhandenen Aufgüssen (aufguss_id)
+         * 2. Auswahl aus vorhandenen Namen (aufguss_id / select_aufguss_id)
          * 3. NULL (kein Name)
          */
+        $selectedAufgussId = $data['select_aufguss_id'] ?? ($data['aufguss_id'] ?? null);
         if (!empty($data['aufguss_name']) && $data['aufguss_name'] !== '') {
-            // Benutzer hat einen Namen eingetippt - diesen verwenden
-            $data['aufguss_name'] = $data['aufguss_name'];
-        } elseif (!empty($data['aufguss_id']) && $data['aufguss_id'] !== '') {
-            // Benutzer hat aus vorhandenen Aufgüssen ausgewählt
-            // Name aus Datenbank holen, oder Fallback verwenden
-            $data['aufguss_name'] = $this->getAufgussNameById($data['aufguss_id']) ?? 'Aufguss #' . $data['aufguss_id'];
+            $data['aufguss_name_id'] = $this->getOrCreateAufgussName($data['aufguss_name']);
+        } elseif (!empty($selectedAufgussId)) {
+            $data['aufguss_name_id'] = (int)$selectedAufgussId;
         } else {
-            // Keine Eingabe - NULL verwenden
-            $data['aufguss_name'] = null;
+            $data['aufguss_name_id'] = null;
         }
-
         /**
          * DUFTMITTEL: Automatische Erstellung neuer Einträge
          *
@@ -415,14 +410,34 @@ class Aufguss {
      */
     private function getAufgussNameById($id) {
         try {
-            $stmt = $this->db->prepare("SELECT name FROM aufguesse WHERE id = ?");
+            $stmt = $this->db->prepare("SELECT name FROM aufguss_namen WHERE id = ?");
             $stmt->execute([$id]);
             $result = $stmt->fetch();
             return $result ? $result['name'] : null;
         } catch (Exception $e) {
-            // Bei Datenbankfehlern: null zurückgeben (nicht abstürzen)
+            // Bei Datenbankfehlern: null zurueckgeben (nicht abstuerzen)
             return null;
         }
+    }
+
+    /**
+     * Aufguss-Namen finden oder neu erstellen
+     *
+     * @param string $name - Name des Aufgusses
+     * @return int - ID des Aufgussnamens
+     */
+    private function getOrCreateAufgussName($name) {
+        $stmt = $this->db->prepare("SELECT id FROM aufguss_namen WHERE name = ?");
+        $stmt->execute([$name]);
+        $existing = $stmt->fetch();
+
+        if ($existing) {
+            return $existing['id'];
+        }
+
+        $stmt = $this->db->prepare("INSERT INTO aufguss_namen (name) VALUES (?)");
+        $stmt->execute([$name]);
+        return $this->db->lastInsertId();
     }
 
     /**
@@ -573,6 +588,7 @@ class Aufguss {
      */
     public function getAll() {
         $sql = "SELECT a.*,
+                       an.name as name,
                        aa_list.aufgieser_namen,
                        aa_list.aufgieser_items,
                        m.name as mitarbeiter_name, m.bild as mitarbeiter_bild,
@@ -588,6 +604,7 @@ class Aufguss {
                     LEFT JOIN mitarbeiter m2 ON aa.mitarbeiter_id = m2.id
                     GROUP BY aa.aufguss_id
                 ) aa_list ON aa_list.aufguss_id = a.id
+                LEFT JOIN aufguss_namen an ON a.aufguss_name_id = an.id
                 LEFT JOIN mitarbeiter m ON a.mitarbeiter_id = m.id
                 LEFT JOIN saunen s ON a.sauna_id = s.id
                 LEFT JOIN duftmittel d ON a.duftmittel_id = d.id
@@ -695,6 +712,7 @@ class Aufguss {
         }
 
         $sql = "SELECT a.*,
+                       an.name as name,
                        aa_list.aufgieser_namen,
                        aa_list.aufgieser_items,
                        m.name as mitarbeiter_name, m.bild as mitarbeiter_bild,
@@ -710,6 +728,7 @@ class Aufguss {
                     LEFT JOIN mitarbeiter m2 ON aa.mitarbeiter_id = m2.id
                     GROUP BY aa.aufguss_id
                 ) aa_list ON aa_list.aufguss_id = a.id
+                LEFT JOIN aufguss_namen an ON a.aufguss_name_id = an.id
                 LEFT JOIN mitarbeiter m ON a.mitarbeiter_id = m.id
                 LEFT JOIN saunen s ON a.sauna_id = s.id
                 LEFT JOIN duftmittel d ON a.duftmittel_id = d.id

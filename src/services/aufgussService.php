@@ -150,14 +150,13 @@ class AufgussService {
 
             // Datenbank-Update durchführen
             $sql = "UPDATE aufguesse SET
-                        name = ?,
+                        aufguss_name_id = ?,
                         datum = ?,
                         zeit = ?,
                         zeit_anfang = ?,
                         zeit_ende = ?,
                         duftmittel_id = ?,
                         sauna_id = ?,
-                        aufgieser_name = ?,
                         mitarbeiter_id = ?,
                         staerke = ?,
                         plan_id = ?
@@ -165,14 +164,13 @@ class AufgussService {
 
             $stmt = $this->aufgussModel->db->prepare($sql);
             $success = $stmt->execute([
-                $data['aufguss_name'],
+                $data['aufguss_name_id'],
                 $data['datum'] ?? date('Y-m-d'),
                 $data['zeit'] ?? date('H:i'),
                 $data['zeit_anfang'] ?? null,
                 $data['zeit_ende'] ?? null,
                 $data['duftmittel_id'],
                 $data['sauna_id'],
-                $data['aufgieser_name'],
                 $data['mitarbeiter_id'],
                 $data['staerke'],
                 $data['plan_id'] ?? null,

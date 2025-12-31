@@ -93,7 +93,7 @@ $saunen = $db->query("SELECT id, name FROM saunen ORDER BY name")->fetchAll();
 $duftmittel = $db->query("SELECT id, name FROM duftmittel ORDER BY name")->fetchAll();
 
 // AUFGÜSSE für Dropdown laden (sortiert nach Name)
-$aufguesse = $db->query("SELECT id, name FROM aufguesse ORDER BY name")->fetchAll();
+$aufguesse = $db->query("SELECT id, name FROM aufguss_namen ORDER BY name")->fetchAll();
 
 // PLÄNE für Übersicht laden (neueste zuerst)
 $plaene = $db->query("SELECT id, name, beschreibung, erstellt_am FROM plaene ORDER BY erstellt_am DESC")->fetchAll();

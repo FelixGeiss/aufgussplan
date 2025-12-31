@@ -127,15 +127,15 @@ try {
             }
 
             if ($hasMulti || !empty($aufgieserNamesRaw)) {
-                $stmt = $db->prepare("UPDATE aufguesse SET mitarbeiter_id = NULL, aufgieser_name = NULL WHERE id = ?");
+                $stmt = $db->prepare("UPDATE aufguesse SET mitarbeiter_id = NULL WHERE id = ?");
                 $stmt->execute([$aufgussId]);
             } elseif (!empty($resolvedMitarbeiterId)) {
                 // Mitarbeiter zuweisen (vorhanden oder neu erstellt)
-                $stmt = $db->prepare("UPDATE aufguesse SET mitarbeiter_id = ?, aufgieser_name = NULL WHERE id = ?");
+                $stmt = $db->prepare("UPDATE aufguesse SET mitarbeiter_id = ? WHERE id = ?");
                 $stmt->execute([$resolvedMitarbeiterId, $aufgussId]);
             } else {
                 // Beide Felder sind leer - das ist erlaubt, setze beide auf NULL
-                $stmt = $db->prepare("UPDATE aufguesse SET mitarbeiter_id = NULL, aufgieser_name = NULL WHERE id = ?");
+                $stmt = $db->prepare("UPDATE aufguesse SET mitarbeiter_id = NULL WHERE id = ?");
                 $stmt->execute([$aufgussId]);
             }
 
@@ -254,10 +254,7 @@ try {
             // #endregion
 
             if (!empty($aufgussIdSelect)) {
-                // Vorhandenen Aufguss kopieren (Name übernehmen)
-                $stmt = $db->prepare("SELECT name FROM aufguesse WHERE id = ?");
-                $stmt->execute([$aufgussIdSelect]);
-                $existingAufguss = $stmt->fetch();
+                $selectedId = (int)$aufgussIdSelect;
 
                 // #region agent log - Debug select path
                 file_put_contents('c:\xampp\htdocs\aufgussplan\.cursor\debug.log', json_encode([
@@ -266,8 +263,7 @@ try {
                     'message' => 'Taking select path',
                     'data' => [
                         'aufgussIdSelect' => $aufgussIdSelect,
-                        'existingAufguss' => $existingAufguss,
-                        'sql' => "SELECT name FROM aufguesse WHERE id = $aufgussIdSelect"
+                        'sql' => "UPDATE aufguesse SET aufguss_name_id = $selectedId WHERE id = $aufgussId"
                     ],
                     'sessionId' => 'debug-session',
                     'runId' => 'unified-field-logic',
@@ -275,29 +271,35 @@ try {
                 ]) . "\n", FILE_APPEND);
                 // #endregion
 
-                if ($existingAufguss) {
-                    $stmt = $db->prepare("UPDATE aufguesse SET name = ? WHERE id = ?");
-                    $stmt->execute([$existingAufguss['name'], $aufgussId]);
+                $stmt = $db->prepare("UPDATE aufguesse SET aufguss_name_id = ? WHERE id = ?");
+                $stmt->execute([$selectedId, $aufgussId]);
 
-                    // #region agent log - Debug update executed
-                    file_put_contents('c:\xampp\htdocs\aufgussplan\.cursor\debug.log', json_encode([
-                        'timestamp' => time() * 1000,
-                        'location' => 'update_aufguss.php:update_executed',
-                        'message' => 'UPDATE executed for select path',
-                        'data' => [
-                            'sql' => "UPDATE aufguesse SET name = '{$existingAufguss['name']}' WHERE id = $aufgussId",
-                            'existing_name' => $existingAufguss['name']
-                        ],
-                        'sessionId' => 'debug-session',
-                        'runId' => 'unified-field-logic',
-                        'hypothesisId' => 'E'
-                    ]) . "\n", FILE_APPEND);
-                    // #endregion
-                }
+                // #region agent log - Debug update executed
+                file_put_contents('c:\xampp\htdocs\aufgussplan\.cursor\debug.log', json_encode([
+                    'timestamp' => time() * 1000,
+                    'location' => 'update_aufguss.php:update_executed',
+                    'message' => 'UPDATE executed for select path',
+                    'data' => [
+                        'sql' => "UPDATE aufguesse SET aufguss_name_id = $selectedId WHERE id = $aufgussId"
+                    ],
+                    'sessionId' => 'debug-session',
+                    'runId' => 'unified-field-logic',
+                    'hypothesisId' => 'E'
+                ]) . "\n", FILE_APPEND);
+                // #endregion
             } elseif (!empty($aufgussName)) {
-                // Neuen Namen setzen
-                $stmt = $db->prepare("UPDATE aufguesse SET name = ? WHERE id = ?");
-                $stmt->execute([$aufgussName, $aufgussId]);
+                $stmt = $db->prepare("SELECT id FROM aufguss_namen WHERE name = ?");
+                $stmt->execute([$aufgussName]);
+                $existing = $stmt->fetch();
+                if ($existing && !empty($existing['id'])) {
+                    $nameId = (int)$existing['id'];
+                } else {
+                    $stmt = $db->prepare("INSERT INTO aufguss_namen (name) VALUES (?)");
+                    $stmt->execute([$aufgussName]);
+                    $nameId = (int)$db->lastInsertId();
+                }
+                $stmt = $db->prepare("UPDATE aufguesse SET aufguss_name_id = ? WHERE id = ?");
+                $stmt->execute([$nameId, $aufgussId]);
 
                 // #region agent log - Debug input path
                 file_put_contents('c:\xampp\htdocs\aufgussplan\.cursor\debug.log', json_encode([
@@ -306,7 +308,7 @@ try {
                     'message' => 'Taking input path',
                     'data' => [
                         'aufgussName' => $aufgussName,
-                        'sql' => "UPDATE aufguesse SET name = '$aufgussName' WHERE id = $aufgussId"
+                        'sql' => "UPDATE aufguesse SET aufguss_name_id = $nameId WHERE id = $aufgussId"
                     ],
                     'sessionId' => 'debug-session',
                     'runId' => 'unified-field-logic',
@@ -314,8 +316,8 @@ try {
                 ]) . "\n", FILE_APPEND);
                 // #endregion
             } else {
-                // Feld ist leer - Standardwert setzen
-                $stmt = $db->prepare("UPDATE aufguesse SET name = 'Aufguss' WHERE id = ?");
+                // Feld ist leer - ID leeren
+                $stmt = $db->prepare("UPDATE aufguesse SET aufguss_name_id = NULL WHERE id = ?");
                 $stmt->execute([$aufgussId]);
 
                 // #region agent log - Debug default path
@@ -324,7 +326,7 @@ try {
                     'location' => 'update_aufguss.php:default_path',
                     'message' => 'Taking default path',
                     'data' => [
-                        'sql' => "UPDATE aufguesse SET name = 'Aufguss' WHERE id = $aufgussId"
+                        'sql' => "UPDATE aufguesse SET aufguss_name_id = NULL WHERE id = $aufgussId"
                     ],
                     'sessionId' => 'debug-session',
                     'runId' => 'unified-field-logic',

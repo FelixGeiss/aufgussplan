@@ -153,6 +153,61 @@ function renderAreaChart(array $items, $strokeClass, $fillClass) {
     ]);
 }
 
+function renderColumnChart(array $items, $barClass, array $options = []) {
+    $values = array_map(function ($item) {
+        return (int)$item['value'];
+    }, $items);
+
+    $maxValue = max(1, max($values));
+    $count = count($items);
+    $pointWidth = $options['pointWidth'] ?? 48;
+    $width = max(320, $count * $pointWidth);
+    $height = 170;
+    $paddingLeft = 22;
+    $paddingRight = 10;
+    $paddingTop = 12;
+    $paddingBottom = 26;
+    $plotWidth = $width - $paddingLeft - $paddingRight;
+    $plotHeight = $height - $paddingTop - $paddingBottom;
+    $gridLines = 4;
+    $slotWidth = $count > 0 ? ($plotWidth / $count) : $plotWidth;
+    $barWidth = min(28, $slotWidth * 0.6);
+    $palette = $options['palette'] ?? ['#475569', '#0EA5E9', '#F97316', '#F59E0B', '#EF4444', '#22C55E', '#8B5CF6', '#14B8A6'];
+
+    echo '<div class="w-full overflow-x-auto">';
+    echo '<svg viewBox="0 0 ' . $width . ' ' . $height . '" class="h-40" style="min-width:' . $width . 'px">';
+    for ($i = 0; $i <= $gridLines; $i++) {
+        $y = $paddingTop + ($plotHeight * $i / $gridLines);
+        $yPos = number_format($y, 2, '.', '');
+        echo '<line x1="' . $paddingLeft . '" y1="' . $yPos . '" x2="' . ($width - $paddingRight) . '" y2="' . $yPos . '" class="stroke-gray-200" stroke-width="1" />';
+    }
+    echo '<text x="2" y="' . ($paddingTop + 6) . '" class="fill-gray-400 text-[10px]">' . $maxValue . '</text>';
+    echo '<text x="2" y="' . ($paddingTop + $plotHeight + 4) . '" class="fill-gray-400 text-[10px]">0</text>';
+
+    foreach ($items as $index => $item) {
+        $value = (int)$item['value'];
+        $xCenter = $paddingLeft + ($slotWidth * $index) + ($slotWidth / 2);
+        $barX = $xCenter - ($barWidth / 2);
+        $barHeight = $plotHeight * ($value / $maxValue);
+        $barY = $paddingTop + ($plotHeight - $barHeight);
+        $xPos = number_format($barX, 2, '.', '');
+        $yPos = number_format($barY, 2, '.', '');
+        $hPos = number_format($barHeight, 2, '.', '');
+        $wPos = number_format($barWidth, 2, '.', '');
+        $label = htmlspecialchars($item['label']);
+        $color = $palette[$index % count($palette)];
+        echo '<rect x="' . $xPos . '" y="' . $yPos . '" width="' . $wPos . '" height="' . $hPos . '" class="' . $barClass . ' chart-bar" style="fill:' . $color . ';transition:opacity 0.15s ease;cursor:pointer;" data-label="' . $label . '" data-value="' . $value . '"></rect>';
+    }
+
+    echo '</svg>';
+    echo '<div class="mt-3 flex text-xs text-gray-500" style="min-width:' . $width . 'px">';
+    foreach ($items as $item) {
+        echo '<span class="flex-1 text-center truncate">' . htmlspecialchars($item['label']) . '</span>';
+    }
+    echo '</div>';
+    echo '</div>';
+}
+
 function mapCountsByKey(array $rows, $keyField, $valueField) {
     $map = [];
     foreach ($rows as $row) {
@@ -161,15 +216,50 @@ function mapCountsByKey(array $rows, $keyField, $valueField) {
     return $map;
 }
 
+function buildPlanFilter(array $selectedPlanIds) {
+    if (empty($selectedPlanIds)) {
+        return ['sql' => '', 'params' => []];
+    }
+    $placeholders = implode(',', array_fill(0, count($selectedPlanIds), '?'));
+    return ['sql' => 'a.plan_id IN (' . $placeholders . ')', 'params' => $selectedPlanIds];
+}
+
+$planRows = $db->query("SELECT id, name FROM plaene ORDER BY name ASC")->fetchAll();
+$allPlanIds = [];
+foreach ($planRows as $planRow) {
+    $allPlanIds[] = (int)$planRow['id'];
+}
+
+$selectedPlanIds = [];
+if (isset($_GET['plans']) && $_GET['plans'] !== '' && $_GET['plans'] !== 'all') {
+    $rawPlanIds = array_filter(array_map('trim', explode(',', $_GET['plans'])));
+    foreach ($rawPlanIds as $rawPlanId) {
+        if (ctype_digit($rawPlanId)) {
+            $selectedPlanIds[] = (int)$rawPlanId;
+        }
+    }
+    if (!empty($allPlanIds)) {
+        $selectedPlanIds = array_values(array_intersect($selectedPlanIds, $allPlanIds));
+    }
+}
+
+if (!empty($allPlanIds) && (!empty($selectedPlanIds) && count($selectedPlanIds) < count($allPlanIds))) {
+    $planFilter = buildPlanFilter($selectedPlanIds);
+} else {
+    $selectedPlanIds = [];
+    $planFilter = buildPlanFilter([]);
+}
+
 // Aufguesse pro Tag (letzte 7 Tage)
 $byDayRows = $db->prepare(
     "SELECT DATE(datum) AS label, COUNT(*) AS cnt
-     FROM aufguesse
-     WHERE datum >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+     FROM aufguesse a
+     WHERE a.datum >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)"
+     . ($planFilter['sql'] ? " AND " . $planFilter['sql'] : "") . "
      GROUP BY DATE(datum)
      ORDER BY label ASC"
 );
-$byDayRows->execute();
+$byDayRows->execute($planFilter['params']);
 $byDayMap = mapCountsByKey($byDayRows->fetchAll(), 'label', 'cnt');
 $dayLabels = [];
 $dayCounts = [];
@@ -187,12 +277,13 @@ $byDayItems = buildBarItems($dayLabels, $dayCounts);
 // Aufguesse pro Woche (letzte 8 Wochen)
 $byWeekRows = $db->prepare(
     "SELECT YEARWEEK(datum, 3) AS yw, COUNT(*) AS cnt
-     FROM aufguesse
-     WHERE datum >= DATE_SUB(CURDATE(), INTERVAL 7 WEEK)
+     FROM aufguesse a
+     WHERE a.datum >= DATE_SUB(CURDATE(), INTERVAL 7 WEEK)"
+     . ($planFilter['sql'] ? " AND " . $planFilter['sql'] : "") . "
      GROUP BY YEARWEEK(datum, 3)
      ORDER BY yw ASC"
 );
-$byWeekRows->execute();
+$byWeekRows->execute($planFilter['params']);
 $byWeekMap = mapCountsByKey($byWeekRows->fetchAll(), 'yw', 'cnt');
 $weekLabels = [];
 $weekCounts = [];
@@ -209,12 +300,13 @@ $byWeekItems = buildBarItems($weekLabels, $weekCounts);
 // Aufguesse pro Monat (letzte 12 Monate)
 $byMonthRows = $db->prepare(
     "SELECT DATE_FORMAT(datum, '%Y-%m') AS ym, COUNT(*) AS cnt
-     FROM aufguesse
-     WHERE datum >= DATE_SUB(CURDATE(), INTERVAL 11 MONTH)
+     FROM aufguesse a
+     WHERE a.datum >= DATE_SUB(CURDATE(), INTERVAL 11 MONTH)"
+     . ($planFilter['sql'] ? " AND " . $planFilter['sql'] : "") . "
      GROUP BY DATE_FORMAT(datum, '%Y-%m')
      ORDER BY ym ASC"
 );
-$byMonthRows->execute();
+$byMonthRows->execute($planFilter['params']);
 $byMonthMap = mapCountsByKey($byMonthRows->fetchAll(), 'ym', 'cnt');
 $monthLabels = [];
 $monthCounts = [];
@@ -231,11 +323,12 @@ $byMonthItems = buildBarItems($monthLabels, $monthCounts);
 // Aufguesse pro Jahr
 $byYearRows = $db->prepare(
     "SELECT YEAR(datum) AS y, COUNT(*) AS cnt
-     FROM aufguesse
+     FROM aufguesse a"
+     . ($planFilter['sql'] ? " WHERE " . $planFilter['sql'] : "") . "
      GROUP BY YEAR(datum)
      ORDER BY y ASC"
 );
-$byYearRows->execute();
+$byYearRows->execute($planFilter['params']);
 $yearLabels = [];
 $yearCounts = [];
 foreach ($byYearRows->fetchAll() as $row) {
@@ -245,49 +338,62 @@ foreach ($byYearRows->fetchAll() as $row) {
 $byYearItems = buildBarItems($yearLabels, $yearCounts);
 
 // Wie oft welcher Aufguss
-$aufgussNameRows = $db->query(
-    "SELECT COALESCE(name, 'Ohne Name') AS label, COUNT(*) AS cnt
-     FROM aufguesse
-     GROUP BY COALESCE(name, 'Ohne Name')
+$aufgussNameStmt = $db->prepare(
+    "SELECT COALESCE(an.name, 'Ohne Name') AS label, COUNT(*) AS cnt
+     FROM aufguesse a
+     LEFT JOIN aufguss_namen an ON a.aufguss_name_id = an.id"
+    . ($planFilter['sql'] ? " WHERE " . $planFilter['sql'] : "") . "
+     GROUP BY COALESCE(an.name, 'Ohne Name')
      ORDER BY cnt DESC, label ASC"
-)->fetchAll();
+);
+$aufgussNameStmt->execute($planFilter['params']);
+$aufgussNameRows = $aufgussNameStmt->fetchAll();
 $aufgussNameItems = [];
 foreach ($aufgussNameRows as $row) {
     $aufgussNameItems[] = ['label' => $row['label'], 'value' => (int)$row['cnt']];
 }
 
 // Wie oft ein Duftmittel verwendet wurde
-$duftmittelRows = $db->query(
+$duftmittelStmt = $db->prepare(
     "SELECT COALESCE(d.name, 'Ohne Duftmittel') AS label, COUNT(*) AS cnt
      FROM aufguesse a
      LEFT JOIN duftmittel d ON a.duftmittel_id = d.id
+     " . ($planFilter['sql'] ? "WHERE " . $planFilter['sql'] : "") . "
      GROUP BY COALESCE(d.name, 'Ohne Duftmittel')
      ORDER BY cnt DESC, label ASC"
-)->fetchAll();
+);
+$duftmittelStmt->execute($planFilter['params']);
+$duftmittelRows = $duftmittelStmt->fetchAll();
 $duftmittelItems = [];
 foreach ($duftmittelRows as $row) {
     $duftmittelItems[] = ['label' => $row['label'], 'value' => (int)$row['cnt']];
 }
 
 // Wie oft welche Sauna genutzt wurde
-$saunaRows = $db->query(
+$saunaStmt = $db->prepare(
     "SELECT COALESCE(s.name, 'Ohne Sauna') AS label, COUNT(*) AS cnt
      FROM aufguesse a
      LEFT JOIN saunen s ON a.sauna_id = s.id
+     " . ($planFilter['sql'] ? "WHERE " . $planFilter['sql'] : "") . "
      GROUP BY COALESCE(s.name, 'Ohne Sauna')
      ORDER BY cnt DESC, label ASC"
-)->fetchAll();
+);
+$saunaStmt->execute($planFilter['params']);
+$saunaRows = $saunaStmt->fetchAll();
 $saunaItems = [];
 foreach ($saunaRows as $row) {
     $saunaItems[] = ['label' => $row['label'], 'value' => (int)$row['cnt']];
 }
 
 // Aufguesse nach Staerke
-$staerkeRows = $db->query(
+$staerkeStmt = $db->prepare(
     "SELECT staerke, COUNT(*) AS cnt
-     FROM aufguesse
+     FROM aufguesse a"
+     . ($planFilter['sql'] ? " WHERE " . $planFilter['sql'] : "") . "
      GROUP BY staerke"
-)->fetchAll();
+);
+$staerkeStmt->execute($planFilter['params']);
+$staerkeRows = $staerkeStmt->fetchAll();
 $staerkeMap = [];
 $ohneStaerkeCount = 0;
 foreach ($staerkeRows as $row) {
@@ -441,12 +547,30 @@ function renderDataAccordion($id, $title, array $items) {
 
         <div class="my-8 border-t border-gray-200"></div>
 
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Weitere Statistiken (immer sichtbar)</h3>
+        <h3 id="more-stats" class="text-lg font-semibold text-gray-900 mb-4">Weitere Statistiken (immer sichtbar)</h3>
+        <?php if (!empty($planRows)) : ?>
+        <div class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-3">Plaene (ein-/ausblenden)</h3>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex flex-wrap items-center gap-4">
+                    <span class="text-sm font-semibold text-gray-700">Plaene anzeigen:</span>
+                    <?php foreach ($planRows as $planRow) :
+                        $planId = (int)$planRow['id'];
+                        $isActive = empty($selectedPlanIds) || in_array($planId, $selectedPlanIds, true);
+                    ?>
+                        <button type="button" class="plan-select-btn<?php echo $isActive ? ' is-active' : ''; ?>" data-plan-id="<?php echo $planId; ?>" aria-pressed="<?php echo $isActive ? 'true' : 'false'; ?>">
+                            <?php echo htmlspecialchars($planRow['name']); ?>
+                        </button>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="bg-white rounded-lg shadow-md p-6">
                 <h3 class="text-lg font-semibold mb-4">Aufguesse nach Staerke</h3>
                 <div class="max-h-96 overflow-y-auto pr-2">
-                    <?php renderAreaChart($staerkeItems, 'stroke-slate-600', 'fill-slate-200/70'); ?>
+                    <?php renderColumnChart($staerkeItems, 'fill-slate-500'); ?>
                 </div>
                 <div class="mt-4">
                     <?php renderDataAccordion('staerke', $datasets['staerke']['title'], $datasets['staerke']['items']); ?>
@@ -455,7 +579,7 @@ function renderDataAccordion($id, $title, array $items) {
             <div class="bg-white rounded-lg shadow-md p-6">
                 <h3 class="text-lg font-semibold mb-4">Wie oft welcher Aufguss</h3>
                 <div class="max-h-96 overflow-y-auto pr-2">
-                    <?php renderAreaChart($aufgussNameItems, 'stroke-orange-500', 'fill-orange-200/70'); ?>
+                    <?php renderColumnChart($aufgussNameItems, 'fill-orange-500'); ?>
                 </div>
                 <div class="mt-4">
                     <?php renderDataAccordion('aufguss', $datasets['aufguss']['title'], $datasets['aufguss']['items']); ?>
@@ -464,7 +588,7 @@ function renderDataAccordion($id, $title, array $items) {
             <div class="bg-white rounded-lg shadow-md p-6">
                 <h3 class="text-lg font-semibold mb-4">Wie oft Duftmittel verwendet</h3>
                 <div class="max-h-96 overflow-y-auto pr-2">
-                    <?php renderAreaChart($duftmittelItems, 'stroke-amber-500', 'fill-amber-200/70'); ?>
+                    <?php renderColumnChart($duftmittelItems, 'fill-amber-500'); ?>
                 </div>
                 <div class="mt-4">
                     <?php renderDataAccordion('duftmittel', $datasets['duftmittel']['title'], $datasets['duftmittel']['items']); ?>
@@ -473,7 +597,7 @@ function renderDataAccordion($id, $title, array $items) {
             <div class="bg-white rounded-lg shadow-md p-6">
                 <h3 class="text-lg font-semibold mb-4">Wie oft welche Sauna</h3>
                 <div class="max-h-96 overflow-y-auto pr-2">
-                    <?php renderAreaChart($saunaItems, 'stroke-rose-500', 'fill-rose-200/70'); ?>
+                    <?php renderColumnChart($saunaItems, 'fill-rose-500'); ?>
                 </div>
                 <div class="mt-4">
                     <?php renderDataAccordion('sauna', $datasets['sauna']['title'], $datasets['sauna']['items']); ?>
@@ -526,6 +650,47 @@ function renderDataAccordion($id, $title, array $items) {
                 point.addEventListener('mousemove', moveTooltip);
                 point.addEventListener('mouseleave', () => {
                     tooltip.classList.add('hidden');
+                });
+            });
+
+            document.querySelectorAll('.chart-bar').forEach((bar) => {
+                bar.addEventListener('mouseenter', (event) => {
+                    bar.style.opacity = '0.85';
+                    showTooltip(event, bar.dataset.label || '-', bar.dataset.value || '0');
+                });
+                bar.addEventListener('mousemove', moveTooltip);
+                bar.addEventListener('mouseleave', () => {
+                    bar.style.opacity = '1';
+                    tooltip.classList.add('hidden');
+                });
+            });
+        }
+
+        const planButtons = Array.from(document.querySelectorAll('[data-plan-id]'));
+        if (planButtons.length > 0) {
+            const syncPlans = () => {
+                const allIds = Array.from(planButtons).map((btn) => btn.getAttribute('data-plan-id'));
+                const selected = planButtons
+                    .filter((btn) => btn.getAttribute('aria-pressed') === 'true')
+                    .map((btn) => btn.getAttribute('data-plan-id'));
+                const params = new URLSearchParams(window.location.search);
+                if (selected.length === 0 || selected.length === allIds.length) {
+                    params.delete('plans');
+                } else {
+                    params.set('plans', selected.join(','));
+                }
+                const next = params.toString();
+                const base = window.location.pathname;
+                const target = next ? `${base}?${next}` : base;
+                window.location.href = `${target}#more-stats`;
+            };
+
+            planButtons.forEach((button) => {
+                button.addEventListener('click', () => {
+                    const isActive = button.getAttribute('aria-pressed') === 'true';
+                    button.setAttribute('aria-pressed', isActive ? 'false' : 'true');
+                    button.classList.toggle('is-active', !isActive);
+                    syncPlans();
                 });
             });
         }
