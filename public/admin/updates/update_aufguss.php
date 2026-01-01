@@ -21,17 +21,6 @@ try {
         throw new Exception('Nur POST-Requests erlaubt');
     }
 
-    // #region agent log - hypothesis D: Check what data is received on server
-    file_put_contents('c:\xampp\htdocs\aufgussplan\.cursor\debug.log', json_encode([
-        'timestamp' => time() * 1000,
-        'location' => 'update_aufguss.php:25',
-        'message' => 'Received POST data',
-        'data' => ['POST' => $_POST, 'field' => $_POST['field'] ?? 'not set'],
-        'sessionId' => 'debug-session',
-        'runId' => 'unified-field-logic',
-        'hypothesisId' => 'D'
-    ]) . "\n", FILE_APPEND);
-    // #endregion
 
     // Parameter validieren
     $aufgussId = $_POST['aufguss_id'] ?? null;
@@ -235,58 +224,14 @@ try {
             $aufgussName = trim($_POST['aufguss_name'] ?? '');
             $aufgussIdSelect = $_POST['select_aufguss_id'] ?? '';
 
-            // #region agent log - Debug aufguss logic
-            file_put_contents('c:\xampp\htdocs\aufgussplan\.cursor\debug.log', json_encode([
-                'timestamp' => time() * 1000,
-                'location' => 'update_aufguss.php:aufguss_case',
-                'message' => 'Processing aufguss case',
-                'data' => [
-                    'aufgussId' => $aufgussId,
-                    'aufgussName' => $aufgussName,
-                    'aufgussIdSelect' => $aufgussIdSelect,
-                    'aufgussName_empty' => empty($aufgussName),
-                    'aufgussIdSelect_empty' => empty($aufgussIdSelect)
-                ],
-                'sessionId' => 'debug-session',
-                'runId' => 'unified-field-logic',
-                'hypothesisId' => 'E'
-            ]) . "\n", FILE_APPEND);
-            // #endregion
 
             if (!empty($aufgussIdSelect)) {
                 $selectedId = (int)$aufgussIdSelect;
 
-                // #region agent log - Debug select path
-                file_put_contents('c:\xampp\htdocs\aufgussplan\.cursor\debug.log', json_encode([
-                    'timestamp' => time() * 1000,
-                    'location' => 'update_aufguss.php:select_path',
-                    'message' => 'Taking select path',
-                    'data' => [
-                        'aufgussIdSelect' => $aufgussIdSelect,
-                        'sql' => "UPDATE aufguesse SET aufguss_name_id = $selectedId WHERE id = $aufgussId"
-                    ],
-                    'sessionId' => 'debug-session',
-                    'runId' => 'unified-field-logic',
-                    'hypothesisId' => 'E'
-                ]) . "\n", FILE_APPEND);
-                // #endregion
 
                 $stmt = $db->prepare("UPDATE aufguesse SET aufguss_name_id = ? WHERE id = ?");
                 $stmt->execute([$selectedId, $aufgussId]);
 
-                // #region agent log - Debug update executed
-                file_put_contents('c:\xampp\htdocs\aufgussplan\.cursor\debug.log', json_encode([
-                    'timestamp' => time() * 1000,
-                    'location' => 'update_aufguss.php:update_executed',
-                    'message' => 'UPDATE executed for select path',
-                    'data' => [
-                        'sql' => "UPDATE aufguesse SET aufguss_name_id = $selectedId WHERE id = $aufgussId"
-                    ],
-                    'sessionId' => 'debug-session',
-                    'runId' => 'unified-field-logic',
-                    'hypothesisId' => 'E'
-                ]) . "\n", FILE_APPEND);
-                // #endregion
             } elseif (!empty($aufgussName)) {
                 $stmt = $db->prepare("SELECT id FROM aufguss_namen WHERE name = ?");
                 $stmt->execute([$aufgussName]);
@@ -301,38 +246,11 @@ try {
                 $stmt = $db->prepare("UPDATE aufguesse SET aufguss_name_id = ? WHERE id = ?");
                 $stmt->execute([$nameId, $aufgussId]);
 
-                // #region agent log - Debug input path
-                file_put_contents('c:\xampp\htdocs\aufgussplan\.cursor\debug.log', json_encode([
-                    'timestamp' => time() * 1000,
-                    'location' => 'update_aufguss.php:input_path',
-                    'message' => 'Taking input path',
-                    'data' => [
-                        'aufgussName' => $aufgussName,
-                        'sql' => "UPDATE aufguesse SET aufguss_name_id = $nameId WHERE id = $aufgussId"
-                    ],
-                    'sessionId' => 'debug-session',
-                    'runId' => 'unified-field-logic',
-                    'hypothesisId' => 'E'
-                ]) . "\n", FILE_APPEND);
-                // #endregion
             } else {
                 // Feld ist leer - ID leeren
                 $stmt = $db->prepare("UPDATE aufguesse SET aufguss_name_id = NULL WHERE id = ?");
                 $stmt->execute([$aufgussId]);
 
-                // #region agent log - Debug default path
-                file_put_contents('c:\xampp\htdocs\aufgussplan\.cursor\debug.log', json_encode([
-                    'timestamp' => time() * 1000,
-                    'location' => 'update_aufguss.php:default_path',
-                    'message' => 'Taking default path',
-                    'data' => [
-                        'sql' => "UPDATE aufguesse SET aufguss_name_id = NULL WHERE id = $aufgussId"
-                    ],
-                    'sessionId' => 'debug-session',
-                    'runId' => 'unified-field-logic',
-                    'hypothesisId' => 'E'
-                ]) . "\n", FILE_APPEND);
-                // #endregion
             }
             break;
 

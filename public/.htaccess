@@ -5,6 +5,10 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^api/(.*)$ api/$1.php [L]
 
+RewriteRule ^admin/delete-entry\.php$ admin/deletes/delete-entry.php [L]
+RewriteRule ^admin/delete_(.+)\.php$ admin/deletes/delete_$1.php [L]
+RewriteRule ^admin/update_(.+)\.php$ admin/updates/update_$1.php [L]
+
 RewriteCond %{REQUEST_URI} ^/admin/
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
