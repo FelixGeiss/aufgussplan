@@ -239,18 +239,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <!-- Meldungen anzeigen -->
         <?php if ($message): ?>
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-                <?php echo htmlspecialchars($message); ?>
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 flex items-start justify-between gap-4">
+                <div><?php echo htmlspecialchars($message); ?></div>
+                <button type="button" class="text-green-700 hover:text-green-900 font-bold leading-none" aria-label="Meldung schliessen" onclick="this.parentElement.remove()">
+                    &times;
+                </button>
             </div>
         <?php endif; ?>
 
         <?php if (!empty($errors)): ?>
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 flex items-start justify-between gap-4">
                 <ul>
                     <?php foreach ($errors as $error): ?>
                         <li><?php echo htmlspecialchars($error); ?></li>
                     <?php endforeach; ?>
                 </ul>
+                <button type="button" class="text-red-700 hover:text-red-900 font-bold leading-none" aria-label="Meldung schliessen" onclick="this.parentElement.remove()">
+                    &times;
+                </button>
             </div>
         <?php endif; ?>
 
