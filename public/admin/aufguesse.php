@@ -787,9 +787,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     <!-- Select für vorhandene Aufgüsse -->
                                                     <div class="mt-3">
                                                         <label for="aufguss-select-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-1 text-center">Oder vorhandenen Aufguss auswählen:</label>
-                                                        <select id="aufguss-select-<?php echo $plan['id']; ?>" name="aufguss_id" class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)">
+                                                        <select id="aufguss-select-<?php echo $plan['id']; ?>" name="select_aufguss_id" class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)">
                                                             <option class="border-2 border-solid text-center" style="border-color: var(--border-color)" value="">-- Aufguss auswählen --</option>
-                                                            <?php foreach ($aufgüsse as $a): ?>
+                                                            <?php foreach ($aufguss_optionen as $a): ?>
                                                                 <option class="text-center" value="<?php echo $a['id']; ?>">
                                                                     <?php echo htmlspecialchars($a['name'] ?? ''); ?>
                                                                 </option>
