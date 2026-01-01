@@ -79,9 +79,13 @@ $addUploadedFile = function ($bereich, $name, $datei, $typ, $extra = []) use (&$
 };
 
 foreach ($plaene as $plan) {
-    $addUploadedFile('Plan', $plan['name'] ?? '', $plan['hintergrund_bild'] ?? '', 'Hintergrundbild');
+    $addUploadedFile('Plan', $plan['name'] ?? '', $plan['hintergrund_bild'] ?? '', 'Hintergrundbild', [
+        'plan_id' => $plan['id'] ?? null
+    ]);
     $adType = ($plan['werbung_media_typ'] ?? '') === 'video' ? 'Werbung (Video)' : 'Werbung (Bild)';
-    $addUploadedFile('Plan', $plan['name'] ?? '', $plan['werbung_media'] ?? '', $adType);
+    $addUploadedFile('Plan', $plan['name'] ?? '', $plan['werbung_media'] ?? '', $adType, [
+        'plan_id' => $plan['id'] ?? null
+    ]);
 }
 
 foreach ($saunen as $sauna) {
@@ -92,7 +96,125 @@ foreach ($mitarbeiter as $mitarbeiterItem) {
     $addUploadedFile('Mitarbeiter', $mitarbeiterItem['name'] ?? '', $mitarbeiterItem['bild'] ?? '', 'Mitarbeiter-Bild');
 }
 
-// Formular-Verarbeitung für neue Aufgüsse
+// Dateien fuer Tabs filtern
+$werbungFiles = array_values(array_filter($uploadedFiles, function ($file) {
+    $typ = $file['typ'] ?? '';
+    if (is_array($typ)) {
+        $typ = implode(' ', $typ);
+    }
+    return stripos((string)$typ, 'Werbung') !== false;
+}));
+$hintergrundFiles = array_values(array_filter($uploadedFiles, function ($file) {
+    $typ = $file['typ'] ?? '';
+    if (is_array($typ)) {
+        $typ = implode(' ', $typ);
+    }
+    return stripos((string)$typ, 'Hintergrund') !== false;
+}));
+
+// Dateien aus Upload-Ordnern einsammeln (auch wenn sie nicht in der DB stehen)
+$uploadBaseDir = rtrim(UPLOAD_PATH, '/\\') . DIRECTORY_SEPARATOR;
+$werbungUploadDir = $uploadBaseDir . 'werbung' . DIRECTORY_SEPARATOR;
+$planUploadDir = $uploadBaseDir . 'plan' . DIRECTORY_SEPARATOR;
+$werbungUploadFiles = [];
+if (is_dir($werbungUploadDir)) {
+    foreach (scandir($werbungUploadDir) as $entry) {
+        if ($entry === '.' || $entry === '..') {
+            continue;
+        }
+        $fullPath = $werbungUploadDir . $entry;
+        if (!is_file($fullPath)) {
+            continue;
+        }
+        $werbungUploadFiles[] = 'werbung/' . $entry;
+    }
+}
+$planUploadFiles = [];
+if (is_dir($planUploadDir)) {
+    foreach (scandir($planUploadDir) as $entry) {
+        if ($entry === '.' || $entry === '..') {
+            continue;
+        }
+        $fullPath = $planUploadDir . $entry;
+        if (!is_file($fullPath)) {
+            continue;
+        }
+        $planUploadFiles[] = 'plan/' . $entry;
+    }
+}
+
+// Auswahl-Optionen fuer vorhandene Dateien
+$werbungOptions = [];
+$werbungSeen = [];
+$werbungSource = array_unique(array_merge(
+    $werbungUploadFiles,
+    array_map(function ($file) {
+        return (string)($file['datei'] ?? '');
+    }, $werbungFiles)
+));
+foreach ($werbungSource as $path) {
+    $path = trim((string)$path);
+    if ($path === '' || isset($werbungSeen[$path])) {
+        continue;
+    }
+    $werbungSeen[$path] = true;
+    $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+    $mediaType = in_array($ext, ['mp4', 'webm', 'ogg'], true) ? 'video' : 'image';
+    $label = basename($path);
+    $werbungOptions[] = ['path' => $path, 'type' => $mediaType, 'label' => $label];
+}
+
+$hintergrundOptions = [];
+$hintergrundSeen = [];
+$hintergrundSource = array_unique(array_merge(
+    $planUploadFiles,
+    array_map(function ($file) {
+        return (string)($file['datei'] ?? '');
+    }, $hintergrundFiles)
+));
+foreach ($hintergrundSource as $path) {
+    $path = trim($path);
+    if ($path === '' || isset($hintergrundSeen[$path])) {
+        continue;
+    }
+    $hintergrundSeen[$path] = true;
+    $label = basename($path);
+    $hintergrundOptions[] = ['path' => $path, 'label' => $label];
+}
+
+// Werbung-Dateien fuer die Datenbank-Ansicht (nur Upload-Ordner)
+$werbungTabFiles = [];
+foreach ($werbungUploadFiles as $path) {
+    $path = trim((string)$path);
+    if ($path === '') {
+        continue;
+    }
+    $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+    $typ = in_array($ext, ['mp4', 'webm', 'ogg'], true) ? 'Werbung (Video)' : 'Werbung (Bild)';
+    $werbungTabFiles[] = [
+        'bereich' => 'Plan',
+        'name' => 'Datei',
+        'datei' => $path,
+        'typ' => $typ,
+        'plan_id' => null
+    ];
+}
+
+// Hintergrund-Dateien fuer die Datenbank-Ansicht (nur Upload-Ordner)
+$hintergrundTabFiles = [];
+foreach ($planUploadFiles as $path) {
+    $path = trim((string)$path);
+    if ($path === '') {
+        continue;
+    }
+    $hintergrundTabFiles[] = [
+        'bereich' => 'Plan',
+        'name' => 'Datei',
+        'datei' => $path,
+        'typ' => 'Hintergrundbild',
+        'plan_id' => null
+    ];
+}
 $message = '';
 $errors = [];
 
@@ -1004,6 +1126,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <?php endif; ?>
                                     </div>
 
+                                    <div class="space-y-2">
+                                        <label for="plan-background-select-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700">Vorhandenes Hintergrundbild auswaehlen</label>
+                                        <select id="plan-background-select-<?php echo $plan['id']; ?>" class="block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" onchange="selectPlanBackground(<?php echo $plan['id']; ?>)">
+                                            <option value="">-- Hintergrundbild waehlen --</option>
+                                            <?php foreach ($hintergrundOptions as $option): ?>
+                                                <option value="<?php echo htmlspecialchars($option['path']); ?>" <?php echo ($plan['hintergrund_bild'] ?? '') === $option['path'] ? 'selected' : ''; ?>>
+                                                    <?php echo htmlspecialchars($option['label']); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
                                     <div class="mt-4 space-y-3">
                                         <label for="plan-bild-<?php echo $plan['id']; ?>" class="upload-area flex flex-col items-center rounded-lg border border-dashed border-gray-900/25 px-6 py-6 transition cursor-pointer">
                                             <div class="text-center pointer-events-none">
@@ -1102,6 +1235,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     <?php endif; ?>
                                                 </div>
 
+                                                <div class="space-y-2">
+                                                    <label for="plan-ad-select-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700">Vorhandene Werbung auswaehlen</label>
+                                                    <select id="plan-ad-select-<?php echo $plan['id']; ?>" class="block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" onchange="selectPlanAdMedia(<?php echo $plan['id']; ?>)">
+                                                        <option value="">-- Werbung waehlen --</option>
+                                                        <?php foreach ($werbungOptions as $option): ?>
+                                                            <option value="<?php echo htmlspecialchars($option['path']); ?>" data-type="<?php echo htmlspecialchars($option['type']); ?>" <?php echo ($plan['werbung_media'] ?? '') === $option['path'] ? 'selected' : ''; ?>>
+                                                                <?php echo htmlspecialchars($option['label']); ?>
+                                                            </option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                </div>
                                                 <div class="space-y-3">
                                                     <label for="plan-ad-file-<?php echo $plan['id']; ?>" class="upload-area flex flex-col items-center rounded-lg border border-dashed border-gray-900/25 px-6 py-6 transition cursor-pointer">
                                                         <div class="text-center pointer-events-none">
@@ -1195,8 +1339,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <button onclick="showTab('mitarbeiter')" id="tab-mitarbeiter" class="tab-button whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
                                 Mitarbeiter (<?php echo count($mitarbeiter); ?>)
                             </button>
-                            <button onclick="showTab('dateien')" id="tab-dateien" class="tab-button whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
-                                Dateien (<?php echo count($uploadedFiles); ?>)
+                            <button onclick="showTab('werbung')" id="tab-werbung" class="tab-button whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                                Werbung (<?php echo count($werbungTabFiles); ?>)
+                            </button>
+                            <button onclick="showTab('hintergrund')" id="tab-hintergrund" class="tab-button whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                                Hintergrund (<?php echo count($hintergrundTabFiles); ?>)
                             </button>
                         </nav>
                     </div>
@@ -1540,8 +1687,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                 </div>
 
-                <!-- Dateien Tab -->
-                <div id="content-dateien" class="tab-content hidden">
+                <!-- Werbung Tab -->
+                <div id="content-werbung" class="tab-content hidden">
                     <div class="overflow-x-auto">
                         <table class="min-w-full bg-transparent border border-gray-200 rounded-lg">
                             <thead class="bg-white/5">
@@ -1561,17 +1708,98 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
                                         Name
                                     </th>
+                                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+                                        Aktionen
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody class="bg-transparent divide-y divide-gray-200">
-                                <?php if (empty($uploadedFiles)): ?>
+                                <?php if (empty($werbungTabFiles)): ?>
                                     <tr>
-                                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">
-                                            Keine Dateien in der Datenbank gefunden.
+                                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                                            Keine Werbung in der Datenbank gefunden.
                                         </td>
                                     </tr>
                                 <?php else: ?>
-                                    <?php foreach ($uploadedFiles as $file): ?>
+                                    <?php foreach ($werbungTabFiles as $file): ?>
+                                        <tr class="bg-white/5">
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <?php
+                                                $isVideo = stripos($file['typ'], 'video') !== false;
+                                                $fileRelPath = $file['datei'] ?? '';
+                                                $filePath = '../uploads/' . $fileRelPath;
+                                                ?>
+                                                <?php if ($isVideo): ?>
+                                                    <video src="<?php echo htmlspecialchars($filePath); ?>" class="h-12 w-20 object-cover rounded border border-gray-200" muted></video>
+                                                <?php else: ?>
+                                                    <img src="<?php echo htmlspecialchars($filePath); ?>" alt="Datei" class="h-12 w-12 object-cover rounded border border-gray-200">
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <?php echo htmlspecialchars(basename($file['datei'])); ?>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <?php echo htmlspecialchars($file['typ']); ?>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <?php echo htmlspecialchars($file['bereich']); ?>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <?php echo htmlspecialchars($file['name']); ?>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                                <button type="button"
+                                                    onclick="deleteUploadFile('werbung', <?php echo htmlspecialchars(json_encode($fileRelPath), ENT_QUOTES, 'UTF-8'); ?>)"
+                                                    class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition-colors duration-150"
+                                                    title="Datei loeschen">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Hintergrund Tab -->
+                <div id="content-hintergrund" class="tab-content hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-transparent border border-gray-200 rounded-lg">
+                            <thead class="bg-white/5">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
+                                        Vorschau
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
+                                        Datei
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
+                                        Typ
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
+                                        Bereich
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
+                                        Name
+                                    </th>
+                                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+                                        Aktionen
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-transparent divide-y divide-gray-200">
+                                <?php if (empty($hintergrundTabFiles)): ?>
+                                    <tr>
+                                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                                            Keine Hintergrundbilder in der Datenbank gefunden.
+                                        </td>
+                                    </tr>
+                                <?php else: ?>
+                                    <?php foreach ($hintergrundTabFiles as $file): ?>
                                         <tr class="bg-white/5">
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <?php
@@ -1595,6 +1823,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                 <?php echo htmlspecialchars($file['name']); ?>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                                <button type="button"
+                                                    onclick="deleteUploadFile('plan', <?php echo htmlspecialchars(json_encode($fileRelPath), ENT_QUOTES, 'UTF-8'); ?>)"
+                                                    class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition-colors duration-150"
+                                                    title="Datei loeschen">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                </button>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -2066,6 +2304,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             document.getElementById('modalLoadingBar').classList.add('hidden');
             document.getElementById('modalSubmitBtn').disabled = false;
             document.getElementById('modalSubmitBtn').textContent = 'Hochladen';
+        }
+
+        async function deleteUploadFile(type, path) {
+            if (!confirm('Datei wirklich loeschen?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('delete_upload_file.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        type,
+                        path
+                    })
+                });
+                const result = await response.json();
+                if (!result.success) {
+                    alert(result.error || 'Fehler beim Loeschen der Datei.');
+                    return;
+                }
+                location.reload();
+            } catch (error) {
+                alert('Netzwerkfehler beim Loeschen der Datei.');
+            }
         }
 
         async function deletePlanBackgroundImage(planId, planName) {
@@ -2669,6 +2934,69 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 schedulePlanAd(planId);
                 notifyPublicPlanChange();
+            } catch (error) {
+                alert('Netzwerkfehler beim Speichern der Werbung.');
+            }
+        }
+
+        async function selectPlanBackground(planId) {
+            const select = document.getElementById(`plan-background-select-${planId}`);
+            if (!select) return;
+            const backgroundPath = select.value;
+
+            try {
+                const response = await fetch('update_plan_background.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        plan_id: planId,
+                        background_path: backgroundPath
+                    })
+                });
+                const result = await response.json();
+                if (!result.success) {
+                    alert(result.error || 'Fehler beim Speichern des Hintergrundbilds.');
+                    return;
+                }
+                location.reload();
+            } catch (error) {
+                alert('Netzwerkfehler beim Speichern des Hintergrundbilds.');
+            }
+        }
+
+        async function selectPlanAdMedia(planId) {
+            const select = document.getElementById(`plan-ad-select-${planId}`);
+            if (!select) return;
+            const option = select.options[select.selectedIndex];
+            const mediaPath = select.value;
+            const mediaType = option ? option.getAttribute('data-type') : '';
+
+            if (!mediaPath) {
+                return;
+            }
+
+            try {
+                const response = await fetch('update_plan_ad_select.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        plan_id: planId,
+                        media_path: mediaPath,
+                        media_type: mediaType
+                    })
+                });
+                const result = await response.json();
+                if (!result.success) {
+                    alert(result.error || 'Fehler beim Speichern der Werbung.');
+                    return;
+                }
+                if (result.data && result.data.media_path) {
+                    setPlanAdMediaFromServer(planId, result.data.media_path, result.data.media_type, result.data.media_name);
+                }
             } catch (error) {
                 alert('Netzwerkfehler beim Speichern der Werbung.');
             }
