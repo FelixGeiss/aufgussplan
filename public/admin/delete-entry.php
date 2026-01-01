@@ -43,10 +43,21 @@ $success = false;
 try {
     switch ($type) {
         case 'aufguss':
-            // Aufgüsse können direkt gelöscht werden (keine Abhängigkeiten zu prüfen)
-            $stmt = $db->prepare("DELETE FROM aufguesse WHERE id = ?");
+            // Pruefen, ob der Aufgussname in Aufguessen verwendet wird
+            $stmt = $db->prepare("SELECT COUNT(*) as count FROM aufguesse WHERE aufguss_name_id = ?");
             $stmt->execute([$id]);
-            $_SESSION['delete_message'] = 'Aufguss erfolgreich gelöscht.';
+            $usage = $stmt->fetch();
+
+            if ($usage['count'] > 0) {
+                $_SESSION['delete_error'] = 'Aufgussname kann nicht geloescht werden, da er noch in Aufguessen verwendet wird.';
+                header('Location: aufguesse.php');
+                exit;
+            }
+
+            // Aufgussname loeschen
+            $stmt = $db->prepare("DELETE FROM aufguss_namen WHERE id = ?");
+            $stmt->execute([$id]);
+            $_SESSION['delete_message'] = 'Aufgussname erfolgreich geloescht.';
             break;
 
         case 'sauna':

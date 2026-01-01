@@ -48,7 +48,7 @@ $plaene = $aufgussModel->getAllPlans();
 $mitarbeiter = $db->query("SELECT id, name, bild FROM mitarbeiter ORDER BY name")->fetchAll();
 $saunen = $db->query("SELECT id, name, bild, beschreibung, temperatur FROM saunen ORDER BY name")->fetchAll();
 $duftmittel = $db->query("SELECT id, name, beschreibung FROM duftmittel ORDER BY name")->fetchAll();
-$aufguss_optionen = $db->query("SELECT id, name FROM aufguss_namen ORDER BY name")->fetchAll();
+$aufguss_optionen = $db->query("SELECT id, name, beschreibung FROM aufguss_namen ORDER BY name")->fetchAll();
 // #region agent log - hypothesis A: Check if aufguss_optionen is loaded correctly
 file_put_contents('c:\xampp\htdocs\aufgussplan\.cursor\debug.log', json_encode([
     'timestamp' => time() * 1000,
@@ -262,6 +262,72 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'beschreibung' => $planBeschreibung !== '' ? $planBeschreibung : null
                 ]);
                 $message = 'Plan erfolgreich erstellt!';
+                header('Location: ' . $_SERVER['REQUEST_URI']);
+                exit;
+            } catch (Exception $e) {
+                $errors[] = 'Datenbankfehler: ' . $e->getMessage();
+            }
+        }
+    } elseif (!empty($_POST['form_type']) && $_POST['form_type'] === 'create_sauna') {
+        $saunaName = trim($_POST['sauna_name'] ?? '');
+        $saunaBeschreibung = trim($_POST['sauna_beschreibung'] ?? '');
+        $saunaTemperaturRaw = trim($_POST['sauna_temperatur'] ?? '');
+        $saunaTemperatur = null;
+
+        if ($saunaName === '') {
+            $errors[] = 'Bitte einen Saunanamen eingeben.';
+        } elseif ($saunaTemperaturRaw !== '' && !is_numeric($saunaTemperaturRaw)) {
+            $errors[] = 'Temperatur muss eine Zahl sein.';
+        } else {
+            if ($saunaTemperaturRaw !== '') {
+                $saunaTemperatur = max(0, (int)$saunaTemperaturRaw);
+            }
+            try {
+                $stmt = $db->prepare("INSERT INTO saunen (name, beschreibung, temperatur) VALUES (?, ?, ?)");
+                $stmt->execute([
+                    $saunaName,
+                    $saunaBeschreibung !== '' ? $saunaBeschreibung : null,
+                    $saunaTemperatur
+                ]);
+                $message = 'Sauna erfolgreich erstellt!';
+                header('Location: ' . $_SERVER['REQUEST_URI']);
+                exit;
+            } catch (Exception $e) {
+                $errors[] = 'Datenbankfehler: ' . $e->getMessage();
+            }
+        }
+    } elseif (!empty($_POST['form_type']) && $_POST['form_type'] === 'create_aufguss_name') {
+        $aufgussName = trim($_POST['aufguss_name'] ?? '');
+        $aufgussBeschreibung = trim($_POST['aufguss_beschreibung'] ?? '');
+        if ($aufgussName === '') {
+            $errors[] = 'Bitte einen Aufgussnamen eingeben.';
+        } else {
+            try {
+                $stmt = $db->prepare("INSERT INTO aufguss_namen (name, beschreibung) VALUES (?, ?)");
+                $stmt->execute([
+                    $aufgussName,
+                    $aufgussBeschreibung !== '' ? $aufgussBeschreibung : null
+                ]);
+                $message = 'Aufgussname erfolgreich erstellt!';
+                header('Location: ' . $_SERVER['REQUEST_URI']);
+                exit;
+            } catch (Exception $e) {
+                $errors[] = 'Datenbankfehler: ' . $e->getMessage();
+            }
+        }
+    } elseif (!empty($_POST['form_type']) && $_POST['form_type'] === 'create_duftmittel') {
+        $duftName = trim($_POST['duftmittel_name'] ?? '');
+        $duftBeschreibung = trim($_POST['duftmittel_beschreibung'] ?? '');
+        if ($duftName === '') {
+            $errors[] = 'Bitte einen Duftmittel-Namen eingeben.';
+        } else {
+            try {
+                $stmt = $db->prepare("INSERT INTO duftmittel (name, beschreibung) VALUES (?, ?)");
+                $stmt->execute([
+                    $duftName,
+                    $duftBeschreibung !== '' ? $duftBeschreibung : null
+                ]);
+                $message = 'Duftmittel erfolgreich erstellt!';
                 header('Location: ' . $_SERVER['REQUEST_URI']);
                 exit;
             } catch (Exception $e) {
@@ -1337,7 +1403,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="border-b border-gray-200">
                         <nav class="-mb-px flex space-x-8" aria-label="Tabs">
                             <button onclick="showTab('aufguesse')" id="tab-aufguesse" class="tab-button whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm border-indigo-500 text-indigo-600">
-                                Aufgüsse (<?php echo count($aufgüsse); ?>)
+                                Aufgüsse (<?php echo count($aufguss_optionen); ?>)
                             </button>
                             <button onclick="showTab('saunen')" id="tab-saunen" class="tab-button whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
                                 Saunen (<?php echo count($saunen); ?>)
@@ -1360,6 +1426,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <!-- Aufgüsse Tab -->
                 <div id="content-aufguesse" class="tab-content">
+                    <div class="bg-white/70 border border-gray-200 rounded-lg p-4 mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Neuen Aufgussnamen anlegen</h3>
+                        <form method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+                            <input type="hidden" name="form_type" value="create_aufguss_name">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Aufgussname</label>
+                                <input type="text" name="aufguss_name" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900" placeholder="z.B. Citrus-Explosion" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Beschreibung</label>
+                                <input type="text" name="aufguss_beschreibung" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900" placeholder="optional">
+                            </div>
+                            <div class="md:col-span-2 flex justify-end">
+                                <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded text-sm font-semibold hover:bg-indigo-500">Aufguss speichern</button>
+                            </div>
+                        </form>
+                    </div>
                     <div class="overflow-x-auto">
                         <table class="min-w-full bg-transparent border border-gray-200 rounded-lg">
                             <thead class="bg-white/5">
@@ -1370,26 +1453,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
                                         Name
                                     </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
+                                        Beschreibung
+                                    </th>
                                     <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
                                         Aktionen
                                     </th>
                                 </tr>
                             </thead>
                             <tbody class="bg-transparent divide-y divide-gray-200">
-                                <?php if (empty($aufgüsse)): ?>
+                                <?php if (empty($aufguss_optionen)): ?>
                                     <tr>
-                                        <td colspan="3" class="px-6 py-4 text-center text-gray-500">
-                                            Keine Aufgüsse in der Datenbank gefunden.
+                                        <td colspan="4" class="px-6 py-4 text-center text-gray-500">
+                                            Keine Aufguesse in der Datenbank gefunden.
                                         </td>
                                     </tr>
                                 <?php else: ?>
-                                    <?php foreach ($aufgüsse as $aufguss): ?>
-                                        <tr class="bg-white/5">
+                                    <?php foreach ($aufguss_optionen as $aufguss): ?>
+                                        <tr class="bg-white/5" data-aufguss-name-id="<?php echo $aufguss['id']; ?>">
                                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                                 <?php echo htmlspecialchars($aufguss['id']); ?>
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                <?php echo htmlspecialchars($aufguss['name'] ?? ''); ?>
+                                            <td class="px-6 py-4 whitespace-nowrap aufguss-name-cell">
+                                                <div class="display-mode text-sm font-medium text-gray-900 cursor-pointer hover:bg-blue-50 hover:text-blue-700 transition-colors duration-150 rounded px-2 py-1 group" onclick="toggleAufgussNameEdit(<?php echo $aufguss['id']; ?>, 'name')">
+                                                    <span><?php echo htmlspecialchars($aufguss['name'] ?? ''); ?></span>
+                                                    <svg class="inline-block w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                                                    </svg>
+                                                </div>
+                                                <div class="edit-mode hidden flex flex-col gap-2">
+                                                    <input type="text" name="aufguss_name" value="<?php echo htmlspecialchars($aufguss['name'] ?? ''); ?>"
+                                                        class="rounded px-2 py-1 text-sm border border-gray-300">
+                                                    <div class="flex items-center gap-2 mt-2">
+                                                        <button onclick="saveAufgussNameEdit(<?php echo $aufguss['id']; ?>, 'name')" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">✓ Speichern</button>
+                                                        <button onclick="cancelAufgussNameEdit(<?php echo $aufguss['id']; ?>, 'name')" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">✕ Abbrechen</button>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap aufguss-desc-cell">
+                                                <div class="display-mode text-lg text-gray-600 cursor-pointer hover:bg-purple-50 transition-colors duration-150 rounded px-2 py-1 group" onclick="toggleAufgussNameEdit(<?php echo $aufguss['id']; ?>, 'beschreibung')">
+                                                    <span><?php echo htmlspecialchars($aufguss['beschreibung'] ?? 'Keine Beschreibung'); ?></span>
+                                                    <svg class="inline-block w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                                                    </svg>
+                                                </div>
+                                                <div class="edit-mode hidden flex flex-col gap-2">
+                                                    <textarea name="aufguss_beschreibung" rows="2"
+                                                        class="rounded px-2 py-1 text-sm border border-gray-300"><?php echo htmlspecialchars($aufguss['beschreibung'] ?? ''); ?></textarea>
+                                                    <div class="flex items-center gap-2 mt-2">
+                                                        <button onclick="saveAufgussNameEdit(<?php echo $aufguss['id']; ?>, 'beschreibung')" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">✓ Speichern</button>
+                                                        <button onclick="cancelAufgussNameEdit(<?php echo $aufguss['id']; ?>, 'beschreibung')" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">✕ Abbrechen</button>
+                                                    </div>
+                                                </div>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                                 <button onclick="deleteDatenbankEintrag('aufguss', <?php echo $aufguss['id']; ?>, '<?php echo htmlspecialchars($aufguss['name'] ?? ''); ?>')"
@@ -1410,6 +1525,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <!-- Saunen Tab -->
                 <div id="content-saunen" class="tab-content hidden">
+                    <div class="bg-white/70 border border-gray-200 rounded-lg p-4 mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Neue Sauna anlegen</h3>
+                        <form method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                            <input type="hidden" name="form_type" value="create_sauna">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                                <input type="text" name="sauna_name" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900" placeholder="z.B. Finnische Sauna" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Beschreibung</label>
+                                <input type="text" name="sauna_beschreibung" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900" placeholder="optional">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Temperatur (°C)</label>
+                                <input type="number" name="sauna_temperatur" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900" placeholder="z.B. 90" min="0" step="1">
+                            </div>
+                            <div class="md:col-span-3 flex justify-end">
+                                <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded text-sm font-semibold hover:bg-indigo-500">Sauna speichern</button>
+                            </div>
+                        </form>
+                    </div>
                     <div class="overflow-x-auto">
                         <table class="min-w-full bg-transparent border border-gray-200 rounded-lg">
                             <thead class="bg-white/5">
@@ -1503,12 +1639,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             </td>
 
                                             <!-- Temperatur -->
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                <?php if ($sauna['temperatur'] !== null && $sauna['temperatur'] !== ''): ?>
-                                                    <?php echo (int)$sauna['temperatur']; ?>C
-                                                <?php else: ?>
-                                                    -
-                                                <?php endif; ?>
+                                            <td class="px-6 py-4 whitespace-nowrap sauna-temp-cell">
+                                                <div class="display-mode text-sm font-medium text-gray-900 cursor-pointer hover:bg-blue-50 hover:text-blue-700 transition-colors duration-150 rounded px-2 py-1 group" onclick="toggleSaunaEdit(<?php echo $sauna['id']; ?>, 'temperatur')">
+                                                    <span>
+                                                        <?php if ($sauna['temperatur'] !== null && $sauna['temperatur'] !== ''): ?>
+                                                            <?php echo (int)$sauna['temperatur']; ?>&deg;C
+                                                        <?php else: ?>
+                                                            -
+                                                        <?php endif; ?>
+                                                    </span>
+                                                    <svg class="inline-block w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                                                    </svg>
+                                                </div>
+                                                <div class="edit-mode hidden flex flex-col gap-2">
+                                                    <input type="number" name="sauna_temperatur" value="<?php echo htmlspecialchars($sauna['temperatur'] ?? ''); ?>"
+                                                        class="rounded px-2 py-1 text-sm border border-gray-300" min="0" step="1" placeholder="z.B. 90">
+                                                    <div class="flex items-center gap-2 mt-2">
+                                                        <button onclick="saveSaunaEdit(<?php echo $sauna['id']; ?>, 'temperatur')" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">✓ Speichern</button>
+                                                        <button onclick="cancelSaunaEdit(<?php echo $sauna['id']; ?>, 'temperatur')" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">✕ Abbrechen</button>
+                                                    </div>
+                                                </div>
                                             </td>
 
                                             <!-- Aktionen -->
@@ -1531,6 +1682,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <!-- Duftmittel Tab -->
                 <div id="content-duftmittel" class="tab-content hidden">
+                    <div class="bg-white/70 border border-gray-200 rounded-lg p-4 mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Neues Duftmittel anlegen</h3>
+                        <form method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+                            <input type="hidden" name="form_type" value="create_duftmittel">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                                <input type="text" name="duftmittel_name" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900" placeholder="z.B. Eukalyptus" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Beschreibung</label>
+                                <input type="text" name="duftmittel_beschreibung" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900" placeholder="optional">
+                            </div>
+                            <div class="md:col-span-2 flex justify-end">
+                                <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded text-sm font-semibold hover:bg-indigo-500">Duftmittel speichern</button>
+                            </div>
+                        </form>
+                    </div>
                     <div class="overflow-x-auto">
                         <table class="min-w-full bg-transparent border border-gray-200 rounded-lg">
                             <thead class="bg-white/5">
@@ -2137,8 +2305,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Inline-Editing für Saunen
         function toggleSaunaEdit(saunaId, field) {
             const row = document.querySelector(`[data-sauna-id="${saunaId}"]`);
-            const displayMode = row.querySelector(`.sauna-${field === 'beschreibung' ? 'desc' : 'name'}-cell .display-mode`);
-            const editMode = row.querySelector(`.sauna-${field === 'beschreibung' ? 'desc' : 'name'}-cell .edit-mode`);
+            const fieldMap = {
+                name: 'name',
+                beschreibung: 'desc',
+                temperatur: 'temp'
+            };
+            const key = fieldMap[field] || 'name';
+            const displayMode = row.querySelector(`.sauna-${key}-cell .display-mode`);
+            const editMode = row.querySelector(`.sauna-${key}-cell .edit-mode`);
 
             displayMode.classList.add('hidden');
             editMode.classList.remove('hidden');
@@ -2146,8 +2320,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         function cancelSaunaEdit(saunaId, field) {
             const row = document.querySelector(`[data-sauna-id="${saunaId}"]`);
-            const displayMode = row.querySelector(`.sauna-${field === 'beschreibung' ? 'desc' : 'name'}-cell .display-mode`);
-            const editMode = row.querySelector(`.sauna-${field === 'beschreibung' ? 'desc' : 'name'}-cell .edit-mode`);
+            const fieldMap = {
+                name: 'name',
+                beschreibung: 'desc',
+                temperatur: 'temp'
+            };
+            const key = fieldMap[field] || 'name';
+            const displayMode = row.querySelector(`.sauna-${key}-cell .display-mode`);
+            const editMode = row.querySelector(`.sauna-${key}-cell .edit-mode`);
 
             editMode.classList.add('hidden');
             displayMode.classList.remove('hidden');
@@ -2155,7 +2335,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         async function saveSaunaEdit(saunaId, field) {
             const row = document.querySelector(`[data-sauna-id="${saunaId}"]`);
-            const editMode = row.querySelector(`.sauna-${field === 'beschreibung' ? 'desc' : 'name'}-cell .edit-mode`);
+            const fieldMap = {
+                name: 'name',
+                beschreibung: 'desc',
+                temperatur: 'temp'
+            };
+            const key = fieldMap[field] || 'name';
+            const editMode = row.querySelector(`.sauna-${key}-cell .edit-mode`);
             const input = editMode.querySelector(field === 'beschreibung' ? 'textarea' : 'input');
             const newValue = input.value;
 
@@ -2176,8 +2362,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if (result.success) {
                     // Erfolg - Display-Modus aktualisieren
-                    const displayMode = row.querySelector(`.sauna-${field === 'beschreibung' ? 'desc' : 'name'}-cell .display-mode span`);
-                    displayMode.textContent = field === 'beschreibung' && (!newValue || newValue.trim() === '') ? 'Keine Beschreibung' : newValue;
+                    const displayMode = row.querySelector(`.sauna-${key}-cell .display-mode span`);
+                    if (field === 'beschreibung') {
+                        displayMode.textContent = (!newValue || newValue.trim() === '') ? 'Keine Beschreibung' : newValue;
+                    } else if (field === 'temperatur') {
+                        displayMode.textContent = (!newValue || newValue.trim() === '') ? '-' : `${parseInt(newValue, 10)}°C`;
+                    } else {
+                        displayMode.textContent = newValue;
+                    }
 
                     cancelSaunaEdit(saunaId, field);
                 } else {
@@ -2235,6 +2427,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     displayMode.textContent = newValue;
 
                     cancelMitarbeiterEdit(mitarbeiterId, field);
+                } else {
+                    alert('Fehler beim Speichern: ' + (result.error || 'Unbekannter Fehler'));
+                }
+            } catch (error) {
+                alert('Netzwerkfehler beim Speichern');
+                console.error('Save error:', error);
+            }
+        }
+
+        // Inline-Editing fuer Aufgussnamen
+        function toggleAufgussNameEdit(aufgussId, field) {
+            const row = document.querySelector(`[data-aufguss-name-id="${aufgussId}"]`);
+            const displayMode = row.querySelector(`.aufguss-${field === 'beschreibung' ? 'desc' : 'name'}-cell .display-mode`);
+            const editMode = row.querySelector(`.aufguss-${field === 'beschreibung' ? 'desc' : 'name'}-cell .edit-mode`);
+
+            displayMode.classList.add('hidden');
+            editMode.classList.remove('hidden');
+        }
+
+        function cancelAufgussNameEdit(aufgussId, field) {
+            const row = document.querySelector(`[data-aufguss-name-id="${aufgussId}"]`);
+            const displayMode = row.querySelector(`.aufguss-${field === 'beschreibung' ? 'desc' : 'name'}-cell .display-mode`);
+            const editMode = row.querySelector(`.aufguss-${field === 'beschreibung' ? 'desc' : 'name'}-cell .edit-mode`);
+
+            editMode.classList.add('hidden');
+            displayMode.classList.remove('hidden');
+        }
+
+        async function saveAufgussNameEdit(aufgussId, field) {
+            const row = document.querySelector(`[data-aufguss-name-id="${aufgussId}"]`);
+            const editMode = row.querySelector(`.aufguss-${field === 'beschreibung' ? 'desc' : 'name'}-cell .edit-mode`);
+            const input = editMode.querySelector(field === 'beschreibung' ? 'textarea' : 'input');
+            const newValue = input.value;
+
+            try {
+                const response = await fetch('update_aufguss_name.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        id: aufgussId,
+                        field: field,
+                        value: newValue
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    const displayMode = row.querySelector(`.aufguss-${field === 'beschreibung' ? 'desc' : 'name'}-cell .display-mode span`);
+                    displayMode.textContent = field === 'beschreibung' && (!newValue || newValue.trim() === '') ? 'Keine Beschreibung' : newValue;
+
+                    cancelAufgussNameEdit(aufgussId, field);
                 } else {
                     alert('Fehler beim Speichern: ' + (result.error || 'Unbekannter Fehler'));
                 }

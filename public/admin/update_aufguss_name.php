@@ -1,9 +1,9 @@
 <?php
 /**
- * Sauna-Update-Script für Inline-Editing
+ * Aufgussnamen-Update-Script fuer Inline-Editing
  */
 
-// Session für Sicherheit starten
+// Session fuer Sicherheit starten
 session_start();
 
 // Konfiguration laden
@@ -27,12 +27,12 @@ try {
         throw new Exception('Invalid input data');
     }
 
-    $saunaId = (int)$input['id'];
+    $aufgussId = (int)$input['id'];
     $field = $input['field'];
     $value = trim($input['value']);
 
     // Validierung
-    if (!in_array($field, ['name', 'beschreibung', 'temperatur'])) {
+    if (!in_array($field, ['name', 'beschreibung'])) {
         throw new Exception('Invalid field');
     }
 
@@ -40,21 +40,10 @@ try {
         throw new Exception('Name darf nicht leer sein');
     }
 
-    $valueToSave = $value;
-    if ($field === 'temperatur') {
-        if ($value === '') {
-            $valueToSave = null;
-        } elseif (is_numeric($value)) {
-            $valueToSave = (int)$value;
-        } else {
-            throw new Exception('Temperatur muss eine Zahl sein');
-        }
-    }
-
-    // Update durchführen
-    $sql = "UPDATE saunen SET {$field} = ? WHERE id = ?";
+    // Update durchfuehren
+    $sql = "UPDATE aufguss_namen SET {$field} = ? WHERE id = ?";
     $stmt = $db->prepare($sql);
-    $success = $stmt->execute([$valueToSave, $saunaId]);
+    $success = $stmt->execute([$value, $aufgussId]);
 
     if ($success) {
         echo json_encode(['success' => true]);
@@ -63,7 +52,7 @@ try {
     }
 
 } catch (Exception $e) {
-    error_log('Sauna update error: ' . $e->getMessage());
+    error_log('Aufgussnamen update error: ' . $e->getMessage());
     echo json_encode([
         'success' => false,
         'error' => $e->getMessage()
