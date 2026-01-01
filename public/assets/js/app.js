@@ -960,9 +960,18 @@ function updateNextAufgussIndicators() {
 
     let nextRow = null;
     let nextStart = null;
+    const dayMs = 24 * 60 * 60 * 1000;
     rows.forEach(row => {
-        const startTs = Number(row.getAttribute('data-start-ts') || 0);
-        if (!startTs || startTs <= now) return;
+        let startTs = Number(row.getAttribute('data-start-ts') || 0);
+        if (!startTs) {
+            const aufgussId = row.getAttribute('data-aufguss-id');
+            const aufguss = aufgussId ? aufgussById.get(String(aufgussId)) : null;
+            startTs = aufguss ? (getAufgussStartTimestamp(aufguss) || 0) : 0;
+        }
+        if (!startTs) return;
+        if (startTs <= now) {
+            startTs += dayMs;
+        }
         if (nextStart === null || startTs < nextStart) {
             nextStart = startTs;
             nextRow = row;
@@ -981,7 +990,9 @@ function updateNextAufgussIndicators() {
     const leadMs = Math.max(1, settings.leadSeconds) * 1000;
     if (nextStart - now <= leadMs && nextStart - now > 0) {
         const aufgussId = nextRow.getAttribute('data-aufguss-id');
-        const key = `${selectedPlanId}:${aufgussId}`;
+        const nextDate = new Date(nextStart);
+        const dayKey = `${nextDate.getFullYear()}-${String(nextDate.getMonth() + 1).padStart(2, '0')}-${String(nextDate.getDate()).padStart(2, '0')}`;
+        const key = `${selectedPlanId}:${aufgussId}:${dayKey}`;
         if (!nextAufgussShown.has(key)) {
             const aufguss = aufgussById.get(String(aufgussId));
             if (aufguss) {
@@ -1029,6 +1040,8 @@ function buildNextAufgussHtml(aufguss) {
     const aufgussName = aufguss.name || aufguss.aufguss_name || 'Aufguss';
     const staerkeText = aufguss.staerke ? `Staerke: ${aufguss.staerke}` : 'Staerke: -';
     const saunaName = aufguss.sauna_name || aufguss.sauna || '-';
+    const saunaTempText = formatSaunaTempText(aufguss);
+    const saunaTempLine = saunaTempText ? `Temperatur: ${saunaTempText}\u00b0C` : 'Temperatur: -';
     const duftmittel = aufguss.duftmittel_name || aufguss.duftmittel || '-';
     const saunaTempText = formatSaunaTempText(aufguss);
     const people = parseAufgiesserItems(aufguss);
@@ -1056,15 +1069,16 @@ function buildNextAufgussHtml(aufguss) {
 
     return `
         <div class="relative flex flex-col gap-4">
-            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div class="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
                 <div class="text-8xl font-bold text-gray-900 bg-white/80 border border-white/80 rounded-full px-10 py-4 shadow-lg" id="next-aufguss-countdown">--</div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 min-h-[70vh]">
+            <div class="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-6 min-h-[70vh]">
                 <div class="flex flex-col gap-3">
                     <div class="flex flex-col gap-1">
                         <div class="text-3xl font-bold text-gray-900">${escapeHtml(aufgussName)}</div>
                         <div class="text-lg text-gray-600">${escapeHtml(staerkeText)}</div>
                         <div class="text-lg text-gray-600">Duftmittel: ${escapeHtml(duftmittel)}</div>
+                        <div class="text-lg text-gray-600">${escapeHtml(saunaTempLine)}</div>
                     </div>
                     <div class="flex flex-col gap-2">
                         ${saunaImg}

@@ -2901,6 +2901,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 .filter(Boolean);
             const aufgieser = aufgieserList.length > 1 ? aufgieserList.join('<br>') : aufgieserRaw;
             const saunaName = data.sauna_name || 'Sauna: -';
+            const saunaTempText = (data.sauna_temperatur !== null && data.sauna_temperatur !== undefined && data.sauna_temperatur !== '')
+                ? String(data.sauna_temperatur)
+                : '';
+            const saunaTempLine = saunaTempText ? `Temperatur: ${saunaTempText}&deg;C` : 'Temperatur: -';
             const duftmittel = data.duftmittel_name || 'Duftmittel: -';
 
             const aufgieserItems = (data.aufgieser_items || '')
@@ -2922,21 +2926,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ? `<img src="../uploads/${data.mitarbeiter_bild}" alt="Aufgieser" class="w-full h-72 object-contain rounded-lg bg-gray-100">`
                     : `<div class="w-full h-72 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500">Kein Aufgieser-Bild</div>`);
 
+            const saunaBadge = saunaTempText
+                ? `<span class="absolute -top-2 -right-4 bg-white text-sm leading-none px-3 py-1.5 rounded-full border border-gray-200 text-gray-700">${saunaTempText}&deg;C</span>`
+                : '';
             const saunaImg = data.sauna_bild ?
-                `<img src="../uploads/${data.sauna_bild}" alt="Sauna" class="w-full h-72 object-contain rounded-lg bg-gray-100">` :
+                `<div class="relative">${saunaBadge}<img src="../uploads/${data.sauna_bild}" alt="Sauna" class="w-full h-72 object-contain rounded-lg bg-gray-100"></div>` :
                 `<div class="w-full h-72 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500">Kein Sauna-Bild</div>`;
 
             return `
                 <div class="relative flex flex-col gap-4">
-                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div class="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
                         <div class="text-8xl font-bold text-gray-900 bg-white/80 border border-white/80 rounded-full px-10 py-4 shadow-lg" id="next-aufguss-countdown">--</div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 min-h-[70vh]">
+                    <div class="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-6 min-h-[70vh]">
                         <div class="flex flex-col gap-3">
                             <div class="flex flex-col gap-1">
                                 <div class="text-3xl font-bold text-gray-900">${aufgussName}</div>
                                 <div class="text-lg text-gray-600">${staerke}</div>
                                                                 <div class="text-lg text-gray-600">Duftmittel: ${duftmittel}</div>
+                                <div class="text-lg text-gray-600">${saunaTempLine}</div>
                             </div>
                             <div class="flex flex-col gap-2">
                                 ${saunaImg}
@@ -3122,6 +3130,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 aufgieser_name: 'Max Mustermann',
                 sauna_name: 'Finnische Sauna',
                 duftmittel_name: 'Eukalyptus',
+                sauna_temperatur: 90,
                 sauna_bild: '',
                 mitarbeiter_bild: ''
             };
