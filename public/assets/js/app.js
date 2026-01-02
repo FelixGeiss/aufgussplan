@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initServerPlanSync();
     initNextAufgussTimer();
     loadStatsLogged();
+    initVideoAutoplayUnlock();
 
     /**
      * VOLLBILD-MODUS FR TV-ANZEIGE
@@ -66,9 +67,19 @@ const planChangeStorageKey = 'aufgussplanPlanChanged';
 const selectedPlanApiUrl = 'api/selected_plan.php';
 let serverSelectedPlanId = null;
 let serverPlanSyncInFlight = false;
+let serverSelectedPlanUpdatedAt = null;
 let planAdIntervalId = null;
 let planAdHideTimeout = null;
 let activeAdPlanId = null;
+let lastPlanAdShownAt = 0;
+let lastPlanAdKey = null;
+let planAdConfigKey = null;
+let currentPlanAdIntervalMs = 0;
+let planAdStartTimeout = null;
+let planAdAnchorTimeMs = 0;
+let videoAutoplayUnlocked = false;
+let planAdPreloadVideo = null;
+let planAdOffscreenContainer = null;
 let aufgussById = new Map();
 let nextAufgussTimer = null;
 let nextAufgussShown = new Set();
@@ -130,11 +141,16 @@ function fetchSelectedPlanId() {
     return fetch(selectedPlanApiUrl, { cache: 'no-store' })
         .then(response => response.ok ? response.json() : null)
         .then(data => {
-            const planId = data && data.data ? data.data.plan_id : null;
+            const payload = data && data.data ? data.data : null;
+            const planId = payload ? payload.plan_id : null;
+            const updatedAt = payload ? payload.updated_at : null;
             if (planId === null || planId === undefined || planId === '') {
-                return null;
+                return { planId: null, updatedAt: null };
             }
-            return String(planId);
+            return {
+                planId: String(planId),
+                updatedAt: updatedAt ? String(updatedAt) : null
+            };
         });
 }
 
@@ -143,17 +159,23 @@ function syncSelectedPlanIdFromServer() {
     serverPlanSyncInFlight = true;
 
     fetchSelectedPlanId()
-        .then(planId => {
+        .then(result => {
             serverPlanSyncInFlight = false;
-            if (!planId) return;
-            if (serverSelectedPlanId === planId && selectedPlanId === planId) return;
+            if (!result || !result.planId) return;
+            const { planId, updatedAt } = result;
+            if (serverSelectedPlanId === planId && serverSelectedPlanUpdatedAt === updatedAt) {
+                return;
+            }
             serverSelectedPlanId = planId;
+            serverSelectedPlanUpdatedAt = updatedAt;
+            const parsedUpdatedAt = updatedAt ? Date.parse(updatedAt) : NaN;
+            planAdAnchorTimeMs = Number.isNaN(parsedUpdatedAt) ? 0 : parsedUpdatedAt;
             if (selectedPlanId !== planId) {
                 selectedPlanId = planId;
                 saveSelectedPlan();
-                loadPlans();
-                loadAufgussplan();
             }
+            loadPlans();
+            loadAufgussplan();
         })
         .catch(error => {
             serverPlanSyncInFlight = false;
@@ -164,6 +186,107 @@ function syncSelectedPlanIdFromServer() {
 function initServerPlanSync() {
     syncSelectedPlanIdFromServer();
     setInterval(syncSelectedPlanIdFromServer, 5000);
+}
+
+function initVideoAutoplayUnlock() {
+    const unlock = () => {
+        if (videoAutoplayUnlocked) return;
+        videoAutoplayUnlocked = true;
+        const wrap = document.getElementById('plan-ad-wrap');
+        const video = wrap ? wrap.querySelector('video') : null;
+        if (video) {
+            const playResult = video.play();
+            if (playResult && typeof playResult.catch === 'function') {
+                playResult.catch(() => {});
+            }
+        }
+        window.removeEventListener('click', unlock);
+        window.removeEventListener('touchstart', unlock);
+        window.removeEventListener('keydown', unlock);
+    };
+
+    window.addEventListener('click', unlock, { once: true });
+    window.addEventListener('touchstart', unlock, { once: true });
+    window.addEventListener('keydown', unlock, { once: true });
+
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+            resumePlanAdVideo();
+        }
+    });
+    window.addEventListener('focus', resumePlanAdVideo);
+    window.addEventListener('pageshow', resumePlanAdVideo);
+}
+
+function ensurePlanAdPreloadVideo() {
+    if (planAdPreloadVideo) return planAdPreloadVideo;
+    const video = document.createElement('video');
+    video.muted = true;
+    video.playsInline = true;
+    video.setAttribute('muted', '');
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', '');
+    video.preload = 'auto';
+    movePlanAdVideoOffscreen(video);
+    planAdPreloadVideo = video;
+    return video;
+}
+
+function ensurePlanAdOffscreenContainer() {
+    if (planAdOffscreenContainer) return planAdOffscreenContainer;
+    const container = document.createElement('div');
+    container.style.position = 'absolute';
+    container.style.left = '-9999px';
+    container.style.top = '0';
+    container.style.width = '1px';
+    container.style.height = '1px';
+    container.style.overflow = 'hidden';
+    document.body.appendChild(container);
+    planAdOffscreenContainer = container;
+    return container;
+}
+
+function movePlanAdVideoOffscreen(video) {
+    const container = ensurePlanAdOffscreenContainer();
+    if (video.parentElement !== container) {
+        container.appendChild(video);
+    }
+    video.classList.remove('plan-ad-asset');
+    video.style.position = 'absolute';
+    video.style.left = '0';
+    video.style.top = '0';
+    video.style.width = '1px';
+    video.style.height = '1px';
+}
+
+function movePlanAdVideoVisible(video, media) {
+    if (!video || !media) return;
+    if (video.parentElement !== media) {
+        media.innerHTML = '';
+        media.appendChild(video);
+    }
+    video.classList.add('plan-ad-asset');
+    video.style.position = '';
+    video.style.left = '';
+    video.style.top = '';
+    video.style.width = '';
+    video.style.height = '';
+}
+
+function preloadPlanAdVideo(mediaPath) {
+    if (!mediaPath || !document.body) return;
+    const video = ensurePlanAdPreloadVideo();
+    if (video.dataset.src !== mediaPath) {
+        video.dataset.src = mediaPath;
+        video.src = mediaPath;
+        if (typeof video.load === 'function') {
+            try {
+                video.load();
+            } catch (error) {
+                // Ignore load errors on older browsers.
+            }
+        }
+    }
 }
 
 function ensureSelectedPlan(plaene) {
@@ -489,23 +612,88 @@ function setupPlanAd(plan, adMediaPath, adMediaType) {
     const enabled = !!plan.werbung_aktiv;
     const intervalMinutes = Number(plan.werbung_interval_minuten) || 10;
     const durationSeconds = Number(plan.werbung_dauer_sekunden) || 10;
-
-    clearPlanAdTimers();
+    const intervalMs = Math.max(1, intervalMinutes) * 60000;
+    const durationMs = durationSeconds * 1000;
 
     if (!enabled || !adMediaPath) {
+        clearPlanAdTimers();
         activeAdPlanId = null;
+        hidePlanAd();
+        planAdConfigKey = null;
+        currentPlanAdIntervalMs = 0;
         return;
     }
 
     activeAdPlanId = String(plan.id);
-    const intervalMs = Math.max(1, intervalMinutes) * 60000;
-    schedulePlanAd(intervalMs, durationSeconds * 1000, adMediaPath, adMediaType);
+    if (adMediaType === 'video') {
+        preloadPlanAdVideo(adMediaPath);
+    }
+    const adKey = `${activeAdPlanId}|${adMediaPath}`;
+    if (lastPlanAdKey !== adKey) {
+        lastPlanAdKey = adKey;
+        lastPlanAdShownAt = 0;
+    }
+    const newConfigKey = `${adKey}|${intervalMs}|${durationMs}`;
+    if (planAdConfigKey === newConfigKey && planAdIntervalId) {
+        return;
+    }
+    planAdConfigKey = newConfigKey;
+    currentPlanAdIntervalMs = intervalMs;
+    clearPlanAdTimers();
+    schedulePlanAd(intervalMs, durationMs, adMediaPath, adMediaType, planAdAnchorTimeMs);
 }
 
-function schedulePlanAd(intervalMs, durationMs, mediaPath, mediaType) {
-    planAdIntervalId = setInterval(() => {
+function schedulePlanAd(intervalMs, durationMs, mediaPath, mediaType, anchorMs) {
+    const now = Date.now();
+    let nextDelay = 0;
+
+    if (anchorMs && !Number.isNaN(anchorMs)) {
+        const elapsed = ((now - anchorMs) % intervalMs + intervalMs) % intervalMs;
+        if (elapsed < durationMs) {
+            showPlanAd(mediaPath, mediaType, durationMs);
+            nextDelay = intervalMs - elapsed;
+        } else {
+            nextDelay = intervalMs - elapsed;
+        }
+    } else {
         showPlanAd(mediaPath, mediaType, durationMs);
-    }, intervalMs);
+        nextDelay = intervalMs;
+    }
+
+    planAdStartTimeout = setTimeout(() => {
+        showPlanAd(mediaPath, mediaType, durationMs);
+        planAdIntervalId = setInterval(() => {
+            showPlanAd(mediaPath, mediaType, durationMs);
+        }, intervalMs);
+    }, Math.max(0, nextDelay));
+}
+
+function tryPlayPlanAdVideo(video, forceLoad = false) {
+    if (!video) return;
+    if (forceLoad && typeof video.load === 'function') {
+        try {
+            video.load();
+        } catch (error) {
+            // Ignore load errors on older browsers.
+        }
+    }
+    if (video.ended) {
+        video.currentTime = 0;
+    }
+    const playResult = video.play();
+    if (playResult && typeof playResult.catch === 'function') {
+        playResult.catch(() => {});
+    }
+}
+
+function resumePlanAdVideo() {
+    const wrap = document.getElementById('plan-ad-wrap');
+    if (!wrap || !wrap.classList.contains('is-visible')) return;
+    const video = wrap.querySelector('video');
+    if (!video) return;
+    if (video.paused || video.ended) {
+        tryPlayPlanAdVideo(video, false);
+    }
 }
 
 function showPlanAd(mediaPath, mediaType, durationMs) {
@@ -514,8 +702,42 @@ function showPlanAd(mediaPath, mediaType, durationMs) {
 
     if (!wrap || !media) return;
 
+    const now = Date.now();
+    if (lastPlanAdShownAt && (now - lastPlanAdShownAt) < 500) {
+        return;
+    }
+    lastPlanAdShownAt = now;
+
     if (mediaType === 'video') {
-        media.innerHTML = `<video src="${mediaPath}" class="plan-ad-asset" autoplay muted playsinline loop></video>`;
+        let video = media.querySelector('video');
+        const needsReplace = !video || video.dataset.src !== mediaPath;
+        if (needsReplace) {
+            video = ensurePlanAdPreloadVideo();
+        }
+        if (video) {
+            movePlanAdVideoOffscreen(video);
+            video.dataset.src = mediaPath;
+            if (video.src !== mediaPath) {
+                video.src = mediaPath;
+            }
+            video.autoplay = true;
+            video.muted = true;
+            video.playsInline = true;
+            video.setAttribute('playsinline', '');
+            video.setAttribute('webkit-playsinline', '');
+            video.setAttribute('muted', '');
+            video.loop = true;
+
+            const reveal = () => movePlanAdVideoVisible(video, media);
+            const tryPlay = () => {
+                tryPlayPlanAdVideo(video, true);
+            };
+
+            video.addEventListener('playing', reveal, { once: true });
+            video.addEventListener('loadedmetadata', tryPlay, { once: true });
+            setTimeout(tryPlay, 150);
+            setTimeout(reveal, 1200);
+        }
     } else {
         media.innerHTML = `<img src="${mediaPath}" alt="Werbung" class="plan-ad-asset">`;
     }
@@ -538,6 +760,10 @@ function hidePlanAd() {
 }
 
 function clearPlanAdTimers() {
+    if (planAdStartTimeout) {
+        clearTimeout(planAdStartTimeout);
+        planAdStartTimeout = null;
+    }
     if (planAdIntervalId) {
         clearInterval(planAdIntervalId);
         planAdIntervalId = null;

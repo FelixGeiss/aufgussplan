@@ -34,27 +34,31 @@ function sendResponse($success, $message, $data = null, $statusCode = 200) {
     exit;
 }
 
-function readSelectedPlanId($storageFile) {
+function readSelectedPlanData($storageFile) {
     if (!file_exists($storageFile)) {
-        return null;
+        return ['plan_id' => null, 'updated_at' => null];
     }
 
     $raw = file_get_contents($storageFile);
     if ($raw === false || $raw === '') {
-        return null;
+        return ['plan_id' => null, 'updated_at' => null];
     }
 
     $data = json_decode($raw, true);
-    if (!is_array($data) || !array_key_exists('plan_id', $data)) {
-        return null;
+    if (!is_array($data)) {
+        return ['plan_id' => null, 'updated_at' => null];
     }
 
-    $planId = $data['plan_id'];
+    $planId = $data['plan_id'] ?? null;
+    $updatedAt = $data['updated_at'] ?? null;
     if ($planId === null || $planId === '') {
-        return null;
+        return ['plan_id' => null, 'updated_at' => $updatedAt];
     }
 
-    return (string)$planId;
+    return [
+        'plan_id' => (string)$planId,
+        'updated_at' => $updatedAt ? (string)$updatedAt : null
+    ];
 }
 
 function writeSelectedPlanId($storageDir, $storageFile, $planId) {
@@ -73,8 +77,8 @@ function writeSelectedPlanId($storageDir, $storageFile, $planId) {
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'GET') {
-    $planId = readSelectedPlanId($storageFile);
-    sendResponse(true, 'Selected plan loaded', ['plan_id' => $planId]);
+    $data = readSelectedPlanData($storageFile);
+    sendResponse(true, 'Selected plan loaded', $data);
 }
 
 if ($method === 'POST') {
@@ -89,7 +93,7 @@ if ($method === 'POST') {
     }
 
     writeSelectedPlanId($storageDir, $storageFile, $planId);
-    sendResponse(true, 'Selected plan saved', ['plan_id' => (string)$planId]);
+    sendResponse(true, 'Selected plan saved', ['plan_id' => (string)$planId, 'updated_at' => date('c')]);
 }
 
 sendResponse(false, 'HTTP method not supported', null, 405);

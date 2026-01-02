@@ -510,11 +510,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
                             </div>
                             <div class="text-right">
-                                <button type="button"
-                                    class="plan-select-btn"
-                                    data-plan-select="<?php echo (int)$plan['id']; ?>">
-                                    Plan auswaehlen
-                                </button>
+                                <div class="flex flex-wrap items-center justify-end gap-2">
+                                    <button type="button"
+                                        class="plan-select-btn"
+                                        data-plan-select="<?php echo (int)$plan['id']; ?>">
+                                        Plan auswaehlen
+                                    </button>
+                                    <button type="button"
+                                        class="rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
+                                        onclick="saveAllPlanSettings(<?php echo (int)$plan['id']; ?>)">
+                                        Speichern
+                                    </button>
+                                </div>
                                 <div class="text-sm text-gray-500">Erstellt am</div>
                                 <div class="text-sm font-medium text-gray-900">
                                     <?php echo date('d.m.Y', strtotime($plan['erstellt_am'])); ?>
@@ -3007,7 +3014,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             });
             updateNextAufgussControls(planId);
             updateNextAufgussRowHighlight();
-            notifyPublicPlanChange();
+            notifyPublicPlanChange(planId);
 
             if (!enabled) {
                 for (let i = nextAufgussQueue.length - 1; i >= 0; i -= 1) {
@@ -3019,6 +3026,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     closeNextAufgussPopup();
                 }
             }
+        }
+
+        async function saveAllPlanSettings(planId) {
+            savePlanSettings(planId);
+            await savePlanAdSettings(planId);
         }
 
         function updateNextAufgussControls(planId) {
@@ -3157,7 +3169,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             schedulePlanAd(planId);
         }
 
-        async function savePlanAdSettings(planId, includeFile = false) {
+        async function savePlanAdSettings(planId, includeFile = false, options = {}) {
             const enabledInput = document.getElementById(`plan-ad-enabled-${planId}`);
             const intervalInput = document.getElementById(`plan-ad-interval-${planId}`);
             const durationInput = document.getElementById(`plan-ad-duration-${planId}`);
@@ -3209,7 +3221,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     removeAdFile(planId);
                 }
                 schedulePlanAd(planId);
-                notifyPublicPlanChange();
+                if (options.notify !== false) {
+                    notifyPublicPlanChange(planId);
+                }
             } catch (error) {
                 alert('Netzwerkfehler beim Speichern der Werbung.');
             }
@@ -3316,7 +3330,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 getPlanAdSettings(planId);
                 updatePlanAdControls(planId);
                 schedulePlanAd(planId);
-                notifyPublicPlanChange();
+            notifyPublicPlanChange(planId);
             } catch (error) {
                 alert('Netzwerkfehler beim Loeschen der Werbung.');
             }
