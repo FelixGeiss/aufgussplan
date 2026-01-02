@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadPlans();
     loadAufgussplan();
     initPlanChangeListener();
+    initServerPlanSync();
     initNextAufgussTimer();
     loadStatsLogged();
 
@@ -62,6 +63,9 @@ let lastPlaene = [];
 let selectedPlanId = null;
 const selectedPlansStorageKey = 'aufgussplanSelectedPlan';
 const planChangeStorageKey = 'aufgussplanPlanChanged';
+const selectedPlanApiUrl = 'api/selected_plan.php';
+let serverSelectedPlanId = null;
+let serverPlanSyncInFlight = false;
 let planAdIntervalId = null;
 let planAdHideTimeout = null;
 let activeAdPlanId = null;
@@ -120,6 +124,46 @@ function saveSelectedPlan() {
         return;
     }
     localStorage.setItem(selectedPlansStorageKey, String(selectedPlanId));
+}
+
+function fetchSelectedPlanId() {
+    return fetch(selectedPlanApiUrl, { cache: 'no-store' })
+        .then(response => response.ok ? response.json() : null)
+        .then(data => {
+            const planId = data && data.data ? data.data.plan_id : null;
+            if (planId === null || planId === undefined || planId === '') {
+                return null;
+            }
+            return String(planId);
+        });
+}
+
+function syncSelectedPlanIdFromServer() {
+    if (serverPlanSyncInFlight) return;
+    serverPlanSyncInFlight = true;
+
+    fetchSelectedPlanId()
+        .then(planId => {
+            serverPlanSyncInFlight = false;
+            if (!planId) return;
+            if (serverSelectedPlanId === planId && selectedPlanId === planId) return;
+            serverSelectedPlanId = planId;
+            if (selectedPlanId !== planId) {
+                selectedPlanId = planId;
+                saveSelectedPlan();
+                loadPlans();
+                loadAufgussplan();
+            }
+        })
+        .catch(error => {
+            serverPlanSyncInFlight = false;
+            console.warn('Plan sync failed:', error);
+        });
+}
+
+function initServerPlanSync() {
+    syncSelectedPlanIdFromServer();
+    setInterval(syncSelectedPlanIdFromServer, 5000);
 }
 
 function ensureSelectedPlan(plaene) {
@@ -1043,7 +1087,6 @@ function buildNextAufgussHtml(aufguss) {
     const saunaTempText = formatSaunaTempText(aufguss);
     const saunaTempLine = saunaTempText ? `Temperatur: ${saunaTempText}\u00b0C` : 'Temperatur: -';
     const duftmittel = aufguss.duftmittel_name || aufguss.duftmittel || '-';
-    const saunaTempText = formatSaunaTempText(aufguss);
     const people = parseAufgiesserItems(aufguss);
 
     const personCards = people.map(person => {

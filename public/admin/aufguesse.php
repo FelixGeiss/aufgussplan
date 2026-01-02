@@ -3609,13 +3609,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if (!planId) return;
                     setActive(planId);
                     localStorage.setItem(storageKey, String(planId));
-                    notifyPublicPlanChange();
+                    notifyPublicPlanChange(planId);
                 });
             });
         }
 
-        function notifyPublicPlanChange() {
+        function notifyPublicPlanChange(planId) {
             localStorage.setItem('aufgussplanPlanChanged', String(Date.now()));
+            if (!planId) return;
+            fetch('../api/selected_plan.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ plan_id: String(planId) })
+            }).catch(error => {
+                console.warn('Failed to sync selected plan:', error);
+            });
         }
     </script>
 </body>
