@@ -351,12 +351,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="../assets/css/admin.css">
     <style>
         .next-aufguss-row {
-            background-color: var(--plan-accent-color, #ffffff);
+            background-color: transparent;
+        }
+
+        .next-aufguss-row td,
+        .next-aufguss-row .display-mode {
+            animation: next-row-pulse 1.6s ease-in-out infinite;
+            transform-origin: center;
+            will-change: transform, opacity, filter;
         }
 
         .next-aufguss-row .display-mode {
-            background-color: var(--plan-accent-color, #ffffff);
+            background-color: transparent;
             color: #111827;
+        }
+
+        @keyframes next-row-pulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.85;
+                filter: brightness(0.95);
+            }
+            50% {
+                transform: scale(1.06);
+                opacity: 1;
+                filter: brightness(1.08);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0.85;
+                filter: brightness(0.95);
+            }
         }
 
         .plan-clock-admin {
@@ -413,6 +438,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .plan-table-scroll {
             max-height: 520px;
             overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .plan-table-scroll .zeit-cell,
+        .plan-table-scroll .zeit-cell .display-mode {
+            text-align: center;
+        }
+
+        .plan-table-scroll .zeit-cell .display-mode {
+            color: #111827 !important;
+        }
+
+        .plan-table-scroll tbody tr td:first-child {
+            border-left: 1px solid #e5e7eb;
+        }
+
+        .plan-table-scroll tbody tr td:last-child {
+            border-right: 1px solid #e5e7eb;
         }
     </style>
 </head>
