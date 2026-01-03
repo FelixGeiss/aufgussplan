@@ -67,7 +67,13 @@ if ($method === 'GET') {
             'enabled' => true,
             'lead_seconds' => 5,
             'highlight_enabled' => true,
-            'clock_enabled' => false
+            'clock_enabled' => false,
+            'banner_enabled' => false,
+            'banner_mode' => 'text',
+            'banner_text' => '',
+            'banner_image' => '',
+            'banner_height' => 160,
+            'banner_width' => 220
         ];
     }
     sendResponse(true, 'Settings loaded', [
@@ -91,6 +97,12 @@ if ($method === 'POST') {
     $leadSeconds = isset($input['lead_seconds']) ? max(1, (int)$input['lead_seconds']) : 5;
     $highlightEnabled = isset($input['highlight_enabled']) ? (bool)$input['highlight_enabled'] : true;
     $clockEnabled = isset($input['clock_enabled']) ? (bool)$input['clock_enabled'] : false;
+    $bannerEnabled = isset($input['banner_enabled']) ? (bool)$input['banner_enabled'] : false;
+    $bannerMode = isset($input['banner_mode']) ? (string)$input['banner_mode'] : 'text';
+    $bannerText = isset($input['banner_text']) ? trim((string)$input['banner_text']) : '';
+    $bannerImage = isset($input['banner_image']) ? trim((string)$input['banner_image']) : '';
+    $bannerHeight = isset($input['banner_height']) ? max(40, (int)$input['banner_height']) : 160;
+    $bannerWidth = isset($input['banner_width']) ? max(160, (int)$input['banner_width']) : 220;
 
     $allSettings = loadSettings($storageFile);
     $allSettings[(string)$planId] = [
@@ -98,6 +110,12 @@ if ($method === 'POST') {
         'lead_seconds' => $leadSeconds,
         'highlight_enabled' => $highlightEnabled,
         'clock_enabled' => $clockEnabled,
+        'banner_enabled' => $bannerEnabled,
+        'banner_mode' => $bannerMode === 'image' ? 'image' : 'text',
+        'banner_text' => $bannerText,
+        'banner_image' => $bannerImage,
+        'banner_height' => $bannerHeight,
+        'banner_width' => $bannerWidth,
         'updated_at' => date('c')
     ];
     writeSettings($storageDir, $storageFile, $allSettings);

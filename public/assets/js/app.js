@@ -504,12 +504,38 @@ function renderPlanView(planId, plaene, aufguesse) {
     const adMediaType = plan.werbung_media_typ || '';
     const planSettings = getNextAufgussSettings(plan.id);
     const clockEnabled = !!(planSettings && planSettings.clockEnabled);
-    const clockClass = clockEnabled ? ' plan-view-with-clock' : '';
-    const clockHtml = clockEnabled
+    const bannerEnabled = !!(planSettings && planSettings.bannerEnabled);
+    const bannerMode = planSettings ? planSettings.bannerMode : 'text';
+    const bannerText = planSettings ? planSettings.bannerText : '';
+    const bannerImage = planSettings ? planSettings.bannerImage : '';
+    const bannerWidth = planSettings ? planSettings.bannerWidth : 220;
+    const clockBlockHeight = 96;
+    const clockClass = (clockEnabled || bannerEnabled) ? ' plan-view-with-clock' : '';
+    const bannerImagePath = bannerEnabled && bannerMode === 'image'
+        ? normalizeBannerImagePath(bannerImage)
+        : '';
+    const bannerContent = bannerEnabled
+        ? (bannerMode === 'image'
+            ? (bannerImagePath ? `<img src="${escapeHtml(bannerImagePath)}" alt="Banner" />` : '')
+            : (bannerText ? `<div class="plan-clock-banner-text">${escapeHtml(bannerText)}</div>` : ''))
+        : '';
+    const clockStackHeight = clockEnabled ? clockBlockHeight : 0;
+    const clockStyle = (clockEnabled || bannerContent)
+        ? ` style="--plan-clock-width: ${bannerWidth || 220}px; --plan-clock-stack-height: ${clockStackHeight}px;"`
+        : '';
+    const bannerHtml = bannerContent
+        ? `<div class="plan-clock-banner">${bannerContent}</div>`
+        : '';
+    const clockHtml = (clockEnabled || bannerContent)
         ? `
-            <div class="plan-clock" id="plan-clock">
-                <div class="plan-clock-time">--:--</div>
-                <div class="plan-clock-date">--.--.----</div>
+            <div class="plan-clock-stack"${clockStyle}>
+                ${clockEnabled ? `
+                    <div class="plan-clock" id="plan-clock">
+                        <div class="plan-clock-time">--:--</div>
+                        <div class="plan-clock-date">--.--.----</div>
+                    </div>
+                ` : ''}
+                ${bannerHtml}
             </div>
         `
         : '';
@@ -586,7 +612,7 @@ function renderPlanView(planId, plaene, aufguesse) {
 
     if (hideHeader) {
         container.innerHTML = `
-            <div class="relative rounded-lg overflow-hidden${clockClass}">
+            <div class="relative rounded-lg overflow-hidden${clockClass}"${clockStyle}>
                 ${backgroundImage ? `<div class="absolute inset-0 bg-cover bg-center" style="background-image: url('${backgroundImage}');"></div>` : ''}
                 <div class="relative">
                     ${clockHtml}
@@ -601,15 +627,16 @@ function renderPlanView(planId, plaene, aufguesse) {
         `;
         setupPlanAd(plan, adMediaPath, adMediaType);
         initPlanClock(clockEnabled ? document.getElementById('plan-clock') : null);
+        requestAnimationFrame(() => updatePlanClockLayout(container.querySelector('.plan-view-with-clock') || container.firstElementChild));
         updateNextAufgussIndicators();
         return;
     }
 
     container.innerHTML = `
-        <div class="bg-white rounded-lg shadow-md relative">
+            <div class="bg-white rounded-lg shadow-md relative">
             <div class="relative p-6">
                 ${headerHtml}
-                <div class="relative rounded-lg overflow-hidden${clockClass}">
+                <div class="relative rounded-lg overflow-hidden${clockClass}"${clockStyle}>
                     ${backgroundImage ? `<div class="absolute inset-0 bg-cover bg-center" style="background-image: url('${backgroundImage}');"></div>` : ''}
                     <div class="relative">
                         ${clockHtml}
@@ -627,6 +654,7 @@ function renderPlanView(planId, plaene, aufguesse) {
 
     setupPlanAd(plan, adMediaPath, adMediaType);
     initPlanClock(clockEnabled ? document.getElementById('plan-clock') : null);
+    requestAnimationFrame(() => updatePlanClockLayout(container.querySelector('.plan-view-with-clock')));
     updateNextAufgussIndicators();
 }
 
@@ -726,6 +754,19 @@ function tryPlayPlanAdVideo(video, forceLoad = false) {
     }
 }
 
+function normalizeBannerImagePath(path) {
+    if (!path) return '';
+    const trimmed = String(path).trim();
+    if (!trimmed) return '';
+    if (/^https?:\/\//i.test(trimmed)) {
+        return trimmed;
+    }
+    if (trimmed.startsWith('uploads/')) {
+        return trimmed;
+    }
+    return `uploads/${trimmed.replace(/^\/+/, '')}`;
+}
+
 function formatClockTime(value) {
     return value.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
 }
@@ -751,6 +792,17 @@ function initPlanClock(clockEl) {
     if (!clockEl) return;
     updatePlanClock(clockEl);
     planClockTimer = setInterval(() => updatePlanClock(clockEl), 1000);
+}
+
+function updatePlanClockLayout(container) {
+    if (!container) return;
+    const stack = container.querySelector('.plan-clock-stack');
+    if (!stack) {
+        container.style.setProperty('--plan-clock-stack-height', '0px');
+        return;
+    }
+    const height = stack.offsetHeight || 0;
+    container.style.setProperty('--plan-clock-stack-height', `${height + 8}px`);
 }
 
 function resumePlanAdVideo() {
@@ -1358,12 +1410,24 @@ function getNextAufgussSettings(planId) {
     const leadKey = `nextAufgussLeadSeconds_${planId}`;
     const highlightKey = `nextAufgussHighlightEnabled_${planId}`;
     const clockKey = `nextAufgussClockEnabled_${planId}`;
+    const bannerEnabledKey = `nextAufgussBannerEnabled_${planId}`;
+    const bannerModeKey = `nextAufgussBannerMode_${planId}`;
+    const bannerTextKey = `nextAufgussBannerText_${planId}`;
+    const bannerImageKey = `nextAufgussBannerImage_${planId}`;
+    const bannerHeightKey = `nextAufgussBannerHeight_${planId}`;
+    const bannerWidthKey = `nextAufgussBannerWidth_${planId}`;
 
     const serverSettings = serverNextAufgussSettings.get(String(planId)) || null;
     const enabledStored = localStorage.getItem(enabledKey);
     const leadStored = localStorage.getItem(leadKey);
     const highlightStored = localStorage.getItem(highlightKey);
     const clockStored = localStorage.getItem(clockKey);
+    const bannerEnabledStored = localStorage.getItem(bannerEnabledKey);
+    const bannerModeStored = localStorage.getItem(bannerModeKey);
+    const bannerTextStored = localStorage.getItem(bannerTextKey);
+    const bannerImageStored = localStorage.getItem(bannerImageKey);
+    const bannerHeightStored = localStorage.getItem(bannerHeightKey);
+    const bannerWidthStored = localStorage.getItem(bannerWidthKey);
 
     const enabled = serverSettings && typeof serverSettings.enabled === 'boolean'
         ? serverSettings.enabled
@@ -1377,12 +1441,36 @@ function getNextAufgussSettings(planId) {
     const clockEnabled = serverSettings && typeof serverSettings.clock_enabled === 'boolean'
         ? serverSettings.clock_enabled
         : (clockStored === null ? false : clockStored === 'true');
+    const bannerEnabled = serverSettings && typeof serverSettings.banner_enabled === 'boolean'
+        ? serverSettings.banner_enabled
+        : (bannerEnabledStored === null ? false : bannerEnabledStored === 'true');
+    const bannerMode = serverSettings && typeof serverSettings.banner_mode === 'string'
+        ? serverSettings.banner_mode
+        : (bannerModeStored === 'image' ? 'image' : 'text');
+    const bannerText = serverSettings && typeof serverSettings.banner_text === 'string'
+        ? serverSettings.banner_text
+        : (bannerTextStored || '');
+    const bannerImage = serverSettings && typeof serverSettings.banner_image === 'string'
+        ? serverSettings.banner_image
+        : (bannerImageStored || '');
+    const bannerHeight = serverSettings && Number.isFinite(Number(serverSettings.banner_height))
+        ? Math.max(40, parseInt(serverSettings.banner_height, 10))
+        : (bannerHeightStored ? Math.max(40, parseInt(bannerHeightStored, 10)) : 160);
+    const bannerWidth = serverSettings && Number.isFinite(Number(serverSettings.banner_width))
+        ? Math.max(160, parseInt(serverSettings.banner_width, 10))
+        : (bannerWidthStored ? Math.max(160, parseInt(bannerWidthStored, 10)) : 220);
 
     return {
         enabled,
         leadSeconds,
         highlightEnabled,
-        clockEnabled
+        clockEnabled,
+        bannerEnabled,
+        bannerMode,
+        bannerText,
+        bannerImage,
+        bannerHeight,
+        bannerWidth
     };
 }
 

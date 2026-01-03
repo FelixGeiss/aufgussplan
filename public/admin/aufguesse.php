@@ -1293,6 +1293,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 </span>
                                                 <span>Digitale Uhr anzeigen</span>
                                             </label>
+                                            <label class="flex items-center gap-3 text-sm text-gray-700 cursor-pointer">
+                                                <input id="next-aufguss-banner-enabled-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="checkbox" class="sr-only peer">
+                                                <span class="h-4 w-4 rounded border border-gray-300 bg-white flex items-center justify-center text-white peer-checked:bg-indigo-600 peer-checked:border-indigo-600">
+                                                    <svg class="h-3 w-3 hidden peer-checked:block" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                        <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.25 7.25a1 1 0 0 1-1.414 0l-3.25-3.25a1 1 0 1 1 1.414-1.414l2.543 2.543 6.543-6.543a1 1 0 0 1 1.408 0Z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                                <span>Banner anzeigen</span>
+                                            </label>
+                                            <button type="button" onclick="openPlanBannerModal(<?php echo $plan['id']; ?>)" class="w-full rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 border border-gray-200 hover:bg-gray-50">
+                                                Info-Banner unter Uhr bearbeiten
+                                            </button>
                                         </div>
                                         <div class="mt-4 border-t border-gray-200 pt-4 space-y-4">
                                             <h5 class="text-sm font-semibold text-gray-900">Werbung</h5>
@@ -2051,6 +2063,102 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
+    <!-- Plan-Banner Modal -->
+    <div id="planBannerModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-full max-w-xl shadow-lg rounded-md bg-white">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Info-Banner unter der Uhr</h3>
+                <button type="button" onclick="closePlanBannerModal()" class="text-gray-400 hover:text-gray-600">
+                    <span class="sr-only">Schliessen</span>
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <input type="hidden" id="planBannerPlanId" value="">
+            <div class="space-y-4">
+                <label class="flex items-center gap-3 text-sm text-gray-700 cursor-pointer">
+                    <input id="planBannerEnabled" type="checkbox" class="sr-only peer">
+                    <span class="h-4 w-4 rounded border border-gray-300 bg-white flex items-center justify-center text-white peer-checked:bg-indigo-600 peer-checked:border-indigo-600">
+                        <svg class="h-3 w-3 hidden peer-checked:block" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.25 7.25a1 1 0 0 1-1.414 0l-3.25-3.25a1 1 0 1 1 1.414-1.414l2.543 2.543 6.543-6.543a1 1 0 0 1 1.408 0Z" clip-rule="evenodd" />
+                        </svg>
+                    </span>
+                    <span>Banner anzeigen</span>
+                </label>
+                <div>
+                    <label for="planBannerText" class="block text-sm font-medium text-gray-700 mb-1">Banner-Text (optional)</label>
+                    <textarea id="planBannerText" rows="5" class="block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Text fuer den Info-Banner" style="width: 220px; box-sizing: border-box;"></textarea>
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Banner-Inhalt</label>
+                    <label class="flex items-center gap-3 text-sm text-gray-700 cursor-pointer">
+                        <input id="planBannerModeText" type="radio" name="planBannerMode" value="text" class="sr-only peer" checked>
+                        <span class="h-4 w-4 rounded-full border border-gray-300 bg-white flex items-center justify-center text-white peer-checked:bg-indigo-600 peer-checked:border-indigo-600">
+                            <svg class="h-3 w-3 hidden peer-checked:block" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.25 7.25a1 1 0 0 1-1.414 0l-3.25-3.25a1 1 0 1 1 1.414-1.414l2.543 2.543 6.543-6.543a1 1 0 0 1 1.408 0Z" clip-rule="evenodd" />
+                            </svg>
+                        </span>
+                        <span>Text anzeigen</span>
+                    </label>
+                    <label class="flex items-center gap-3 text-sm text-gray-700 cursor-pointer">
+                        <input id="planBannerModeImage" type="radio" name="planBannerMode" value="image" class="sr-only peer">
+                        <span class="h-4 w-4 rounded-full border border-gray-300 bg-white flex items-center justify-center text-white peer-checked:bg-indigo-600 peer-checked:border-indigo-600">
+                            <svg class="h-3 w-3 hidden peer-checked:block" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.25 7.25a1 1 0 0 1-1.414 0l-3.25-3.25a1 1 0 1 1 1.414-1.414l2.543 2.543 6.543-6.543a1 1 0 0 1 1.408 0Z" clip-rule="evenodd" />
+                            </svg>
+                        </span>
+                        <span>Bild anzeigen</span>
+                    </label>
+                </div>
+                <input id="planBannerImage" type="hidden">
+                <div>
+                    <label for="planBannerImageSelect" class="block text-sm font-medium text-gray-700 mb-1">Vorhandene Werbung auswaehlen</label>
+                    <select id="planBannerImageSelect" class="block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" onchange="selectPlanBannerImage()">
+                        <option value="">-- Werbung waehlen --</option>
+                        <?php foreach ($werbungOptions as $option): ?>
+                            <option value="<?php echo htmlspecialchars($option['path']); ?>">
+                                <?php echo htmlspecialchars($option['label']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="space-y-3">
+                    <label for="planBannerFile" class="upload-area flex flex-col items-center rounded-lg border border-dashed border-gray-900/25 px-6 py-6 transition cursor-pointer">
+                        <div class="text-center pointer-events-none">
+                            <svg viewBox="0 0 24 24" fill="currentColor" data-slot="icon" aria-hidden="true" class="mx-auto size-8 text-gray-300">
+                                <path d="M1.5 6a2.25 2.25 0 0 1 2.25-2.25h16.5A2.25 2.25 0 0 1 22.5 6v12a2.25 2.25 0 0 1-2.25 2.25H3.75A2.25 2.25 0 0 1 1.5 18V6ZM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0 0 21 18v-1.94l-2.69-2.689a1.5 1.5 0 0 0-2.12 0l-.88.879.97.97a.75.75 0 1 1-1.06 1.06l-5.16-5.159a1.5 1.5 0 0 0-2.12 0L3 16.061Zm10.125-7.81a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Z" clip-rule="evenodd" fill-rule="evenodd" />
+                            </svg>
+                            <div class="mt-2 flex flex-col text-lg text-gray-600">
+                                <span class="relative rounded-md bg-transparent font-semibold text-indigo-600 hover:text-indigo-500">Banner-Bild hochladen</span>
+                                <input id="planBannerFile" type="file" accept="image/*" class="sr-only" onchange="updatePlanBannerFileName()" />
+                                <div id="plan-banner-filename" class="mt-2 text-xs text-green-600 font-medium hidden flex items-center justify-between">
+                                    <span>Ausgewaehlte Datei: <span id="plan-banner-filename-text"></span></span>
+                                    <button type="button" onclick="removePlanBannerFile()" class="text-red-500 hover:text-red-700 ml-2" title="Datei entfernen">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <p class="pl-1 flex">oder ziehen und ablegen</p>
+                            </div>
+                            <p class="text-sm font-semibold text-gray-900">PNG, JPG, GIF bis zu 10MB</p>
+                        </div>
+                    </label>
+                    <button type="button" onclick="uploadPlanBannerImage()" class="w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">
+                        Hochladen
+                    </button>
+                    <p class="text-xs text-gray-500">Hinweis: Fuer volle Seitenhoehe sollte das Bild etwa 1080px hoch sein (Full-HD).</p>
+                </div>
+                <p class="text-xs text-gray-500">Der Banner passt seine Hoehe automatisch an den Text an.</p>
+                <div class="flex items-center justify-end gap-2 pt-2">
+                    <button type="button" onclick="closePlanBannerModal()" class="rounded-md bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-200">Abbrechen</button>
+                    <button type="button" onclick="savePlanBannerSettings()" class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500">Speichern</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bild-Upload Modal -->
     <div id="imageModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
         <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
@@ -2803,6 +2911,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 closeImageModal();
             }
         });
+        document.getElementById('planBannerModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePlanBannerModal();
+            }
+        });
 
         // Verbesserte Drag & Drop Funktionalität
         document.addEventListener('DOMContentLoaded', function() {
@@ -2982,15 +3095,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const keyLead = `nextAufgussLeadSeconds_${planId}`;
             const keyHighlight = `nextAufgussHighlightEnabled_${planId}`;
             const keyClock = `nextAufgussClockEnabled_${planId}`;
+            const keyBannerEnabled = `nextAufgussBannerEnabled_${planId}`;
+            const keyBannerMode = `nextAufgussBannerMode_${planId}`;
+            const keyBannerText = `nextAufgussBannerText_${planId}`;
+            const keyBannerImage = `nextAufgussBannerImage_${planId}`;
+            const keyBannerHeight = `nextAufgussBannerHeight_${planId}`;
+            const keyBannerWidth = `nextAufgussBannerWidth_${planId}`;
             const enabled = localStorage.getItem(keyEnabled);
             const leadSeconds = localStorage.getItem(keyLead);
             const highlightEnabled = localStorage.getItem(keyHighlight);
             const clockEnabled = localStorage.getItem(keyClock);
+            const bannerEnabled = localStorage.getItem(keyBannerEnabled);
+            const bannerMode = localStorage.getItem(keyBannerMode);
+            const bannerText = localStorage.getItem(keyBannerText);
+            const bannerImage = localStorage.getItem(keyBannerImage);
+            const bannerHeight = localStorage.getItem(keyBannerHeight);
+            const bannerWidth = localStorage.getItem(keyBannerWidth);
             const settings = {
                 enabled: enabled === null ? true : enabled === 'true',
                 leadSeconds: leadSeconds ? Math.max(1, parseInt(leadSeconds, 10)) : 5,
                 highlightEnabled: highlightEnabled === null ? true : highlightEnabled === 'true',
-                clockEnabled: clockEnabled === null ? false : clockEnabled === 'true'
+                clockEnabled: clockEnabled === null ? false : clockEnabled === 'true',
+                bannerEnabled: bannerEnabled === null ? false : bannerEnabled === 'true',
+                bannerMode: bannerMode === 'image' ? 'image' : 'text',
+                bannerText: bannerText ? String(bannerText) : '',
+                bannerImage: bannerImage ? String(bannerImage) : '',
+                bannerHeight: bannerHeight ? Math.max(40, parseInt(bannerHeight, 10)) : 160,
+                bannerWidth: bannerWidth ? Math.max(160, parseInt(bannerWidth, 10)) : 220
             };
             nextAufgussSettings.set(String(planId), settings);
             return settings;
@@ -3002,10 +3133,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const leadInput = document.getElementById(`next-aufguss-lead-${planId}`);
             const highlightInput = document.getElementById(`next-aufguss-highlight-enabled-${planId}`);
             const clockInput = document.getElementById(`next-aufguss-clock-enabled-${planId}`);
+            const bannerInput = document.getElementById(`next-aufguss-banner-enabled-${planId}`);
             if (enabledInput) enabledInput.checked = settings.enabled;
             if (leadInput) leadInput.value = settings.leadSeconds;
             if (highlightInput) highlightInput.checked = settings.highlightEnabled;
             if (clockInput) clockInput.checked = settings.clockEnabled;
+            if (bannerInput) bannerInput.checked = settings.bannerEnabled;
             toggleAdminClock(planId, settings.clockEnabled);
             updateNextAufgussControls(planId);
         }
@@ -3015,29 +3148,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const leadInput = document.getElementById(`next-aufguss-lead-${planId}`);
             const highlightInput = document.getElementById(`next-aufguss-highlight-enabled-${planId}`);
             const clockInput = document.getElementById(`next-aufguss-clock-enabled-${planId}`);
+            const bannerInput = document.getElementById(`next-aufguss-banner-enabled-${planId}`);
             if (!enabledInput || !leadInput) return;
 
             const enabled = enabledInput.checked;
             const leadSeconds = Math.max(1, parseInt(leadInput.value || '5', 10));
             const highlightEnabled = highlightInput ? highlightInput.checked : true;
             const clockEnabled = clockInput ? clockInput.checked : false;
+            const currentSettings = nextAufgussSettings.get(String(planId)) || getPlanSettings(planId);
+            const bannerEnabled = bannerInput ? bannerInput.checked : (currentSettings ? !!currentSettings.bannerEnabled : false);
+            const bannerText = currentSettings ? String(currentSettings.bannerText || '') : '';
+            const bannerImage = currentSettings ? String(currentSettings.bannerImage || '') : '';
+            const bannerHeight = currentSettings ? Math.max(40, parseInt(currentSettings.bannerHeight || 160, 10)) : 160;
+            const bannerWidth = currentSettings ? Math.max(160, parseInt(currentSettings.bannerWidth || 220, 10)) : 220;
             leadInput.value = leadSeconds;
 
             localStorage.setItem(`nextAufgussEnabled_${planId}`, String(enabled));
             localStorage.setItem(`nextAufgussLeadSeconds_${planId}`, String(leadSeconds));
             localStorage.setItem(`nextAufgussHighlightEnabled_${planId}`, String(highlightEnabled));
             localStorage.setItem(`nextAufgussClockEnabled_${planId}`, String(clockEnabled));
+            localStorage.setItem(`nextAufgussBannerEnabled_${planId}`, String(bannerEnabled));
             nextAufgussSettings.set(String(planId), {
                 enabled,
                 leadSeconds,
                 highlightEnabled,
-                clockEnabled
+                clockEnabled,
+                bannerEnabled,
+                bannerText,
+                bannerImage,
+                bannerHeight,
+                bannerWidth
             });
             toggleAdminClock(planId, clockEnabled);
             updateNextAufgussControls(planId);
             updateNextAufgussRowHighlight();
             notifyPublicPlanChange(planId);
-            syncNextAufgussSettings(planId, enabled, leadSeconds, highlightEnabled, clockEnabled);
+            syncNextAufgussSettings(
+                planId,
+                enabled,
+                leadSeconds,
+                highlightEnabled,
+                clockEnabled,
+                bannerEnabled,
+                currentSettings ? currentSettings.bannerMode : 'text',
+                bannerText,
+                bannerImage,
+                bannerHeight,
+                bannerWidth
+            );
 
             if (!enabled) {
                 for (let i = nextAufgussQueue.length - 1; i >= 0; i -= 1) {
@@ -3051,7 +3209,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        function syncNextAufgussSettings(planId, enabled, leadSeconds, highlightEnabled, clockEnabled) {
+        function syncNextAufgussSettings(planId, enabled, leadSeconds, highlightEnabled, clockEnabled, bannerEnabled, bannerMode, bannerText, bannerImage, bannerHeight, bannerWidth) {
             fetch('../api/next_aufguss_settings.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -3060,7 +3218,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     enabled: !!enabled,
                     lead_seconds: Number(leadSeconds),
                     highlight_enabled: !!highlightEnabled,
-                    clock_enabled: !!clockEnabled
+                    clock_enabled: !!clockEnabled,
+                    banner_enabled: !!bannerEnabled,
+                    banner_mode: String(bannerMode || 'text'),
+                    banner_text: String(bannerText || ''),
+                    banner_image: String(bannerImage || ''),
+                    banner_height: Number(bannerHeight || 160),
+                    banner_width: Number(bannerWidth || 220)
                 })
             }).catch(() => {});
         }
@@ -3576,6 +3740,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 const leadInput = document.getElementById(`next-aufguss-lead-${planId}`);
                 const highlightInput = document.getElementById(`next-aufguss-highlight-enabled-${planId}`);
                 const clockInput = document.getElementById(`next-aufguss-clock-enabled-${planId}`);
+                const bannerInput = document.getElementById(`next-aufguss-banner-enabled-${planId}`);
                 const adEnabledInput = document.getElementById(`plan-ad-enabled-${planId}`);
                 const adIntervalInput = document.getElementById(`plan-ad-interval-${planId}`);
                 const adDurationInput = document.getElementById(`plan-ad-duration-${planId}`);
@@ -3591,6 +3756,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 if (clockInput) {
                     clockInput.addEventListener('change', () => savePlanSettings(planId));
+                }
+                if (bannerInput) {
+                    bannerInput.addEventListener('change', () => savePlanSettings(planId));
                 }
                 if (adEnabledInput) {
                     adEnabledInput.addEventListener('change', () => savePlanAdSettings(planId));
@@ -3699,6 +3867,147 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     updateAdminClockElement(clockEl);
                 });
             }, 1000);
+        }
+
+        function openPlanBannerModal(planId) {
+            const modal = document.getElementById('planBannerModal');
+            if (!modal) return;
+            const settings = nextAufgussSettings.get(String(planId)) || getPlanSettings(planId);
+            const planIdInput = document.getElementById('planBannerPlanId');
+            const enabledInput = document.getElementById('planBannerEnabled');
+            const modeTextInput = document.getElementById('planBannerModeText');
+            const modeImageInput = document.getElementById('planBannerModeImage');
+            const textInput = document.getElementById('planBannerText');
+            const imageInput = document.getElementById('planBannerImage');
+            const imageSelect = document.getElementById('planBannerImageSelect');
+
+            if (planIdInput) planIdInput.value = String(planId);
+            if (enabledInput) enabledInput.checked = !!settings.bannerEnabled;
+            if (modeTextInput) modeTextInput.checked = settings.bannerMode !== 'image';
+            if (modeImageInput) modeImageInput.checked = settings.bannerMode === 'image';
+            if (textInput) textInput.value = settings.bannerText || '';
+            if (imageInput) imageInput.value = settings.bannerImage || '';
+            if (imageSelect) imageSelect.value = settings.bannerImage || '';
+
+            modal.classList.remove('hidden');
+        }
+
+        function closePlanBannerModal() {
+            const modal = document.getElementById('planBannerModal');
+            if (!modal) return;
+            modal.classList.add('hidden');
+        }
+
+        function savePlanBannerSettings() {
+            const planId = document.getElementById('planBannerPlanId')?.value;
+            if (!planId) return;
+            const enabledInput = document.getElementById('planBannerEnabled');
+            const modeTextInput = document.getElementById('planBannerModeText');
+            const textInput = document.getElementById('planBannerText');
+            const imageInput = document.getElementById('planBannerImage');
+
+            const bannerEnabled = !!(enabledInput && enabledInput.checked);
+            const bannerMode = modeTextInput && modeTextInput.checked ? 'text' : 'image';
+            const bannerText = textInput ? textInput.value.trimEnd() : '';
+            const bannerImage = imageInput ? imageInput.value.trim() : '';
+            const bannerToggle = document.getElementById(`next-aufguss-banner-enabled-${planId}`);
+            if (bannerToggle) bannerToggle.checked = bannerEnabled;
+            const currentSettings = nextAufgussSettings.get(String(planId)) || getPlanSettings(planId);
+            const bannerWidth = currentSettings ? Math.max(160, parseInt(currentSettings.bannerWidth || 220, 10)) : 220;
+            const bannerHeight = currentSettings ? Math.max(40, parseInt(currentSettings.bannerHeight || 160, 10)) : 160;
+
+            localStorage.setItem(`nextAufgussBannerEnabled_${planId}`, String(bannerEnabled));
+            localStorage.setItem(`nextAufgussBannerMode_${planId}`, String(bannerMode));
+            localStorage.setItem(`nextAufgussBannerText_${planId}`, String(bannerText));
+            localStorage.setItem(`nextAufgussBannerImage_${planId}`, String(bannerImage));
+            localStorage.setItem(`nextAufgussBannerWidth_${planId}`, String(bannerWidth));
+            localStorage.setItem(`nextAufgussBannerHeight_${planId}`, String(bannerHeight));
+
+            nextAufgussSettings.set(String(planId), {
+                ...currentSettings,
+                bannerEnabled,
+                bannerMode,
+                bannerText,
+                bannerImage,
+                bannerWidth,
+                bannerHeight
+            });
+
+            syncNextAufgussSettings(
+                planId,
+                currentSettings.enabled,
+                currentSettings.leadSeconds,
+                currentSettings.highlightEnabled,
+                currentSettings.clockEnabled,
+                bannerEnabled,
+                bannerMode,
+                bannerText,
+                bannerImage,
+                bannerHeight,
+                bannerWidth
+            );
+            notifyPublicPlanChange(planId);
+            closePlanBannerModal();
+        }
+
+        function selectPlanBannerImage() {
+            const select = document.getElementById('planBannerImageSelect');
+            const input = document.getElementById('planBannerImage');
+            if (!select || !input) return;
+            input.value = select.value;
+        }
+
+        function updatePlanBannerFileName() {
+            const input = document.getElementById('planBannerFile');
+            const filenameDiv = document.getElementById('plan-banner-filename');
+            const filenameText = document.getElementById('plan-banner-filename-text');
+            if (!input || !filenameDiv || !filenameText) return;
+            if (!input.files || !input.files[0]) {
+                filenameDiv.classList.add('hidden');
+                filenameText.textContent = '';
+                return;
+            }
+            filenameText.textContent = input.files[0].name;
+            filenameDiv.classList.remove('hidden');
+        }
+
+        function removePlanBannerFile() {
+            const input = document.getElementById('planBannerFile');
+            const filenameDiv = document.getElementById('plan-banner-filename');
+            const filenameText = document.getElementById('plan-banner-filename-text');
+            if (input) input.value = '';
+            if (filenameDiv) filenameDiv.classList.add('hidden');
+            if (filenameText) filenameText.textContent = '';
+        }
+
+        async function uploadPlanBannerImage() {
+            const input = document.getElementById('planBannerFile');
+            if (!input || !input.files || !input.files[0]) {
+                alert('Bitte eine Datei auswaehlen.');
+                return;
+            }
+            const formData = new FormData();
+            formData.append('banner', input.files[0]);
+            try {
+                const response = await fetch('updates/upload_banner_image.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                if (!data || !data.success) {
+                    throw new Error(data && data.error ? data.error : 'Upload fehlgeschlagen');
+                }
+                const path = data.data && data.data.path ? data.data.path : '';
+                if (path) {
+                    const imageInput = document.getElementById('planBannerImage');
+                    const imageSelect = document.getElementById('planBannerImageSelect');
+                    if (imageInput) imageInput.value = path;
+                    if (imageSelect) imageSelect.value = path;
+                }
+                removePlanBannerFile();
+            } catch (error) {
+                alert(error && error.message ? error.message : 'Upload fehlgeschlagen');
+            }
         }
 
         function notifyPublicPlanChange(planId) {

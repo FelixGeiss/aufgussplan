@@ -289,8 +289,7 @@
 }
 
 .kiosk-view .plan-table-wrap {
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    border-radius: 0.75rem;
+    border: 0;
 }
 
 .kiosk-view .plan-table-wrap {
@@ -302,16 +301,23 @@
     position: relative;
 }
 
-.plan-view-with-clock .plan-clock {
+.plan-view-with-clock .plan-clock-stack {
     position: absolute;
-    top: 1rem;
+    top: 0;
     right: 1rem;
     z-index: 50;
-    min-width: 170px;
+    width: var(--plan-clock-width, 220px);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.plan-view-with-clock .plan-clock {
+    width: 100%;
     padding: 0.75rem 1rem;
-    background: rgba(255, 255, 255, 0.35);
+    background: #ffffff;
     border: 1px solid #e5e7eb;
-    border-radius: 0.75rem;
+    border-radius: 0;
     text-align: center;
     box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
 }
@@ -329,15 +335,47 @@
     color: #374151;
 }
 
+.plan-view-with-clock .plan-clock-banner {
+    width: 100%;
+    height: 100vh;
+    background: #ffffff;
+    border-radius: 0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #111827;
+}
+
+.plan-view-with-clock .plan-clock-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.plan-view-with-clock .plan-clock-banner-text {
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    white-space: pre-wrap;
+}
+
 .plan-view-with-clock .plan-table-wrap {
-    padding: 0 220px 0 1rem;
+    padding: 0 calc(var(--plan-clock-width, 220px) + var(--plan-clock-gap, 24px)) 0 1rem;
+    box-sizing: border-box;
+}
+
+.plan-view-with-clock .plan-list-body {
+    padding-top: 0;
     box-sizing: border-box;
 }
 
 @media (max-width: 900px) {
-    .plan-view-with-clock .plan-clock {
+    .plan-view-with-clock .plan-clock-stack {
         position: static;
         margin: 1rem auto 0;
+        width: min(90vw, 320px);
     }
 
     .plan-view-with-clock .plan-table-wrap {
