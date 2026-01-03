@@ -351,12 +351,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="../assets/css/admin.css">
     <style>
         .next-aufguss-row {
-            background-color: #ffffff;
+            background-color: var(--plan-accent-color, #ffffff);
         }
 
         .next-aufguss-row .display-mode {
-            background-color: rgba(59, 130, 246, 0.12);
-            color: #1d4ed8;
+            background-color: var(--plan-accent-color, #ffffff);
+            color: #111827;
+        }
+
+        .plan-clock-admin {
+            background-color: var(--plan-accent-color, #ffffff);
+        }
+
+        .plan-table-head,
+        .plan-table-head th {
+            background-color: var(--plan-accent-color, #ffffff);
         }
 
         .plan-table-wrap {
@@ -542,30 +551,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <?php else: ?>
                                         <div class="overflow-x-auto plan-table-scroll">
                                             <table class="min-w-full bg-transparent border border-gray-200 rounded-lg">
-                                                <thead class="bg-white">
+                                                <thead class="plan-table-head">
                                                     <tr>
-                                                        <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
+                                                        <th class="px-6 py-4 text-left text-sm font-semibold text-black-500 uppercase tracking-wider border-b">
                                                             Zeit
                                                         </th>
-                                                        <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
+                                                        <th class="px-6 py-4 text-left text-sm font-semibold text-black-500 uppercase tracking-wider border-b">
                                                             Aufguss
                                                         </th>
-                                                        <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
+                                                        <th class="px-6 py-4 text-left text-sm font-semibold text-black-500 uppercase tracking-wider border-b">
                                                             Stärke
                                                         </th>
-                                                        <th class="px-6 py-3 text-center text-xs font-medium text-black-500 uppercase tracking-wider border-b">
+                                                        <th class="px-6 py-4 text-center text-sm font-semibold text-black-500 uppercase tracking-wider border-b">
                                                             Aufgießer
                                                         </th>
-                                                        <th class="px-6 py-3 text-center text-xs font-medium text-black-500 uppercase tracking-wider border-b">
+                                                        <th class="px-6 py-4 text-center text-sm font-semibold text-black-500 uppercase tracking-wider border-b">
                                                             Sauna
                                                         </th>
-                                                        <th class="px-6 py-3 text-center text-xs font-medium text-black-500 uppercase tracking-wider border-b">
+                                                        <th class="px-6 py-4 text-center text-sm font-semibold text-black-500 uppercase tracking-wider border-b">
                                                             Duftmittel
                                                         </th>
-                                                        <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
+                                                        <th class="px-6 py-4 text-left text-sm font-semibold text-black-500 uppercase tracking-wider border-b">
                                                             datum
                                                         </th>
-                                                        <th class="px-6 py-3 text-center text-xs font-medium text-black-500 uppercase tracking-wider border-b">
+                                                        <th class="px-6 py-4 text-center text-sm font-semibold text-black-500 uppercase tracking-wider border-b">
                                                             Löschen
                                                         </th>
                                                     </tr>
@@ -1185,6 +1194,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     <button type="submit" id="submit-btn-<?php echo $plan['id']; ?>" class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Speichern</button>
                                                 </div>
                                             </form>
+                                            <div class="mt-6 border-t border-gray-200 pt-4">
+                                                <h3 class="text-lg font-semibold text-gray-900 mb-3 text-center">Farben</h3>
+                                                <label for="next-aufguss-theme-color-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-2 text-center">
+                                                    Farbe fuer Uhr, Header und Row-Hervorhebung
+                                                </label>
+                                                <div class="flex items-center justify-center gap-4">
+                                                    <input id="next-aufguss-theme-color-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="color" class="h-10 w-20 rounded border border-gray-300 bg-white shadow-sm cursor-pointer">
+                                                    <span class="text-xs text-gray-500">Wird im Aufgussplan angezeigt</span>
+                                                </div>
+                                            </div>
                                     </div>
 
                                 </div>
@@ -3101,6 +3120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const keyBannerImage = `nextAufgussBannerImage_${planId}`;
             const keyBannerHeight = `nextAufgussBannerHeight_${planId}`;
             const keyBannerWidth = `nextAufgussBannerWidth_${planId}`;
+            const keyThemeColor = `nextAufgussThemeColor_${planId}`;
             const enabled = localStorage.getItem(keyEnabled);
             const leadSeconds = localStorage.getItem(keyLead);
             const highlightEnabled = localStorage.getItem(keyHighlight);
@@ -3111,6 +3131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const bannerImage = localStorage.getItem(keyBannerImage);
             const bannerHeight = localStorage.getItem(keyBannerHeight);
             const bannerWidth = localStorage.getItem(keyBannerWidth);
+            const themeColor = localStorage.getItem(keyThemeColor);
             const settings = {
                 enabled: enabled === null ? true : enabled === 'true',
                 leadSeconds: leadSeconds ? Math.max(1, parseInt(leadSeconds, 10)) : 5,
@@ -3121,7 +3142,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 bannerText: bannerText ? String(bannerText) : '',
                 bannerImage: bannerImage ? String(bannerImage) : '',
                 bannerHeight: bannerHeight ? Math.max(40, parseInt(bannerHeight, 10)) : 160,
-                bannerWidth: bannerWidth ? Math.max(160, parseInt(bannerWidth, 10)) : 220
+                bannerWidth: bannerWidth ? Math.max(160, parseInt(bannerWidth, 10)) : 220,
+                themeColor: themeColor ? String(themeColor) : '#ffffff'
             };
             nextAufgussSettings.set(String(planId), settings);
             return settings;
@@ -3134,11 +3156,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const highlightInput = document.getElementById(`next-aufguss-highlight-enabled-${planId}`);
             const clockInput = document.getElementById(`next-aufguss-clock-enabled-${planId}`);
             const bannerInput = document.getElementById(`next-aufguss-banner-enabled-${planId}`);
+            const themeColorInput = document.getElementById(`next-aufguss-theme-color-${planId}`);
             if (enabledInput) enabledInput.checked = settings.enabled;
             if (leadInput) leadInput.value = settings.leadSeconds;
             if (highlightInput) highlightInput.checked = settings.highlightEnabled;
             if (clockInput) clockInput.checked = settings.clockEnabled;
             if (bannerInput) bannerInput.checked = settings.bannerEnabled;
+            if (themeColorInput) themeColorInput.value = settings.themeColor || '#ffffff';
+            const planCard = document.getElementById(`plan-${planId}`);
+            if (planCard) {
+                planCard.style.setProperty('--plan-accent-color', settings.themeColor || '#ffffff');
+            }
             toggleAdminClock(planId, settings.clockEnabled);
             updateNextAufgussControls(planId);
         }
@@ -3149,6 +3177,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const highlightInput = document.getElementById(`next-aufguss-highlight-enabled-${planId}`);
             const clockInput = document.getElementById(`next-aufguss-clock-enabled-${planId}`);
             const bannerInput = document.getElementById(`next-aufguss-banner-enabled-${planId}`);
+            const themeColorInput = document.getElementById(`next-aufguss-theme-color-${planId}`);
             if (!enabledInput || !leadInput) return;
 
             const enabled = enabledInput.checked;
@@ -3161,6 +3190,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const bannerImage = currentSettings ? String(currentSettings.bannerImage || '') : '';
             const bannerHeight = currentSettings ? Math.max(40, parseInt(currentSettings.bannerHeight || 160, 10)) : 160;
             const bannerWidth = currentSettings ? Math.max(160, parseInt(currentSettings.bannerWidth || 220, 10)) : 220;
+            const themeColor = themeColorInput && themeColorInput.value
+                ? themeColorInput.value
+                : (currentSettings ? String(currentSettings.themeColor || '#ffffff') : '#ffffff');
             leadInput.value = leadSeconds;
 
             localStorage.setItem(`nextAufgussEnabled_${planId}`, String(enabled));
@@ -3168,6 +3200,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             localStorage.setItem(`nextAufgussHighlightEnabled_${planId}`, String(highlightEnabled));
             localStorage.setItem(`nextAufgussClockEnabled_${planId}`, String(clockEnabled));
             localStorage.setItem(`nextAufgussBannerEnabled_${planId}`, String(bannerEnabled));
+            localStorage.setItem(`nextAufgussThemeColor_${planId}`, String(themeColor));
             nextAufgussSettings.set(String(planId), {
                 enabled,
                 leadSeconds,
@@ -3177,8 +3210,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 bannerText,
                 bannerImage,
                 bannerHeight,
-                bannerWidth
+                bannerWidth,
+                themeColor
             });
+            const planCard = document.getElementById(`plan-${planId}`);
+            if (planCard) {
+                planCard.style.setProperty('--plan-accent-color', themeColor);
+            }
             toggleAdminClock(planId, clockEnabled);
             updateNextAufgussControls(planId);
             updateNextAufgussRowHighlight();
@@ -3194,7 +3232,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 bannerText,
                 bannerImage,
                 bannerHeight,
-                bannerWidth
+                bannerWidth,
+                themeColor
             );
 
             if (!enabled) {
@@ -3209,7 +3248,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        function syncNextAufgussSettings(planId, enabled, leadSeconds, highlightEnabled, clockEnabled, bannerEnabled, bannerMode, bannerText, bannerImage, bannerHeight, bannerWidth) {
+        function syncNextAufgussSettings(planId, enabled, leadSeconds, highlightEnabled, clockEnabled, bannerEnabled, bannerMode, bannerText, bannerImage, bannerHeight, bannerWidth, themeColor) {
             fetch('../api/next_aufguss_settings.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -3224,7 +3263,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     banner_text: String(bannerText || ''),
                     banner_image: String(bannerImage || ''),
                     banner_height: Number(bannerHeight || 160),
-                    banner_width: Number(bannerWidth || 220)
+                    banner_width: Number(bannerWidth || 220),
+                    theme_color: String(themeColor || '#ffffff')
                 })
             }).catch(() => {});
         }
@@ -3741,6 +3781,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 const highlightInput = document.getElementById(`next-aufguss-highlight-enabled-${planId}`);
                 const clockInput = document.getElementById(`next-aufguss-clock-enabled-${planId}`);
                 const bannerInput = document.getElementById(`next-aufguss-banner-enabled-${planId}`);
+                const themeColorInput = document.getElementById(`next-aufguss-theme-color-${planId}`);
+                const planForm = document.querySelector(`#form-${planId} form`);
                 const adEnabledInput = document.getElementById(`plan-ad-enabled-${planId}`);
                 const adIntervalInput = document.getElementById(`plan-ad-interval-${planId}`);
                 const adDurationInput = document.getElementById(`plan-ad-duration-${planId}`);
@@ -3759,6 +3801,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 if (bannerInput) {
                     bannerInput.addEventListener('change', () => savePlanSettings(planId));
+                }
+                if (themeColorInput) {
+                    themeColorInput.addEventListener('change', () => savePlanSettings(planId));
+                }
+                if (planForm) {
+                    planForm.addEventListener('submit', () => savePlanSettings(planId));
                 }
                 if (adEnabledInput) {
                     adEnabledInput.addEventListener('change', () => savePlanAdSettings(planId));
@@ -3944,7 +3992,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 bannerText,
                 bannerImage,
                 bannerHeight,
-                bannerWidth
+                bannerWidth,
+                currentSettings.themeColor
             );
             notifyPublicPlanChange(planId);
             closePlanBannerModal();

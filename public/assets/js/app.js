@@ -509,6 +509,7 @@ function renderPlanView(planId, plaene, aufguesse) {
     const bannerText = planSettings ? planSettings.bannerText : '';
     const bannerImage = planSettings ? planSettings.bannerImage : '';
     const bannerWidth = planSettings ? planSettings.bannerWidth : 220;
+    const themeColor = planSettings ? planSettings.themeColor : '';
     const clockBlockHeight = 96;
     const clockClass = (clockEnabled || bannerEnabled) ? ' plan-view-with-clock' : '';
     const bannerImagePath = bannerEnabled && bannerMode === 'image'
@@ -520,15 +521,20 @@ function renderPlanView(planId, plaene, aufguesse) {
             : (bannerText ? `<div class="plan-clock-banner-text">${escapeHtml(bannerText)}</div>` : ''))
         : '';
     const clockStackHeight = clockEnabled ? clockBlockHeight : 0;
-    const clockStyle = (clockEnabled || bannerContent)
-        ? ` style="--plan-clock-width: ${bannerWidth || 220}px; --plan-clock-stack-height: ${clockStackHeight}px;"`
+    const clockVars = (clockEnabled || bannerContent)
+        ? `--plan-clock-width: ${bannerWidth || 220}px; --plan-clock-stack-height: ${clockStackHeight}px;`
         : '';
+    const accentVars = themeColor ? `--plan-accent-color: ${themeColor};` : '';
+    const wrapperStyle = (clockVars || accentVars)
+        ? ` style="${clockVars}${accentVars ? ` ${accentVars}` : ''}"`
+        : '';
+    const clockStackStyle = clockVars ? ` style="${clockVars}"` : '';
     const bannerHtml = bannerContent
         ? `<div class="plan-clock-banner">${bannerContent}</div>`
         : '';
     const clockHtml = (clockEnabled || bannerContent)
         ? `
-            <div class="plan-clock-stack"${clockStyle}>
+            <div class="plan-clock-stack"${clockStackStyle}>
                 ${clockEnabled ? `
                     <div class="plan-clock" id="plan-clock">
                         <div class="plan-clock-time">--:--</div>
@@ -612,7 +618,7 @@ function renderPlanView(planId, plaene, aufguesse) {
 
     if (hideHeader) {
         container.innerHTML = `
-            <div class="relative rounded-lg overflow-hidden${clockClass}"${clockStyle}>
+            <div class="relative rounded-lg overflow-hidden${clockClass}"${wrapperStyle}>
                 ${backgroundImage ? `<div class="absolute inset-0 bg-cover bg-center" style="background-image: url('${backgroundImage}');"></div>` : ''}
                 <div class="relative">
                     ${clockHtml}
@@ -636,7 +642,7 @@ function renderPlanView(planId, plaene, aufguesse) {
             <div class="bg-white rounded-lg shadow-md relative">
             <div class="relative p-6">
                 ${headerHtml}
-                <div class="relative rounded-lg overflow-hidden${clockClass}"${clockStyle}>
+                <div class="relative rounded-lg overflow-hidden${clockClass}"${wrapperStyle}>
                     ${backgroundImage ? `<div class="absolute inset-0 bg-cover bg-center" style="background-image: url('${backgroundImage}');"></div>` : ''}
                     <div class="relative">
                         ${clockHtml}
@@ -1416,6 +1422,7 @@ function getNextAufgussSettings(planId) {
     const bannerImageKey = `nextAufgussBannerImage_${planId}`;
     const bannerHeightKey = `nextAufgussBannerHeight_${planId}`;
     const bannerWidthKey = `nextAufgussBannerWidth_${planId}`;
+    const themeColorKey = `nextAufgussThemeColor_${planId}`;
 
     const serverSettings = serverNextAufgussSettings.get(String(planId)) || null;
     const enabledStored = localStorage.getItem(enabledKey);
@@ -1428,6 +1435,7 @@ function getNextAufgussSettings(planId) {
     const bannerImageStored = localStorage.getItem(bannerImageKey);
     const bannerHeightStored = localStorage.getItem(bannerHeightKey);
     const bannerWidthStored = localStorage.getItem(bannerWidthKey);
+    const themeColorStored = localStorage.getItem(themeColorKey);
 
     const enabled = serverSettings && typeof serverSettings.enabled === 'boolean'
         ? serverSettings.enabled
@@ -1459,6 +1467,9 @@ function getNextAufgussSettings(planId) {
     const bannerWidth = serverSettings && Number.isFinite(Number(serverSettings.banner_width))
         ? Math.max(160, parseInt(serverSettings.banner_width, 10))
         : (bannerWidthStored ? Math.max(160, parseInt(bannerWidthStored, 10)) : 220);
+    const themeColor = serverSettings && typeof serverSettings.theme_color === 'string'
+        ? serverSettings.theme_color
+        : (themeColorStored || '#ffffff');
 
     return {
         enabled,
@@ -1470,7 +1481,8 @@ function getNextAufgussSettings(planId) {
         bannerText,
         bannerImage,
         bannerHeight,
-        bannerWidth
+        bannerWidth,
+        themeColor
     };
 }
 

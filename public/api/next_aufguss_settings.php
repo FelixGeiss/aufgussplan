@@ -73,7 +73,8 @@ if ($method === 'GET') {
             'banner_text' => '',
             'banner_image' => '',
             'banner_height' => 160,
-            'banner_width' => 220
+            'banner_width' => 220,
+            'theme_color' => '#ffffff'
         ];
     }
     sendResponse(true, 'Settings loaded', [
@@ -103,6 +104,7 @@ if ($method === 'POST') {
     $bannerImage = isset($input['banner_image']) ? trim((string)$input['banner_image']) : '';
     $bannerHeight = isset($input['banner_height']) ? max(40, (int)$input['banner_height']) : 160;
     $bannerWidth = isset($input['banner_width']) ? max(160, (int)$input['banner_width']) : 220;
+    $themeColor = isset($input['theme_color']) ? trim((string)$input['theme_color']) : '#ffffff';
 
     $allSettings = loadSettings($storageFile);
     $allSettings[(string)$planId] = [
@@ -116,6 +118,7 @@ if ($method === 'POST') {
         'banner_image' => $bannerImage,
         'banner_height' => $bannerHeight,
         'banner_width' => $bannerWidth,
+        'theme_color' => $themeColor,
         'updated_at' => date('c')
     ];
     writeSettings($storageDir, $storageFile, $allSettings);

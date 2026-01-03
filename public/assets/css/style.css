@@ -315,8 +315,9 @@
 .plan-view-with-clock .plan-clock {
     width: 100%;
     padding: 0.75rem 1rem;
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
+    background: var(--plan-accent-color, #ffffff);
+    border: 0;
+    border-bottom: 1px solid #e5e7eb;
     border-radius: 0;
     text-align: center;
     box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
@@ -392,7 +393,7 @@
     position: sticky;
     top: 0;
     z-index: 40;
-    background: #ffffff;
+    background: var(--plan-accent-color, #ffffff);
 }
 
 .plan-list {
@@ -413,7 +414,7 @@
     position: sticky;
     top: 0;
     z-index: 40;
-    background: #ffffff;
+    background: var(--plan-accent-color, #ffffff);
     border-bottom: 1px solid #e5e7eb;
 }
 
@@ -424,7 +425,7 @@
 }
 
 .plan-list-row.next-aufguss-row {
-    background: #ffffff;
+    background: var(--plan-accent-color, #ffffff);
 }
 
 .plan-list-cell {
