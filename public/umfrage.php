@@ -24,6 +24,12 @@ if ($planId <= 0) {
 }
 
 $db = Database::getInstance()->getConnection();
+$planBackground = '';
+if ($planId > 0) {
+    $stmt = $db->prepare("SELECT hintergrund_bild FROM plaene WHERE id = ?");
+    $stmt->execute([$planId]);
+    $planBackground = (string)($stmt->fetchColumn() ?: '');
+}
 if (!$clearSurvey && empty($rawCriteria) && $planId > 0) {
     $stmt = $db->prepare("SELECT k1, k2, k3, k4, k5, k6 FROM umfrage_kriterien WHERE plan_id = ?");
     $stmt->execute([$planId]);
@@ -279,7 +285,20 @@ if ($isSubmit && !$clearSurvey) {
     </style>
 </head>
 
-<body class="bg-gray-100 kiosk-view">
+<?php
+$backgroundStyle = '';
+if ($planBackground !== '') {
+    $normalizedPath = str_replace('\\', '/', $planBackground);
+    $backgroundUrl = stripos($normalizedPath, 'uploads/') === 0
+        ? $normalizedPath
+        : 'uploads/' . ltrim($normalizedPath, '/');
+    $backgroundStyle = "background-image: url('" . htmlspecialchars($backgroundUrl, ENT_QUOTES, 'UTF-8') . "');"
+        . "background-size: cover;"
+        . "background-position: center;"
+        . "background-repeat: no-repeat;";
+}
+?>
+<body class="bg-gray-100 kiosk-view" style="<?php echo $backgroundStyle; ?>">
     <nav id="kiosk-admin-nav" class="kiosk-admin-nav bg-blue-600 text-white p-4">
         <div class="container mx-auto flex justify-between items-center">
             <h1 class="text-xl font-bold">Aufgussplan Admin</h1>
