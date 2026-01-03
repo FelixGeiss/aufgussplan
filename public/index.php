@@ -44,6 +44,10 @@ require_once __DIR__ . '/../src/config/config.php';
         }
         /* TODO: Cursor-Ausblendung funktioniert im Kioskmodus noch nicht stabil. */
         html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
             overflow: hidden;
         }
         .kiosk-admin-nav {
@@ -86,7 +90,7 @@ require_once __DIR__ . '/../src/config/config.php';
     <div class="w-full p-0">
         <!-- AUFGUSSPLAN-CONTAINER -->
         <!-- Hier wird der dynamische Inhalt über JavaScript geladen -->
-        <div id="aufgussplan" class="bg-white rounded-lg shadow-md p-0" data-hide-plan-header="true">
+        <div id="aufgussplan" class="p-0 min-h-screen" data-hide-plan-header="true">
             <!-- Platzhalter für JavaScript-Inhalt -->
             <!-- Wird von app.js mit Daten gefüllt -->
         </div>

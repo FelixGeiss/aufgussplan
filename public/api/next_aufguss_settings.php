@@ -66,7 +66,8 @@ if ($method === 'GET') {
         $settings = [
             'enabled' => true,
             'lead_seconds' => 5,
-            'highlight_enabled' => true
+            'highlight_enabled' => true,
+            'clock_enabled' => false
         ];
     }
     sendResponse(true, 'Settings loaded', [
@@ -89,12 +90,14 @@ if ($method === 'POST') {
     $enabled = isset($input['enabled']) ? (bool)$input['enabled'] : true;
     $leadSeconds = isset($input['lead_seconds']) ? max(1, (int)$input['lead_seconds']) : 5;
     $highlightEnabled = isset($input['highlight_enabled']) ? (bool)$input['highlight_enabled'] : true;
+    $clockEnabled = isset($input['clock_enabled']) ? (bool)$input['clock_enabled'] : false;
 
     $allSettings = loadSettings($storageFile);
     $allSettings[(string)$planId] = [
         'enabled' => $enabled,
         'lead_seconds' => $leadSeconds,
         'highlight_enabled' => $highlightEnabled,
+        'clock_enabled' => $clockEnabled,
         'updated_at' => date('c')
     ];
     writeSettings($storageDir, $storageFile, $allSettings);

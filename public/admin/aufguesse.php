@@ -484,7 +484,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div id="plan-<?php echo $plan['id']; ?>" class="bg-white rounded-lg shadow-md relative">
                     <div class="relative p-6">
                         <!-- Plan-Header -->
-                        <div class="flex items-center justify-between mb-6">
+                        <div class="relative flex items-center justify-between mb-6">
                             <div class="flex items-center gap-4">
                                 <div class="flex-shrink-0 h-12 w-12 rounded-full bg-blue-500 flex items-center justify-center">
                                     <span class="text-white font-bold text-lg">
@@ -497,6 +497,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <p class="text-lg text-gray-600 mt-1"><?php echo htmlspecialchars($plan['beschreibung'] ?? ''); ?></p>
                                     <?php endif; ?>
                                 </div>
+                            </div>
+                            <div id="plan-clock-admin-<?php echo $plan['id']; ?>" class="plan-clock-admin hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 inline-flex flex-col items-center justify-center bg-white/70 border border-gray-200 rounded-lg px-3 py-2 shadow-sm">
+                                <div class="plan-clock-admin-time text-lg font-semibold text-gray-900">--:--</div>
+                                <div class="plan-clock-admin-date text-xs text-gray-600">--.--.----</div>
                             </div>
                             <div class="text-right">
                                 <div class="flex flex-wrap items-center justify-end gap-2">
@@ -583,7 +587,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                             // Zeitbereich anzeigen (Sekunden entfernen)
                                                                             $zeitAnfangFormatted = date('H:i', strtotime($zeitAnfang));
                                                                             $zeitEndeFormatted = date('H:i', strtotime($zeitEnde));
-                                                                            echo htmlspecialchars($zeitAnfangFormatted . ' - ' . $zeitEndeFormatted);
+                                                                            echo '<span class="flex flex-col leading-tight">';
+                                                                            echo '<span>' . htmlspecialchars($zeitAnfangFormatted) . '</span>';
+                                                                            echo '<span>' . htmlspecialchars($zeitEndeFormatted) . '</span>';
+                                                                            echo '</span>';
                                                                         } else {
                                                                             // Fallback auf altes zeit-Feld
                                                                             $zeit = $aufguss['zeit'] ?? '--:--';
@@ -1267,7 +1274,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             </button>
                                         </div>
                                         <div class="mt-4 border-t border-gray-200 pt-4 space-y-3">
-                                            <h5 class="text-sm font-semibold text-gray-900">Row Hervorhebung</h5>
+                                            <h5 class="text-sm font-semibold text-gray-900">Anzeige-Optionen</h5>
                                             <label class="flex items-center gap-3 text-sm text-gray-700 cursor-pointer">
                                                 <input id="next-aufguss-highlight-enabled-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="checkbox" class="sr-only peer">
                                                 <span class="h-4 w-4 rounded border border-gray-300 bg-white flex items-center justify-center text-white peer-checked:bg-indigo-600 peer-checked:border-indigo-600">
@@ -1276,6 +1283,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     </svg>
                                                 </span>
                                                 <span>Row hervorheben</span>
+                                            </label>
+                                            <label class="flex items-center gap-3 text-sm text-gray-700 cursor-pointer">
+                                                <input id="next-aufguss-clock-enabled-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="checkbox" class="sr-only peer">
+                                                <span class="h-4 w-4 rounded border border-gray-300 bg-white flex items-center justify-center text-white peer-checked:bg-indigo-600 peer-checked:border-indigo-600">
+                                                    <svg class="h-3 w-3 hidden peer-checked:block" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                        <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.25 7.25a1 1 0 0 1-1.414 0l-3.25-3.25a1 1 0 1 1 1.414-1.414l2.543 2.543 6.543-6.543a1 1 0 0 1 1.408 0Z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                                <span>Digitale Uhr anzeigen</span>
                                             </label>
                                         </div>
                                         <div class="mt-4 border-t border-gray-200 pt-4 space-y-4">
@@ -2835,6 +2851,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         const planAdMedia = new Map();
         const planAdIntervals = new Map();
         const planAdHideTimers = new Map();
+        let adminClockTimer = null;
 
         function parseStartTime(text) {
             if (!text) return null;
@@ -2964,13 +2981,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const keyEnabled = `nextAufgussEnabled_${planId}`;
             const keyLead = `nextAufgussLeadSeconds_${planId}`;
             const keyHighlight = `nextAufgussHighlightEnabled_${planId}`;
+            const keyClock = `nextAufgussClockEnabled_${planId}`;
             const enabled = localStorage.getItem(keyEnabled);
             const leadSeconds = localStorage.getItem(keyLead);
             const highlightEnabled = localStorage.getItem(keyHighlight);
+            const clockEnabled = localStorage.getItem(keyClock);
             const settings = {
                 enabled: enabled === null ? true : enabled === 'true',
                 leadSeconds: leadSeconds ? Math.max(1, parseInt(leadSeconds, 10)) : 5,
-                highlightEnabled: highlightEnabled === null ? true : highlightEnabled === 'true'
+                highlightEnabled: highlightEnabled === null ? true : highlightEnabled === 'true',
+                clockEnabled: clockEnabled === null ? false : clockEnabled === 'true'
             };
             nextAufgussSettings.set(String(planId), settings);
             return settings;
@@ -2981,9 +3001,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const enabledInput = document.getElementById(`next-aufguss-enabled-${planId}`);
             const leadInput = document.getElementById(`next-aufguss-lead-${planId}`);
             const highlightInput = document.getElementById(`next-aufguss-highlight-enabled-${planId}`);
+            const clockInput = document.getElementById(`next-aufguss-clock-enabled-${planId}`);
             if (enabledInput) enabledInput.checked = settings.enabled;
             if (leadInput) leadInput.value = settings.leadSeconds;
             if (highlightInput) highlightInput.checked = settings.highlightEnabled;
+            if (clockInput) clockInput.checked = settings.clockEnabled;
+            toggleAdminClock(planId, settings.clockEnabled);
             updateNextAufgussControls(planId);
         }
 
@@ -2991,25 +3014,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const enabledInput = document.getElementById(`next-aufguss-enabled-${planId}`);
             const leadInput = document.getElementById(`next-aufguss-lead-${planId}`);
             const highlightInput = document.getElementById(`next-aufguss-highlight-enabled-${planId}`);
+            const clockInput = document.getElementById(`next-aufguss-clock-enabled-${planId}`);
             if (!enabledInput || !leadInput) return;
 
             const enabled = enabledInput.checked;
             const leadSeconds = Math.max(1, parseInt(leadInput.value || '5', 10));
             const highlightEnabled = highlightInput ? highlightInput.checked : true;
+            const clockEnabled = clockInput ? clockInput.checked : false;
             leadInput.value = leadSeconds;
 
             localStorage.setItem(`nextAufgussEnabled_${planId}`, String(enabled));
             localStorage.setItem(`nextAufgussLeadSeconds_${planId}`, String(leadSeconds));
             localStorage.setItem(`nextAufgussHighlightEnabled_${planId}`, String(highlightEnabled));
+            localStorage.setItem(`nextAufgussClockEnabled_${planId}`, String(clockEnabled));
             nextAufgussSettings.set(String(planId), {
                 enabled,
                 leadSeconds,
-                highlightEnabled
+                highlightEnabled,
+                clockEnabled
             });
+            toggleAdminClock(planId, clockEnabled);
             updateNextAufgussControls(planId);
             updateNextAufgussRowHighlight();
             notifyPublicPlanChange(planId);
-            syncNextAufgussSettings(planId, enabled, leadSeconds, highlightEnabled);
+            syncNextAufgussSettings(planId, enabled, leadSeconds, highlightEnabled, clockEnabled);
 
             if (!enabled) {
                 for (let i = nextAufgussQueue.length - 1; i >= 0; i -= 1) {
@@ -3023,7 +3051,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        function syncNextAufgussSettings(planId, enabled, leadSeconds, highlightEnabled) {
+        function syncNextAufgussSettings(planId, enabled, leadSeconds, highlightEnabled, clockEnabled) {
             fetch('../api/next_aufguss_settings.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -3031,7 +3059,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     plan_id: String(planId),
                     enabled: !!enabled,
                     lead_seconds: Number(leadSeconds),
-                    highlight_enabled: !!highlightEnabled
+                    highlight_enabled: !!highlightEnabled,
+                    clock_enabled: !!clockEnabled
                 })
             }).catch(() => {});
         }
@@ -3546,6 +3575,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 const enabledInput = document.getElementById(`next-aufguss-enabled-${planId}`);
                 const leadInput = document.getElementById(`next-aufguss-lead-${planId}`);
                 const highlightInput = document.getElementById(`next-aufguss-highlight-enabled-${planId}`);
+                const clockInput = document.getElementById(`next-aufguss-clock-enabled-${planId}`);
                 const adEnabledInput = document.getElementById(`plan-ad-enabled-${planId}`);
                 const adIntervalInput = document.getElementById(`plan-ad-interval-${planId}`);
                 const adDurationInput = document.getElementById(`plan-ad-duration-${planId}`);
@@ -3558,6 +3588,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 if (highlightInput) {
                     highlightInput.addEventListener('change', () => savePlanSettings(planId));
+                }
+                if (clockInput) {
+                    clockInput.addEventListener('change', () => savePlanSettings(planId));
                 }
                 if (adEnabledInput) {
                     adEnabledInput.addEventListener('change', () => savePlanAdSettings(planId));
@@ -3575,6 +3608,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             initPlanSelectButtons();
             initSaunaTemperatureSync();
+            startAdminClockTicker();
             updateNextAufgussRowHighlight();
             setInterval(() => {
                 const rows = document.querySelectorAll('tr[data-aufguss-id]');
@@ -3634,6 +3668,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     notifyPublicPlanChange(planId);
                 });
             });
+        }
+
+        function updateAdminClockElement(clockEl) {
+            if (!clockEl) return;
+            const now = new Date();
+            const timeEl = clockEl.querySelector('.plan-clock-admin-time');
+            const dateEl = clockEl.querySelector('.plan-clock-admin-date');
+            if (timeEl) {
+                timeEl.textContent = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+            }
+            if (dateEl) {
+                dateEl.textContent = now.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            }
+        }
+
+        function toggleAdminClock(planId, enabled) {
+            const clockEl = document.getElementById(`plan-clock-admin-${planId}`);
+            if (!clockEl) return;
+            clockEl.classList.toggle('hidden', !enabled);
+            if (enabled) {
+                updateAdminClockElement(clockEl);
+            }
+        }
+
+        function startAdminClockTicker() {
+            if (adminClockTimer) return;
+            adminClockTimer = setInterval(() => {
+                document.querySelectorAll('.plan-clock-admin:not(.hidden)').forEach(clockEl => {
+                    updateAdminClockElement(clockEl);
+                });
+            }, 1000);
         }
 
         function notifyPublicPlanChange(planId) {

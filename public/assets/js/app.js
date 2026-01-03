@@ -82,6 +82,7 @@ let planAdAnchorTimeMs = 0;
 let videoAutoplayUnlocked = false;
 let planAdPreloadVideo = null;
 let planAdOffscreenContainer = null;
+let planClockTimer = null;
 let aufgussById = new Map();
 let nextAufgussTimer = null;
 let nextAufgussShown = new Set();
@@ -501,6 +502,17 @@ function renderPlanView(planId, plaene, aufguesse) {
     const backgroundImage = plan.hintergrund_bild ? `uploads/${plan.hintergrund_bild}` : '';
     const adMediaPath = plan.werbung_media ? `uploads/${plan.werbung_media}` : '';
     const adMediaType = plan.werbung_media_typ || '';
+    const planSettings = getNextAufgussSettings(plan.id);
+    const clockEnabled = !!(planSettings && planSettings.clockEnabled);
+    const clockClass = clockEnabled ? ' plan-view-with-clock' : '';
+    const clockHtml = clockEnabled
+        ? `
+            <div class="plan-clock" id="plan-clock">
+                <div class="plan-clock-time">--:--</div>
+                <div class="plan-clock-date">--.--.----</div>
+            </div>
+        `
+        : '';
 
     applyPlanBackground(backgroundImage);
 
@@ -574,9 +586,10 @@ function renderPlanView(planId, plaene, aufguesse) {
 
     if (hideHeader) {
         container.innerHTML = `
-            <div class="relative rounded-lg overflow-hidden">
+            <div class="relative rounded-lg overflow-hidden${clockClass}">
                 ${backgroundImage ? `<div class="absolute inset-0 bg-cover bg-center" style="background-image: url('${backgroundImage}');"></div>` : ''}
                 <div class="relative">
+                    ${clockHtml}
                     <div class="plan-table-wrap">
                         ${tableHtml}
                     </div>
@@ -587,6 +600,7 @@ function renderPlanView(planId, plaene, aufguesse) {
             </div>
         `;
         setupPlanAd(plan, adMediaPath, adMediaType);
+        initPlanClock(clockEnabled ? document.getElementById('plan-clock') : null);
         updateNextAufgussIndicators();
         return;
     }
@@ -595,9 +609,10 @@ function renderPlanView(planId, plaene, aufguesse) {
         <div class="bg-white rounded-lg shadow-md relative">
             <div class="relative p-6">
                 ${headerHtml}
-                <div class="relative rounded-lg overflow-hidden">
+                <div class="relative rounded-lg overflow-hidden${clockClass}">
                     ${backgroundImage ? `<div class="absolute inset-0 bg-cover bg-center" style="background-image: url('${backgroundImage}');"></div>` : ''}
                     <div class="relative">
+                        ${clockHtml}
                         <div class="plan-table-wrap">
                             ${tableHtml}
                         </div>
@@ -611,6 +626,7 @@ function renderPlanView(planId, plaene, aufguesse) {
     `;
 
     setupPlanAd(plan, adMediaPath, adMediaType);
+    initPlanClock(clockEnabled ? document.getElementById('plan-clock') : null);
     updateNextAufgussIndicators();
 }
 
@@ -708,6 +724,33 @@ function tryPlayPlanAdVideo(video, forceLoad = false) {
     if (playResult && typeof playResult.catch === 'function') {
         playResult.catch(() => {});
     }
+}
+
+function formatClockTime(value) {
+    return value.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+}
+
+function formatClockDate(value) {
+    return value.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+function updatePlanClock(clockEl) {
+    if (!clockEl) return;
+    const now = new Date();
+    const timeEl = clockEl.querySelector('.plan-clock-time');
+    const dateEl = clockEl.querySelector('.plan-clock-date');
+    if (timeEl) timeEl.textContent = formatClockTime(now);
+    if (dateEl) dateEl.textContent = formatClockDate(now);
+}
+
+function initPlanClock(clockEl) {
+    if (planClockTimer) {
+        clearInterval(planClockTimer);
+        planClockTimer = null;
+    }
+    if (!clockEl) return;
+    updatePlanClock(clockEl);
+    planClockTimer = setInterval(() => updatePlanClock(clockEl), 1000);
 }
 
 function resumePlanAdVideo() {
@@ -1314,11 +1357,13 @@ function getNextAufgussSettings(planId) {
     const enabledKey = `nextAufgussEnabled_${planId}`;
     const leadKey = `nextAufgussLeadSeconds_${planId}`;
     const highlightKey = `nextAufgussHighlightEnabled_${planId}`;
+    const clockKey = `nextAufgussClockEnabled_${planId}`;
 
     const serverSettings = serverNextAufgussSettings.get(String(planId)) || null;
     const enabledStored = localStorage.getItem(enabledKey);
     const leadStored = localStorage.getItem(leadKey);
     const highlightStored = localStorage.getItem(highlightKey);
+    const clockStored = localStorage.getItem(clockKey);
 
     const enabled = serverSettings && typeof serverSettings.enabled === 'boolean'
         ? serverSettings.enabled
@@ -1329,11 +1374,15 @@ function getNextAufgussSettings(planId) {
     const highlightEnabled = serverSettings && typeof serverSettings.highlight_enabled === 'boolean'
         ? serverSettings.highlight_enabled
         : (highlightStored === null ? true : highlightStored === 'true');
+    const clockEnabled = serverSettings && typeof serverSettings.clock_enabled === 'boolean'
+        ? serverSettings.clock_enabled
+        : (clockStored === null ? false : clockStored === 'true');
 
     return {
         enabled,
         leadSeconds,
-        highlightEnabled
+        highlightEnabled,
+        clockEnabled
     };
 }
 

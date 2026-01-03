@@ -280,6 +280,66 @@
     overflow-y: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
+    scroll-padding-top: 80px;
+}
+
+.kiosk-view .plan-table-wrap .plan-list,
+.kiosk-view .plan-table-wrap table {
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+.kiosk-view .plan-table-wrap {
+    padding: 0 1rem 0;
+    box-sizing: border-box;
+}
+
+.plan-view-with-clock {
+    position: relative;
+}
+
+.plan-view-with-clock .plan-clock {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 50;
+    min-width: 170px;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.35);
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    text-align: center;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+}
+
+.plan-view-with-clock .plan-clock-time {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #111827;
+}
+
+.plan-view-with-clock .plan-clock-date {
+    margin-top: 0.3rem;
+    font-size: 0.95rem;
+    color: #374151;
+}
+
+.plan-view-with-clock .plan-table-wrap {
+    padding: 0 220px 0 1rem;
+    box-sizing: border-box;
+}
+
+@media (max-width: 900px) {
+    .plan-view-with-clock .plan-clock {
+        position: static;
+        margin: 1rem auto 0;
+    }
+
+    .plan-view-with-clock .plan-table-wrap {
+        padding: 0 1rem 0;
+    }
 }
 
 .plan-table-wrap::-webkit-scrollbar {
@@ -319,6 +379,7 @@
 .plan-list-row {
     background: rgba(255, 255, 255, 0.35);
     border-bottom: 1px solid #e5e7eb;
+    scroll-margin-top: 80px;
 }
 
 .plan-list-row.next-aufguss-row {
