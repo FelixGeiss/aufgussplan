@@ -49,17 +49,6 @@ $mitarbeiter = $db->query("SELECT id, name, bild FROM mitarbeiter ORDER BY name"
 $saunen = $db->query("SELECT id, name, bild, beschreibung, temperatur FROM saunen ORDER BY name")->fetchAll();
 $duftmittel = $db->query("SELECT id, name, beschreibung FROM duftmittel ORDER BY name")->fetchAll();
 $aufguss_optionen = $db->query("SELECT id, name, beschreibung FROM aufguss_namen ORDER BY name")->fetchAll();
-// #region agent log - hypothesis A: Check if aufguss_optionen is loaded correctly
-file_put_contents('c:\xampp\htdocs\aufgussplan\.cursor\debug.log', json_encode([
-    'timestamp' => time() * 1000,
-    'location' => 'aufguesse.php:52',
-    'message' => 'Loading aufguss_optionen for select field',
-    'data' => ['count' => count($aufguss_optionen), 'first_item' => $aufguss_optionen[0] ?? null],
-    'sessionId' => 'debug-session',
-    'runId' => 'unified-field-logic',
-    'hypothesisId' => 'A'
-]) . "\n", FILE_APPEND);
-// #endregion
 
 // Alle Aufgüsse laden (für die Aufguss-Tabelle)
 $aufgüsse = $aufgussModel->getAll();
