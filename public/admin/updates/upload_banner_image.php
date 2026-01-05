@@ -25,9 +25,9 @@ try {
         throw new Exception('Datei ist zu gross (max. 10MB)');
     }
 
-    $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'video/mp4', 'video/webm', 'video/ogg'];
     if (!in_array($file['type'], $allowedTypes, true)) {
-        throw new Exception('Ungueltiger Dateityp (nur JPG, PNG, GIF erlaubt)');
+        throw new Exception('Ungueltiger Dateityp (nur JPG, PNG, GIF, MP4, WebM, OGG erlaubt)');
     }
 
     $uploadBaseDir = UPLOAD_PATH;

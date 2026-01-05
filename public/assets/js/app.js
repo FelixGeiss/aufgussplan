@@ -515,9 +515,14 @@ function renderPlanView(planId, plaene, aufguesse) {
     const bannerImagePath = bannerEnabled && bannerMode === 'image'
         ? normalizeBannerImagePath(bannerImage)
         : '';
+    const bannerIsVideo = bannerEnabled && bannerMode === 'image' && isBannerVideoPath(bannerImagePath);
     const bannerContent = bannerEnabled
         ? (bannerMode === 'image'
-            ? (bannerImagePath ? `<img src="${escapeHtml(bannerImagePath)}" alt="Banner" />` : '')
+            ? (bannerImagePath
+                ? (bannerIsVideo
+                    ? `<video src="${escapeHtml(bannerImagePath)}" class="plan-clock-banner-video" autoplay muted loop playsinline></video>`
+                    : `<img src="${escapeHtml(bannerImagePath)}" alt="Banner" />`)
+                : '')
             : (bannerText ? `<div class="plan-clock-banner-text">${escapeHtml(bannerText)}</div>` : ''))
         : '';
     const clockStackHeight = clockEnabled ? clockBlockHeight : 0;
@@ -1152,6 +1157,12 @@ function formatSaunaTempBadge(aufguss) {
     const tempText = formatSaunaTempText(aufguss);
     if (!tempText) return '';
     return `<span class="plan-temp-badge absolute -top-1 -right-8 text-sm leading-none px-3 py-1.5 rounded-full border">${escapeHtml(tempText)}&deg;C</span>`;
+}
+
+function isBannerVideoPath(path) {
+    if (!path) return false;
+    const cleanPath = String(path).split('?')[0].split('#')[0];
+    return /\.(mp4|webm|ogg)$/i.test(cleanPath);
 }
 
 function escapeHtml(value) {

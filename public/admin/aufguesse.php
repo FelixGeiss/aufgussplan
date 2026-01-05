@@ -548,7 +548,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
                             </div>
                             <div class="flex-1 flex items-center justify-center gap-2">
-                                <span id="plan-banner-status-<?php echo $plan['id']; ?>" class="plan-banner-status inline-flex flex-col items-center justify-center text-xs font-semibold text-white bg-[#2563eb] border border-[#2563eb] rounded-lg px-3 py-2 shadow-sm">Banner: Aus</span>
+                                <span id="plan-banner-status-<?php echo $plan['id']; ?>" class="plan-banner-status inline-flex flex-col items-center justify-center text-xs font-semibold text-white bg-[#2563eb] border border-[#2563eb] rounded-lg px-3 py-2 shadow-sm">Banner: Text/Video</span>
                                 <div id="plan-clock-admin-<?php echo $plan['id']; ?>" class="plan-clock-admin hidden inline-flex flex-col items-center justify-center bg-white/70 border border-gray-200 rounded-lg px-3 py-2 shadow-sm">
                                     <div class="plan-clock-admin-time text-lg font-semibold text-gray-900">--:--</div>
                                     <div class="plan-clock-admin-date text-xs text-gray-600">--.--.----</div>
@@ -2162,7 +2162,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.25 7.25a1 1 0 0 1-1.414 0l-3.25-3.25a1 1 0 1 1 1.414-1.414l2.543 2.543 6.543-6.543a1 1 0 0 1 1.408 0Z" clip-rule="evenodd" />
                             </svg>
                         </span>
-                        <span>Bild anzeigen</span>
+                        <span>Bild/Video anzeigen</span>
                     </label>
                 </div>
                 <input id="planBannerImage" type="hidden">
@@ -2184,8 +2184,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <path d="M1.5 6a2.25 2.25 0 0 1 2.25-2.25h16.5A2.25 2.25 0 0 1 22.5 6v12a2.25 2.25 0 0 1-2.25 2.25H3.75A2.25 2.25 0 0 1 1.5 18V6ZM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0 0 21 18v-1.94l-2.69-2.689a1.5 1.5 0 0 0-2.12 0l-.88.879.97.97a.75.75 0 1 1-1.06 1.06l-5.16-5.159a1.5 1.5 0 0 0-2.12 0L3 16.061Zm10.125-7.81a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Z" clip-rule="evenodd" fill-rule="evenodd" />
                             </svg>
                             <div class="mt-2 flex flex-col text-lg text-gray-600">
-                                <span class="relative rounded-md bg-transparent font-semibold text-indigo-600 hover:text-indigo-500">Banner-Bild hochladen</span>
-                                <input id="planBannerFile" type="file" accept="image/*" class="sr-only" onchange="updatePlanBannerFileName()" />
+                                <span class="relative rounded-md bg-transparent font-semibold text-indigo-600 hover:text-indigo-500">Banner-Medien hochladen</span>
+                                <input id="planBannerFile" type="file" accept="image/*,video/*" class="sr-only" onchange="updatePlanBannerFileName()" />
                                 <div id="plan-banner-filename" class="mt-2 text-xs text-green-600 font-medium hidden flex items-center justify-between">
                                     <span>Ausgewaehlte Datei: <span id="plan-banner-filename-text"></span></span>
                                     <button type="button" onclick="removePlanBannerFile()" class="text-red-500 hover:text-red-700 ml-2" title="Datei entfernen">
@@ -2196,7 +2196,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
                                 <p class="pl-1 flex">oder ziehen und ablegen</p>
                             </div>
-                            <p class="text-sm font-semibold text-gray-900">PNG, JPG, GIF bis zu 10MB</p>
+                            <p class="text-sm font-semibold text-gray-900">PNG, JPG, GIF, MP4, WebM, OGG bis zu 10MB</p>
                         </div>
                     </label>
                     <button type="button" onclick="uploadPlanBannerImage()" class="w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">
@@ -3207,13 +3207,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             updatePlanBannerStatus(planId);
         }
 
-                function updatePlanBannerStatus(planId) {
+        function isPlanBannerVideoPath(path) {
+            if (!path) return false;
+            const cleanPath = String(path).split('?')[0].split('#')[0];
+            return /\.(mp4|webm|ogg)$/i.test(cleanPath);
+        }
+
+        function updatePlanBannerStatus(planId) {
             const statusEl = document.getElementById(`plan-banner-status-${planId}`);
             if (!statusEl) return;
             const settings = nextAufgussSettings.get(String(planId)) || getPlanSettings(planId);
             let label = 'Banner: Aus';
             if (settings && settings.bannerEnabled) {
-                label = settings.bannerMode === 'image' ? 'Banner: Bild' : 'Banner: Text';
+                if (settings.bannerMode === 'image') {
+                    label = isPlanBannerVideoPath(settings.bannerImage) ? 'Banner: Video' : 'Banner: Bild';
+                } else {
+                    label = 'Banner: Text';
+                }
             }
             statusEl.textContent = label;
         }
