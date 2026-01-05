@@ -10,12 +10,11 @@
 session_start();
 
 require_once __DIR__ . '/../../src/config/config.php';
+require_once __DIR__ . '/../../src/auth.php';
 require_once __DIR__ . '/../../src/db/connection.php';
 
-// if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-//     header('Location: login.php');
-//     exit;
-// }
+require_login();
+require_permission('statistik');
 
 $db = Database::getInstance()->getConnection();
 

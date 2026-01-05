@@ -9,8 +9,12 @@
 session_start();
 
 require_once __DIR__ . '/../../src/config/config.php';
+require_once __DIR__ . '/../../src/auth.php';
 require_once __DIR__ . '/../../src/models/aufguss.php';
 require_once __DIR__ . '/../../src/db/connection.php';
+
+require_login();
+require_permission('umfragen');
 
 $aufgussModel = new Aufguss();
 $plaene = $aufgussModel->getAllPlans();

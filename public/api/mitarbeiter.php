@@ -1,119 +1,117 @@
 <?php
 /**
- * API für Mitarbeiter-Verwaltung
- *
- * Diese Datei stellt REST-ähnliche Endpunkte für die Verwaltung von Mitarbeitern bereit:
- * - GET: Alle Mitarbeiter abrufen
- * - POST: Neuen Mitarbeiter erstellen
- * - PUT: Mitarbeiter aktualisieren
- * - DELETE: Mitarbeiter löschen
+ * API fuer Mitarbeiter-Verwaltung
  */
 
-// CORS-Header für JavaScript-Aufrufe
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 header('Content-Type: application/json');
 
-// OPTIONS-Anfragen für CORS beantworten
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0);
 }
 
-// Session für Sicherheit starten
 session_start();
 
-// Konfiguration laden
 require_once __DIR__ . '/../../src/config/config.php';
-
-// Datenbankverbindung
+require_once __DIR__ . '/../../src/auth.php';
 require_once __DIR__ . '/../../src/db/connection.php';
 
-$db = Database::getInstance()->getConnection();
+if (!is_admin_logged_in()) {
+    sendResponse(false, 'Nicht angemeldet', null, 401);
+}
+if (!is_admin_user()) {
+    sendResponse(false, 'Keine Berechtigung', null, 403);
+}
 
-/**
- * Hauptlogik basierend auf HTTP-Methode
- */
+$db = Database::getInstance()->getConnection();
 $method = $_SERVER['REQUEST_METHOD'];
 
 try {
     switch ($method) {
         case 'GET':
-            // Alle Mitarbeiter abrufen
             handleGetMitarbeiter($db);
             break;
-
         case 'POST':
-            // Neuen Mitarbeiter erstellen
             handleCreateMitarbeiter($db);
             break;
-
         case 'PUT':
-            // Mitarbeiter aktualisieren
             handleUpdateMitarbeiter($db);
             break;
-
         case 'DELETE':
-            // Mitarbeiter löschen
             handleDeleteMitarbeiter($db);
             break;
-
         default:
-            sendResponse(false, 'HTTP-Methode nicht unterstützt', null, 405);
+            sendResponse(false, 'HTTP-Methode nicht unterstuetzt', null, 405);
     }
 } catch (Exception $e) {
     error_log('API-Fehler in mitarbeiter.php: ' . $e->getMessage());
     sendResponse(false, 'Interner Serverfehler', null, 500);
 }
 
-/**
- * GET: Alle Mitarbeiter abrufen
- */
 function handleGetMitarbeiter($db) {
-    try {
-        $stmt = $db->query("SELECT id, name, position, aktiv FROM mitarbeiter ORDER BY name ASC");
-        $mitarbeiter = $stmt->fetchAll();
-        sendResponse(true, 'Mitarbeiter erfolgreich abgerufen', ['mitarbeiter' => $mitarbeiter]);
-    } catch (Exception $e) {
-        sendResponse(false, 'Fehler beim Abrufen der Mitarbeiter', null, 500);
-    }
+    $stmt = $db->query(
+        "SELECT id, name, position, username, aktiv, can_aufguesse, can_statistik, can_umfragen, is_admin
+         FROM mitarbeiter
+         ORDER BY name ASC"
+    );
+    $mitarbeiter = $stmt->fetchAll();
+    sendResponse(true, 'Mitarbeiter erfolgreich abgerufen', ['mitarbeiter' => $mitarbeiter]);
 }
 
-/**
- * POST: Neuen Mitarbeiter erstellen
- */
 function handleCreateMitarbeiter($db) {
-    // JSON-Daten oder Form-Data lesen
     $input = json_decode(file_get_contents('php://input'), true);
     if (!$input) {
         $input = $_POST;
     }
 
-    // Validierung - Name kann leer sein, dann wird ein Platzhalter verwendet
-    $name = trim($input['name'] ?? '');
-    if (empty($name)) {
+    $name = trim((string)($input['name'] ?? ''));
+    if ($name === '') {
         $name = 'Unbenannter Mitarbeiter';
     }
 
-    try {
-        $stmt = $db->prepare("INSERT INTO mitarbeiter (name, position) VALUES (?, ?)");
-        $stmt->execute([
-            $name,
-            trim($input['position'] ?? '')
-        ]);
+    $position = trim((string)($input['position'] ?? ''));
+    $username = trim((string)($input['username'] ?? ''));
+    $password = (string)($input['password'] ?? '');
 
-        $mitarbeiterId = $db->lastInsertId();
-        sendResponse(true, 'Mitarbeiter erfolgreich erstellt', ['mitarbeiter_id' => $mitarbeiterId]);
-    } catch (Exception $e) {
-        sendResponse(false, 'Fehler beim Erstellen des Mitarbeiters', null, 500);
+    if ($username !== '') {
+        $stmt = $db->prepare('SELECT id FROM mitarbeiter WHERE username = ?');
+        $stmt->execute([$username]);
+        if ($stmt->fetch()) {
+            sendResponse(false, 'Benutzername ist bereits vergeben', null, 400);
+        }
     }
+
+    $passwordHash = $username !== '' ? password_hash($password, PASSWORD_DEFAULT) : null;
+
+    $aktiv = normalizeBool($input['aktiv'] ?? true);
+    $canAufguesse = normalizeBool($input['can_aufguesse'] ?? false);
+    $canStatistik = normalizeBool($input['can_statistik'] ?? false);
+    $canUmfragen = normalizeBool($input['can_umfragen'] ?? false);
+    $isAdmin = normalizeBool($input['is_admin'] ?? false);
+
+    $stmt = $db->prepare(
+        "INSERT INTO mitarbeiter (name, position, username, password_hash, aktiv, can_aufguesse, can_statistik, can_umfragen, is_admin)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+    );
+    $stmt->execute([
+        $name,
+        $position !== '' ? $position : null,
+        $username !== '' ? $username : null,
+        $passwordHash,
+        $aktiv,
+        $canAufguesse,
+        $canStatistik,
+        $canUmfragen,
+        $isAdmin
+    ]);
+
+    $mitarbeiterId = $db->lastInsertId();
+    sendResponse(true, 'Mitarbeiter erfolgreich erstellt', ['mitarbeiter_id' => $mitarbeiterId]);
 }
 
-/**
- * PUT: Mitarbeiter aktualisieren
- */
 function handleUpdateMitarbeiter($db) {
-    // JSON-Daten lesen
     $input = json_decode(file_get_contents('php://input'), true);
 
     if (!$input || empty($input['id'])) {
@@ -121,31 +119,71 @@ function handleUpdateMitarbeiter($db) {
         return;
     }
 
-    // Validierung - Name kann leer sein, dann wird ein Platzhalter verwendet
-    $name = trim($input['name'] ?? '');
-    if (empty($name)) {
+    $mitarbeiterId = (int)$input['id'];
+
+    $stmt = $db->prepare('SELECT password_hash FROM mitarbeiter WHERE id = ?');
+    $stmt->execute([$mitarbeiterId]);
+    $existing = $stmt->fetch();
+    if (!$existing) {
+        sendResponse(false, 'Mitarbeiter nicht gefunden', null, 404);
+        return;
+    }
+
+    $name = trim((string)($input['name'] ?? ''));
+    if ($name === '') {
         $name = 'Unbenannter Mitarbeiter';
     }
 
-    try {
-        $stmt = $db->prepare("UPDATE mitarbeiter SET name = ?, position = ? WHERE id = ?");
-        $stmt->execute([
-            $name,
-            trim($input['position'] ?? ''),
-            $input['id']
-        ]);
+    $position = trim((string)($input['position'] ?? ''));
+    $username = trim((string)($input['username'] ?? ''));
+    $password = (string)($input['password'] ?? '');
 
-        sendResponse(true, 'Mitarbeiter erfolgreich aktualisiert');
-    } catch (Exception $e) {
-        sendResponse(false, 'Fehler beim Aktualisieren des Mitarbeiters', null, 500);
+    if ($username !== '') {
+        $stmt = $db->prepare('SELECT id FROM mitarbeiter WHERE username = ? AND id != ?');
+        $stmt->execute([$username, $mitarbeiterId]);
+        if ($stmt->fetch()) {
+            sendResponse(false, 'Benutzername ist bereits vergeben', null, 400);
+        }
     }
+
+    $passwordHash = $existing['password_hash'] ?? null;
+    if ($username === '') {
+        $username = null;
+        $passwordHash = null;
+    } elseif ($password !== '') {
+        $passwordHash = password_hash($password, PASSWORD_DEFAULT);
+    } elseif (empty($passwordHash)) {
+        sendResponse(false, 'Passwort fehlt fuer diesen Benutzer', null, 400);
+    }
+
+    $aktiv = normalizeBool($input['aktiv'] ?? true);
+    $canAufguesse = normalizeBool($input['can_aufguesse'] ?? false);
+    $canStatistik = normalizeBool($input['can_statistik'] ?? false);
+    $canUmfragen = normalizeBool($input['can_umfragen'] ?? false);
+    $isAdmin = normalizeBool($input['is_admin'] ?? false);
+
+    $stmt = $db->prepare(
+        "UPDATE mitarbeiter
+         SET name = ?, position = ?, username = ?, password_hash = ?, aktiv = ?, can_aufguesse = ?, can_statistik = ?, can_umfragen = ?, is_admin = ?
+         WHERE id = ?"
+    );
+    $stmt->execute([
+        $name,
+        $position !== '' ? $position : null,
+        $username,
+        $passwordHash,
+        $aktiv,
+        $canAufguesse,
+        $canStatistik,
+        $canUmfragen,
+        $isAdmin,
+        $mitarbeiterId
+    ]);
+
+    sendResponse(true, 'Mitarbeiter erfolgreich aktualisiert');
 }
 
-/**
- * DELETE: Mitarbeiter löschen
- */
 function handleDeleteMitarbeiter($db) {
-    // Mitarbeiter-ID aus Query-Parameter oder Request-Body
     $mitarbeiterId = $_GET['id'] ?? null;
 
     if (!$mitarbeiterId) {
@@ -158,19 +196,23 @@ function handleDeleteMitarbeiter($db) {
         return;
     }
 
-    try {
-        $stmt = $db->prepare("DELETE FROM mitarbeiter WHERE id = ?");
-        $stmt->execute([$mitarbeiterId]);
+    $stmt = $db->prepare('DELETE FROM mitarbeiter WHERE id = ?');
+    $stmt->execute([$mitarbeiterId]);
 
-        sendResponse(true, 'Mitarbeiter erfolgreich gelöscht');
-    } catch (Exception $e) {
-        sendResponse(false, 'Fehler beim Löschen des Mitarbeiters', null, 500);
-    }
+    sendResponse(true, 'Mitarbeiter erfolgreich geloescht');
 }
 
-/**
- * Hilfsfunktion für API-Antworten
- */
+function normalizeBool($value) {
+    if (is_bool($value)) {
+        return $value ? 1 : 0;
+    }
+    if (is_numeric($value)) {
+        return (int)((int)$value === 1);
+    }
+    $value = strtolower(trim((string)$value));
+    return in_array($value, ['1', 'true', 'on', 'yes'], true) ? 1 : 0;
+}
+
 function sendResponse($success, $message, $data = null, $statusCode = 200) {
     http_response_code($statusCode);
 

@@ -23,16 +23,15 @@ session_start();
 
 // Konfiguration laden
 require_once __DIR__ . '/../../src/config/config.php';
+require_once __DIR__ . '/../../src/auth.php';
 
 /**
  * SICHERHEIT: LOGIN-PRÜFUNG (auskommentiert für Entwicklung)
  *
  * In Produktion: Geschützter Admin-Bereich
  */
-// if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-//     header('Location: login.php');
-//     exit;
-// }
+require_login();
+require_permission('aufguesse');
 
 // Datenbankverbindung für PHP-Operationen
 require_once __DIR__ . '/../../src/db/connection.php';

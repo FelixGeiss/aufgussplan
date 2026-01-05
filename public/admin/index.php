@@ -22,6 +22,7 @@ session_start();
 
 // Konfiguration laden (Datenbank, Pfade, Sicherheit)
 require_once __DIR__ . '/../../src/config/config.php';
+require_once __DIR__ . '/../../src/auth.php';
 
 /**
  * SICHERHEIT: LOGIN-PRUEFUNG
@@ -33,10 +34,7 @@ require_once __DIR__ . '/../../src/config/config.php';
  * - Leitet zu login.php um, falls nicht eingeloggt
  * - Schuetzt den Admin-Bereich vor unbefugtem Zugriff
  */
-// if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-//     header('Location: login.php');
-//     exit;
-// }
+require_login();
 
 /**
  * DATEN FUER DAS DASHBOARD LADEN
@@ -50,6 +48,11 @@ $db = Database::getInstance()->getConnection();
 
 // Plaene fuer die Uebersicht laden (neueste zuerst)
 $plaene = $db->query("SELECT id, name, beschreibung, erstellt_am FROM plaene ORDER BY erstellt_am DESC")->fetchAll();
+
+$isAdmin = is_admin_user();
+$canAufguesse = has_permission('aufguesse');
+$canStatistik = has_permission('statistik');
+$canUmfragen = has_permission('umfragen');
 ?>
 
 <!DOCTYPE html>
@@ -76,31 +79,38 @@ $plaene = $db->query("SELECT id, name, beschreibung, erstellt_am FROM plaene ORD
         <!-- DASHBOARD-INHALTE -->
         <!-- 3-spaltiges Grid-Layout fuer verschiedene Bereiche -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <?php if ($isAdmin): ?>
+                <div class="bg-white rounded-lg  p-6">
+                    <h3 class="text-lg font-semibold mb-2">Mitarbeiter</h3>
+                    <p class="text-gray-600">Verwalten Sie Ihre Mitarbeiter</p>
+                    <a href="mitarbeiter.php" class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Verwalten</a>
+                </div>
+            <?php endif; ?>
 
-            <div class="bg-white rounded-lg  p-6">
-                <h3 class="text-lg font-semibold mb-2">Mitarbeiter</h3>
-                <p class="text-gray-600">Verwalten Sie Ihre Mitarbeiter</p>
-                <a href="mitarbeiter.php" class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Verwalten</a>
-            </div>
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <h3 class="text-lg font-semibold mb-2">Statistiken</h3>
-                <p class="text-gray-600">Uebersicht ueber Aktivitaeten</p>
-                <a href="statistik.php" class="mt-4 inline-block bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Anzeigen</a>
-            </div>
+            <?php if ($canStatistik): ?>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold mb-2">Statistiken</h3>
+                    <p class="text-gray-600">Uebersicht ueber Aktivitaeten</p>
+                    <a href="statistik.php" class="mt-4 inline-block bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Anzeigen</a>
+                </div>
+            <?php endif; ?>
 
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <h3 class="text-lg font-semibold mb-2">Umfrage</h3>
-                <p class="text-gray-600">Umfrage Erstellen</p>
-                <a href="umfragen.php" class="mt-4 inline-block bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Anzeigen</a>
-            </div>
-
+            <?php if ($canUmfragen): ?>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold mb-2">Umfrage</h3>
+                    <p class="text-gray-600">Umfrage Erstellen</p>
+                    <a href="umfragen.php" class="mt-4 inline-block bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Anzeigen</a>
+                </div>
+            <?php endif; ?>
         </div>
 
 
         <div class="bg-white rounded-lg  p-6">
             <h3 class="text-lg font-semibold mb-2">Aufguesse</h3>
             <p class="text-gray-600">Planen Sie Ihre Aufguesse</p>
-            <a href="aufguesse.php" class="mt-4 inline-block bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Verwalten</a>
+            <?php if ($canAufguesse): ?>
+                <a href="aufguesse.php" class="mt-4 inline-block bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Verwalten</a>
+            <?php endif; ?>
 
             <div class="mt-6 border-t border-gray-200 pt-6">
                 <?php if (empty($plaene)): ?>
