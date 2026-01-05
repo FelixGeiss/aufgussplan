@@ -14,8 +14,10 @@
  * URL: http://localhost/aufgussplan/
  */
 
-// Konfiguration laden (Datenbank, Pfade, etc.)
+// Session starten und Konfiguration laden (Datenbank, Pfade, etc.)
+session_start();
 require_once __DIR__ . '/../src/config/config.php';
+require_once __DIR__ . '/../src/auth.php';
 
 // Hier könnte zukünftig PHP-Logik stehen, z.B.:
 // - Direkte Datenbankabfragen für Server-Side Rendering
@@ -70,18 +72,37 @@ require_once __DIR__ . '/../src/config/config.php';
 </head>
 
 <body class="bg-gray-100 kiosk-view">
+    <?php
+    $loggedIn = is_admin_logged_in();
+    $isAdmin = is_admin_user();
+    $canAufguesse = has_permission('aufguesse');
+    $canStatistik = has_permission('statistik');
+    $canUmfragen = has_permission('umfragen');
+    ?>
     <nav id="kiosk-admin-nav" class="kiosk-admin-nav bg-blue-600 text-white p-4">
         <div class="container mx-auto flex justify-between items-center">
             <h1 class="text-xl font-bold">Aufgussplan Admin</h1>
             <div>
-                <a href="index.php" class="mr-4 hover:underline">Anzeige</a>
-                <a href="umfrage.php" class="mr-4 hover:underline">Umfrage anzeigen</a>
-                <a href="admin/index.php" class="mr-4 hover:underline">Dashboard</a>
-                <a href="admin/mitarbeiter.php" class="mr-4 hover:underline">Mitarbeiter</a>
-                <a href="admin/aufguesse.php" class="mr-4 hover:underline">Aufguesse</a>
-                <a href="admin/statistik.php" class="mr-4 hover:underline">Statistiken</a>
-                <a href="admin/umfragen.php" class="mr-4 hover:underline">Umfrage erstellen</a>
-                <a href="admin/logout.php" class="hover:underline">Logout</a>
+                <?php if (!$loggedIn): ?>
+                    <a href="admin/login.php" class="hover:underline">Login</a>
+                <?php else: ?>
+                    <a href="index.php" class="mr-4 hover:underline">Anzeige</a>
+                    <a href="umfrage.php" class="mr-4 hover:underline">Umfrage anzeigen</a>
+                    <a href="admin/index.php" class="mr-4 hover:underline">Dashboard</a>
+                    <?php if ($isAdmin): ?>
+                        <a href="admin/mitarbeiter.php" class="mr-4 hover:underline">Mitarbeiter</a>
+                    <?php endif; ?>
+                    <?php if ($canAufguesse): ?>
+                        <a href="admin/aufguesse.php" class="mr-4 hover:underline">Aufguesse</a>
+                    <?php endif; ?>
+                    <?php if ($canStatistik): ?>
+                        <a href="admin/statistik.php" class="mr-4 hover:underline">Statistiken</a>
+                    <?php endif; ?>
+                    <?php if ($canUmfragen): ?>
+                        <a href="admin/umfragen.php" class="mr-4 hover:underline">Umfrage erstellen</a>
+                    <?php endif; ?>
+                    <a href="admin/logout.php" class="hover:underline">Logout</a>
+                <?php endif; ?>
             </div>
         </div>
     </nav>
