@@ -295,10 +295,10 @@
 
 .plan-view-with-clock {
     position: relative;
-    --plan-clock-min-width: var(--plan-clock-width, 220px);
+    --plan-clock-min-width: var(--plan-clock-width, 168px);
     --plan-banner-aspect: 1.375;
     --plan-clock-display-width: min(
-        max(var(--plan-clock-min-width), 18vw),
+        max(var(--plan-clock-min-width), 12vw),
         calc((100vh - var(--plan-header-height, 96px)) * var(--plan-banner-aspect))
     );
 }
@@ -444,7 +444,7 @@
 .plan-list-row {
     display: grid;
     grid-template-columns: 1.2fr 2fr 1.2fr 2fr 2fr 1.6fr;
-    gap: 0;
+    column-gap: 0.5rem;
 }
 
 .plan-list-head {
@@ -453,6 +453,12 @@
     z-index: 40;
     background: var(--plan-accent-color, #ffffff);
     border-bottom: 1px solid #e5e7eb;
+}
+
+.plan-list-head .plan-list-cell {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .plan-list-row {
@@ -469,7 +475,7 @@
 }
 
 .plan-list-cell {
-    padding: 1rem 1.5rem;
+    padding: 1rem 1rem;
     text-transform: uppercase;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -544,7 +550,7 @@
 
 .kiosk-view .plan-list-cell {
     font-size: clamp(0.95rem, 1.2vw, 1.4rem);
-    padding: clamp(0.75rem, 1vw, 1.5rem) clamp(1rem, 1.6vw, 2rem);
+    padding: clamp(0.75rem, 1vw, 1.5rem) clamp(0.75rem, 1.2vw, 1.5rem);
 }
 
 .kiosk-view .plan-list-head .plan-list-cell {
