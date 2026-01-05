@@ -356,7 +356,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             transform: translateY(-1px);
         }
 
-        .next-aufguss-row .display-mode {
+        .plan-table-scope .next-aufguss-row .display-mode {
             background-color: transparent;
             color: var(--plan-text-color, #111827);
         }
@@ -379,8 +379,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             text-align: center;
         }
 
-        .plan-table-head,
-        .plan-table-head th {
+        .plan-table-scope .plan-table-head,
+        .plan-table-scope .plan-table-head th {
             background-color: var(--plan-accent-color, #ffffff);
             color: var(--plan-text-color, #111827);
         }
@@ -438,7 +438,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             text-align: center;
         }
 
-        .plan-table-scroll .zeit-cell .display-mode {
+        .plan-table-scope .plan-table-scroll .zeit-cell .display-mode {
             color: var(--plan-text-color, #111827) !important;
             display: flex;
             flex-direction: column;
@@ -448,25 +448,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding-right: 1.25rem;
         }
 
-        .plan-table-scroll .zeit-cell .display-mode svg {
+        .plan-table-scope .plan-table-scroll .zeit-cell .display-mode svg {
             position: absolute;
             right: 0.35rem;
             top: 0.35rem;
             margin-left: 0;
         }
 
-        .plan-temp-badge {
+        .plan-table-scope .plan-temp-badge {
             background: var(--plan-accent-color, #2563eb);
             border-color: var(--plan-accent-color, #2563eb);
             color: var(--plan-text-color, #111827);
             font-weight: 600;
         }
 
-        .plan-color-scope {
+        .plan-table-scope {
+            --plan-accent-color: #ffffff;
             --plan-text-color: #111827;
         }
 
-        .plan-color-scope .text-gray-900 {
+        .plan-table-scope .text-gray-900 {
             color: var(--plan-text-color, #111827) !important;
         }
 
@@ -546,7 +547,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ?>
 
                 <!-- Plan-Bereich -->
-                <div id="plan-<?php echo $plan['id']; ?>" class="bg-white rounded-lg shadow-md relative plan-color-scope">
+                <div id="plan-<?php echo $plan['id']; ?>" class="bg-white rounded-lg shadow-md relative">
                     <div class="relative p-6">
                         <!-- Plan-Header -->
                         <div class="relative flex items-center justify-between mb-6">
@@ -600,7 +601,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <?php endif; ?>
                             <div class="relative">
                                 <!-- Aufgüsse für diesen Plan -->
-                                <div class="plan-table-wrap" id="plan-table-wrap-<?php echo $plan['id']; ?>">
+                                <div class="plan-table-wrap plan-table-scope" id="plan-table-wrap-<?php echo $plan['id']; ?>">
                                     <?php if (empty($planAufgüsse)): ?>
                                         <div class="text-center py-8 text-gray-500 border-2 border-dashed border-gray-300 rounded-lg bg-white/70">
                                             <div class="text-4xl mb-2">🕐</div>
@@ -3228,10 +3229,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (bannerInput) bannerInput.checked = settings.bannerEnabled;
             if (themeColorInput) themeColorInput.value = settings.themeColor || '#ffffff';
             if (textColorInput) textColorInput.value = settings.textColor || '#111827';
-            const planCard = document.getElementById(`plan-${planId}`);
-            if (planCard) {
-                planCard.style.setProperty('--plan-accent-color', settings.themeColor || '#ffffff');
-                planCard.style.setProperty('--plan-text-color', settings.textColor || '#111827');
+            const planTableScope = document.getElementById(`plan-table-wrap-${planId}`);
+            if (planTableScope) {
+                planTableScope.style.setProperty('--plan-accent-color', settings.themeColor || '#ffffff');
+                planTableScope.style.setProperty('--plan-text-color', settings.textColor || '#111827');
+            }
+            const planClock = document.getElementById(`plan-clock-admin-${planId}`);
+            if (planClock) {
+                planClock.style.setProperty('--plan-accent-color', settings.themeColor || '#ffffff');
+                planClock.style.setProperty('--plan-text-color', settings.textColor || '#111827');
             }
             toggleAdminClock(planId, settings.clockEnabled);
             updateNextAufgussControls(planId);
@@ -3310,10 +3316,15 @@ function savePlanSettings(planId, options = {}) {
                 themeColor,
                 textColor
             });
-            const planCard = document.getElementById(`plan-${planId}`);
-            if (planCard) {
-                planCard.style.setProperty('--plan-accent-color', themeColor);
-                planCard.style.setProperty('--plan-text-color', textColor);
+            const planTableScope = document.getElementById(`plan-table-wrap-${planId}`);
+            if (planTableScope) {
+                planTableScope.style.setProperty('--plan-accent-color', themeColor);
+                planTableScope.style.setProperty('--plan-text-color', textColor);
+            }
+            const planClock = document.getElementById(`plan-clock-admin-${planId}`);
+            if (planClock) {
+                planClock.style.setProperty('--plan-accent-color', themeColor);
+                planClock.style.setProperty('--plan-text-color', textColor);
             }
             toggleAdminClock(planId, clockEnabled);
             updateNextAufgussControls(planId);
