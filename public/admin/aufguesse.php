@@ -2233,6 +2233,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         Hochladen
                     </button>
                     <p class="text-xs text-gray-500">Hinweis: Fuer volle Seitenhoehe sollte das Bild etwa 1080px hoch sein (Full-HD).</p>
+                    <p class="text-xs text-gray-500">Empfohlene Breite: 220px.</p>
                 </div>
                 <p class="text-xs text-gray-500">Der Banner passt seine Hoehe automatisch an den Text an.</p>
                 <div class="flex items-center justify-end gap-2 pt-2">
