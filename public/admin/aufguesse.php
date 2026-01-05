@@ -351,37 +351,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="../assets/css/admin.css">
     <style>
         .next-aufguss-row {
-            background-color: transparent;
-        }
-
-        .next-aufguss-row td,
-        .next-aufguss-row .display-mode {
-            animation: next-row-pulse 1.6s ease-in-out infinite;
-            transform-origin: center;
-            will-change: transform, opacity, filter;
+            background-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 12px 24px rgba(17, 24, 39, 0.18), 0 2px 6px rgba(17, 24, 39, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            transform: translateY(-1px);
         }
 
         .next-aufguss-row .display-mode {
             background-color: transparent;
             color: #111827;
-        }
-
-        @keyframes next-row-pulse {
-            0% {
-                transform: scale(1);
-                opacity: 0.85;
-                filter: brightness(0.95);
-            }
-            50% {
-                transform: scale(1.06);
-                opacity: 1;
-                filter: brightness(1.08);
-            }
-            100% {
-                transform: scale(1);
-                opacity: 0.85;
-                filter: brightness(0.95);
-            }
         }
 
         .plan-clock-admin {

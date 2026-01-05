@@ -90,17 +90,8 @@
 .aufguss-card.current {
     /* Anderer Farbverlauf (Rosa-Orange) für aktuellen Aufguss */
     background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-
-    /* Pulsierende Animation für Aufmerksamkeit */
-    animation: pulse 2s infinite;
 }
 
-/* PULS-ANIMATION für aktuellen Aufguss */
-@keyframes pulse {
-    0%   { transform: scale(1); }      /* Normalgröße */
-    50%  { transform: scale(1.02); }   /* Leicht vergrößert */
-    100% { transform: scale(1); }      /* Zurück zur Normalgröße */
-}
 
 /* ============================================================================
    TIMER STYLING - COUNTDOWN FÜR LAUFENDEN AUFGUSS
@@ -141,60 +132,19 @@
         opacity: 0.3;    /* Halbtransparent */
     }
 }
-@keyframes next-row-pulse {
-    0% {
-        transform: scale(1);
-        opacity: 0.85;
-        filter: brightness(0.95);
-    }
-    50% {
-        transform: scale(1.06);
-        opacity: 1;
-        filter: brightness(1.08);
-    }
-    100% {
-        transform: scale(1);
-        opacity: 0.85;
-        filter: brightness(0.95);
-    }
-}
-
-50% {
-        transform: scale(1.06);
-        opacity: 1;
-    }
-    100% {
-        transform: scale(1);
-        opacity: 0.85;
-    }
-}
-
-    50% {
-        box-shadow: 0 0 0 16px rgba(59, 130, 246, 0.45);
-        transform: scale(1.02);
-    }
-    100% {
-        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.2);
-        transform: scale(1);
-    }
-}
-
-
 /* ============================================================================
    NAECHSTER AUFGUSS (HERVORHEBUNG + POPUP)
    ============================================================================ */
 
 .next-aufguss-row {
-    background-color: transparent;
+    background-color: rgba(255, 255, 255, 0.6);
     outline: none;
 }
 
 .next-aufguss-row td,
 .next-aufguss-row .plan-list-cell,
 .next-aufguss-row .display-mode {
-    animation: next-row-pulse 1.6s ease-in-out infinite;
     transform-origin: center;
-    will-change: transform, opacity, filter;
 }
 
 .next-aufguss-overlay {
@@ -471,7 +421,10 @@
 }
 
 .plan-list-row.next-aufguss-row {
-    background: transparent;
+    background: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 12px 24px rgba(17, 24, 39, 0.18), 0 2px 6px rgba(17, 24, 39, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    transform: translateY(-1px);
 }
 
 .plan-list-cell {
@@ -575,3 +528,4 @@
     outline: none;
     box-shadow: none;
 }
+
