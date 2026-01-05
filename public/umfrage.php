@@ -313,6 +313,7 @@ if ($planBackground !== '') {
     $canAufguesse = has_permission('aufguesse');
     $canStatistik = has_permission('statistik');
     $canUmfragen = has_permission('umfragen');
+    $canMitarbeiter = has_permission('mitarbeiter');
     ?>
     <nav id="kiosk-admin-nav" class="kiosk-admin-nav bg-blue-600 text-white p-4">
         <div class="container mx-auto flex justify-between items-center">
@@ -324,9 +325,19 @@ if ($planBackground !== '') {
                     <a href="index.php" class="mr-4 hover:underline">Anzeige</a>
                     <a href="umfrage.php" class="mr-4 hover:underline">Umfrage anzeigen</a>
                     <a href="admin/index.php" class="mr-4 hover:underline">Dashboard</a>
-                    <?php if ($isAdmin): ?>
+                    <?php if ($canMitarbeiter): ?>
                         <a href="admin/mitarbeiter.php" class="mr-4 hover:underline">Mitarbeiter</a>
                     <?php endif; ?>
+                    <div class="relative inline-block mr-4 group pt-2 -mt-2">
+                        <a href="admin/bildschirme.php" class="hover:underline">Bildschirme</a>
+                        <div class="absolute left-0 top-full w-48 rounded-md bg-white text-gray-800 shadow-lg ring-1 ring-black/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-150">
+                            <a href="bildschirm_1.php" class="block px-4 py-2 hover:bg-gray-100">Bildschirm 1</a>
+                            <a href="bildschirm_2.php" class="block px-4 py-2 hover:bg-gray-100">Bildschirm 2</a>
+                            <a href="bildschirm_3.php" class="block px-4 py-2 hover:bg-gray-100">Bildschirm 3</a>
+                            <a href="bildschirm_4.php" class="block px-4 py-2 hover:bg-gray-100">Bildschirm 4</a>
+                            <a href="bildschirm_5.php" class="block px-4 py-2 hover:bg-gray-100">Bildschirm 5</a>
+                        </div>
+                    </div>
                     <?php if ($canAufguesse): ?>
                         <a href="admin/aufguesse.php" class="mr-4 hover:underline">Aufguesse</a>
                     <?php endif; ?>

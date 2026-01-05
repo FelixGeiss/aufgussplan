@@ -34,13 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
      *
      * Beim ersten Laden der Seite Daten sofort laden (nicht warten).
      */
-    loadPlans();
-    loadAufgussplan();
-    initPlanChangeListener();
-    initServerPlanSync();
-    initNextAufgussTimer();
-    loadStatsLogged();
-    initVideoAutoplayUnlock();
+    initScreenConfig().then(startAufgussApp);
 
     /**
      * VOLLBILD-MODUS FR TV-ANZEIGE
@@ -65,11 +59,13 @@ let selectedPlanId = null;
 const selectedPlansStorageKey = 'aufgussplanSelectedPlan';
 const planChangeStorageKey = 'aufgussplanPlanChanged';
 const selectedPlanApiUrl = 'api/selected_plan.php';
+const screenConfigApiUrl = 'api/bildschirme.php';
 const nextAufgussSettingsApiUrl = 'api/next_aufguss_settings.php';
 let serverSelectedPlanId = null;
 let serverPlanSyncInFlight = false;
 let serverSelectedPlanUpdatedAt = null;
 let serverNextAufgussSettings = new Map();
+let serverPlanSyncTimer = null;
 let planAdIntervalId = null;
 let planAdHideTimeout = null;
 let activeAdPlanId = null;
@@ -94,6 +90,139 @@ let nextAufgussActivePlanId = null;
 let nextAufgussPlanId = null;
 let statsLogged = new Set();
 const statsLoggedStorageKey = 'aufgussplanStatsLogged';
+let screenId = 0;
+let screenMode = null;
+let screenImagePath = '';
+let screenBackgroundPath = '';
+let screenConfigUpdatedAt = null;
+let screenPlanLocked = false;
+let screenConfigSyncTimer = null;
+
+function startAufgussApp() {
+    loadPlans();
+    loadAufgussplan();
+    initPlanChangeListener();
+    initServerPlanSync();
+    initNextAufgussTimer();
+    loadStatsLogged();
+    initVideoAutoplayUnlock();
+}
+
+function getScreenId() {
+    const container = document.getElementById('aufgussplan');
+    const raw = container && container.dataset ? container.dataset.screenId : null;
+    const parsed = raw ? Number(raw) : 0;
+    return Number.isFinite(parsed) ? Math.max(0, parsed) : 0;
+}
+
+function initScreenConfig() {
+    screenId = getScreenId();
+    if (!screenId) {
+        return Promise.resolve();
+    }
+
+    return fetchScreenConfig()
+        .then(screen => {
+            applyScreenConfig(screen);
+            initScreenConfigSync();
+        })
+        .catch(error => {
+            console.warn('Screen config load failed:', error);
+        });
+}
+
+function initScreenConfigSync() {
+    if (!screenId) return;
+    if (screenConfigSyncTimer) {
+        clearInterval(screenConfigSyncTimer);
+    }
+    screenConfigSyncTimer = setInterval(() => {
+        fetchScreenConfig()
+            .then(screen => {
+                if (!screen || !screen.updated_at) {
+                    return;
+                }
+                if (screen.updated_at === screenConfigUpdatedAt) {
+                    return;
+                }
+                applyScreenConfig(screen);
+                renderFilteredAufguesse();
+            })
+            .catch(() => {});
+    }, 5000);
+}
+
+function fetchScreenConfig() {
+    return fetch(`${screenConfigApiUrl}?screen_id=${encodeURIComponent(screenId)}`, { cache: 'no-store' })
+        .then(response => response.ok ? response.json() : null)
+        .then(data => {
+            const payload = data && data.data ? data.data : null;
+            return payload && payload.screen ? payload.screen : null;
+        });
+}
+
+function applyScreenConfig(screen) {
+    const wasLocked = screenPlanLocked;
+    if (!screen) return;
+    screenConfigUpdatedAt = screen.updated_at || null;
+    screenMode = screen.mode === 'image' ? 'image' : 'plan';
+    screenImagePath = screen.image_path ? String(screen.image_path) : '';
+    screenBackgroundPath = screen.background_path ? String(screen.background_path) : '';
+
+    if (screenMode === 'image') {
+        screenPlanLocked = true;
+        selectedPlanId = null;
+        if (serverPlanSyncTimer) {
+            clearInterval(serverPlanSyncTimer);
+            serverPlanSyncTimer = null;
+        }
+        return;
+    }
+
+    if (screen.plan_id) {
+        screenPlanLocked = true;
+        selectedPlanId = String(screen.plan_id);
+        saveSelectedPlan();
+        if (serverPlanSyncTimer) {
+            clearInterval(serverPlanSyncTimer);
+            serverPlanSyncTimer = null;
+        }
+        return;
+    }
+
+    screenPlanLocked = false;
+    if (!screenPlanLocked && wasLocked) {
+        initServerPlanSync();
+    }
+}
+
+function normalizeScreenAssetPath(path) {
+    if (!path) return '';
+    if (String(path).startsWith('uploads/')) {
+        return String(path);
+    }
+    return `uploads/${path}`;
+}
+
+function renderScreenImage() {
+    const container = document.getElementById('aufgussplan');
+    if (!container) return;
+    const imagePath = screenImagePath ? normalizeScreenAssetPath(screenImagePath) : '';
+    const backgroundPath = screenBackgroundPath ? normalizeScreenAssetPath(screenBackgroundPath) : '';
+    applyPlanBackground(backgroundPath);
+
+    if (!imagePath) {
+        container.innerHTML = '<p class="text-center text-gray-500 py-8">Kein Bildschirm-Bild hinterlegt.</p>';
+        return;
+    }
+
+    const safePath = escapeHtml(imagePath);
+    container.innerHTML = `
+        <div class="w-full min-h-screen flex items-center justify-center">
+            <img src="${safePath}" alt="Bildschirm" class="max-w-full max-h-screen object-contain">
+        </div>
+    `;
+}
 
 function loadPlans() {
     fetch('api/plaene.php')
@@ -110,6 +239,10 @@ function loadPlans() {
 }
 
 function renderFilteredAufguesse() {
+    if (screenMode === 'image') {
+        renderScreenImage();
+        return;
+    }
     const filtered = filterAufguesseByPlan(lastAufguesse);
     renderPlanView(selectedPlanId, lastPlaene, filtered);
 }
@@ -124,6 +257,9 @@ function filterAufguesseByPlan(aufguesse) {
 }
 
 function restoreSelectedPlans() {
+    if (screenPlanLocked) {
+        return;
+    }
     try {
         const stored = localStorage.getItem(selectedPlansStorageKey);
         selectedPlanId = stored ? String(stored) : null;
@@ -174,6 +310,7 @@ function fetchNextAufgussSettings(planId) {
 }
 
 function syncSelectedPlanIdFromServer() {
+    if (screenPlanLocked) return;
     if (serverPlanSyncInFlight) return;
     serverPlanSyncInFlight = true;
 
@@ -209,8 +346,12 @@ function syncSelectedPlanIdFromServer() {
 }
 
 function initServerPlanSync() {
+    if (screenPlanLocked) return;
+    if (serverPlanSyncTimer) {
+        clearInterval(serverPlanSyncTimer);
+    }
     syncSelectedPlanIdFromServer();
-    setInterval(syncSelectedPlanIdFromServer, 5000);
+    serverPlanSyncTimer = setInterval(syncSelectedPlanIdFromServer, 5000);
 }
 
 function initVideoAutoplayUnlock() {
@@ -315,6 +456,9 @@ function preloadPlanAdVideo(mediaPath) {
 }
 
 function ensureSelectedPlan(plaene) {
+    if (screenPlanLocked) {
+        return;
+    }
     restoreSelectedPlans();
     if (!selectedPlanId && Array.isArray(plaene) && plaene.length > 0) {
         selectedPlanId = String(plaene[0].id);
@@ -474,6 +618,7 @@ function initPlanChangeListener() {
             window.location.reload();
             return;
         }
+        if (screenPlanLocked) return;
         if (event.key !== selectedPlansStorageKey && event.key !== planChangeStorageKey) return;
         restoreSelectedPlans();
         loadPlans();
@@ -484,6 +629,10 @@ function initPlanChangeListener() {
 function renderPlanView(planId, plaene, aufguesse) {
     const container = document.getElementById('aufgussplan');
     const hideHeader = !!(container && container.dataset && container.dataset.hidePlanHeader === 'true');
+    if (screenMode === 'image') {
+        renderScreenImage();
+        return;
+    }
     const plan = Array.isArray(plaene)
         ? plaene.find(item => String(item.id) === String(planId))
         : null;
@@ -503,7 +652,8 @@ function renderPlanView(planId, plaene, aufguesse) {
     const planBeschreibung = plan.beschreibung || '';
     const planInitial = planName.trim() ? planName.trim().charAt(0).toUpperCase() : 'P';
     const createdAt = formatPlanDate(plan.erstellt_am);
-    const backgroundImage = plan.hintergrund_bild ? `uploads/${plan.hintergrund_bild}` : '';
+    const forcedBackgroundImage = screenBackgroundPath ? normalizeScreenAssetPath(screenBackgroundPath) : '';
+    const backgroundImage = forcedBackgroundImage || (plan.hintergrund_bild ? `uploads/${plan.hintergrund_bild}` : '');
     const adMediaPath = plan.werbung_media ? `uploads/${plan.werbung_media}` : '';
     const adMediaType = plan.werbung_media_typ || '';
     const planSettings = getNextAufgussSettings(plan.id);
