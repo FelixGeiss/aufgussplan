@@ -752,32 +752,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                                                     switch ($stärke) {
                                                                         case 1:
-                                                                            $stärkeText = '1 - Leicht';
+                                                                            $stärkeText = '1 Leicht';
                                                                             $bgColor = 'bg-green-100';
                                                                             $textColor = 'text-green-800';
                                                                             break;
                                                                         case 2:
-                                                                            $stärkeText = '2 - Leicht+';
+                                                                            $stärkeText = '2 Leicht+';
                                                                             $bgColor = 'bg-green-200';
                                                                             $textColor = 'text-green-800';
                                                                             break;
                                                                         case 3:
-                                                                            $stärkeText = '3 - Mittel';
+                                                                            $stärkeText = '3 Mittel';
                                                                             $bgColor = 'bg-yellow-100';
                                                                             $textColor = 'text-yellow-800';
                                                                             break;
                                                                         case 4:
-                                                                            $stärkeText = '4 - Stark';
+                                                                            $stärkeText = '4 Stark';
                                                                             $bgColor = 'bg-orange-100';
                                                                             $textColor = 'text-orange-800';
                                                                             break;
                                                                         case 5:
-                                                                            $stärkeText = '5 - Stark+';
+                                                                            $stärkeText = '5 Stark+';
                                                                             $bgColor = 'bg-red-100';
                                                                             $textColor = 'text-red-800';
                                                                             break;
                                                                         case 6:
-                                                                            $stärkeText = '6 - Extrem';
+                                                                            $stärkeText = '6 Extrem';
                                                                             $bgColor = 'bg-red-200';
                                                                             $textColor = 'text-red-900';
                                                                             break;
@@ -799,11 +799,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                     <select name="staerke" class="rounded px-2 py-1 text-sm border border-gray-300">
                                                                         <option value="">-- Stärke wählen --</option>
                                                                         <option value="1" <?php echo ($stärke == 1) ? 'selected' : ''; ?>>1 - Sehr leicht</option>
-                                                                        <option value="2" <?php echo ($stärke == 2) ? 'selected' : ''; ?>>2 - Leicht</option>
-                                                                        <option value="3" <?php echo ($stärke == 3) ? 'selected' : ''; ?>>3 - Mittel</option>
-                                                                        <option value="4" <?php echo ($stärke == 4) ? 'selected' : ''; ?>>4 - Stark</option>
+                                                                        <option value="2" <?php echo ($stärke == 2) ? 'selected' : ''; ?>>2 Leicht</option>
+                                                                        <option value="3" <?php echo ($stärke == 3) ? 'selected' : ''; ?>>3 Mittel</option>
+                                                                        <option value="4" <?php echo ($stärke == 4) ? 'selected' : ''; ?>>4 Stark</option>
                                                                         <option value="5" <?php echo ($stärke == 5) ? 'selected' : ''; ?>>5 - Sehr stark</option>
-                                                                        <option value="6" <?php echo ($stärke == 6) ? 'selected' : ''; ?>>6 - Extrem stark</option>
+                                                                        <option value="6" <?php echo ($stärke == 6) ? 'selected' : ''; ?>>6 Extrem stark</option>
                                                                     </select>
                                                                     <div class="flex items-center gap-2 mt-2">
                                                                         <button onclick="saveEdit(<?php echo $aufguss['id']; ?>, 'staerke')" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">✓ Speichern</button>
@@ -1176,11 +1176,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     <select id="staerke-<?php echo $plan['id']; ?>" name="staerke" class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)">
                                                         <option class="border-2 border-solid text-center" style="border-color: var(--border-color)" value="">-- Stärke wählen --</option>
                                                         <option class="text-center" value="1">1 - Sehr leicht</option>
-                                                        <option class="text-center" value="2">2 - Leicht</option>
-                                                        <option class="text-center" value="3">3 - Mittel</option>
-                                                        <option class="text-center" value="4">4 - Stark</option>
+                                                        <option class="text-center" value="2">2 Leicht</option>
+                                                        <option class="text-center" value="3">3 Mittel</option>
+                                                        <option class="text-center" value="4">4 Stark</option>
                                                         <option class="text-center" value="5">5 - Sehr stark</option>
-                                                        <option class="text-center" value="6">6 - Extrem stark</option>
+                                                        <option class="text-center" value="6">6 Extrem stark</option>
                                                     </select>
                                                 </div>
 

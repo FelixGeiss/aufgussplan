@@ -1060,12 +1060,12 @@ function formatPlanDate(value) {
 function formatStaerke(value) {
     const level = Number(value) || 0;
     const map = {
-        1: { text: '1 - Sehr leicht', bgClass: 'bg-green-100', textClass: 'text-green-800' },
-        2: { text: '2 - Leicht', bgClass: 'bg-green-200', textClass: 'text-green-800' },
-        3: { text: '3 - Mittel', bgClass: 'bg-yellow-100', textClass: 'text-yellow-800' },
-        4: { text: '4 - Stark', bgClass: 'bg-orange-100', textClass: 'text-orange-800' },
-        5: { text: '5 - Stark+', bgClass: 'bg-red-100', textClass: 'text-red-800' },
-        6: { text: '6 - Extrem', bgClass: 'bg-red-200', textClass: 'text-red-900' }
+        1: { text: '1 Sehr leicht', bgClass: 'bg-green-100', textClass: 'text-green-800' },
+        2: { text: '2 Leicht', bgClass: 'bg-green-200', textClass: 'text-green-800' },
+        3: { text: '3 Mittel', bgClass: 'bg-yellow-100', textClass: 'text-yellow-800' },
+        4: { text: '4 Stark', bgClass: 'bg-orange-100', textClass: 'text-orange-800' },
+        5: { text: '5 Stark+', bgClass: 'bg-red-100', textClass: 'text-red-800' },
+        6: { text: '6 Extrem', bgClass: 'bg-red-200', textClass: 'text-red-900' }
     };
     return map[level] || { text: 'Unbekannt', bgClass: 'bg-gray-100', textClass: 'text-gray-800' };
 }
