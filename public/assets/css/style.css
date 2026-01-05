@@ -298,7 +298,7 @@
 }
 
 .plan-view-with-clock .plan-clock-stack {
-    position: absolute;
+    position: fixed;
     top: 0;
     right: 1rem;
     z-index: 50;
@@ -317,6 +317,10 @@
     border-radius: 0;
     text-align: center;
     box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+    height: var(--plan-header-height, 96px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .plan-view-with-clock .plan-clock-time {
@@ -327,7 +331,7 @@
 }
 
 .plan-view-with-clock .plan-clock-date {
-    margin-top: 0.3rem;
+    margin-top: 0.2rem;
     font-size: 0.95rem;
     color: var(--plan-text-color, #111827);
 }
@@ -374,10 +378,32 @@
     box-sizing: border-box;
 }
 
+.kiosk-view {
+    --plan-header-height: 96px;
+}
+
+.kiosk-view .plan-list-head {
+    position: fixed;
+    top: 0;
+    left: 1rem;
+    right: 1rem;
+    z-index: 60;
+    height: var(--plan-header-height);
+}
+
+.plan-view-with-clock .plan-list-head {
+    right: calc(var(--plan-clock-width, 220px) + var(--plan-clock-gap, 24px));
+}
+
+.kiosk-view .plan-list-body {
+    padding-top: var(--plan-header-height);
+    box-sizing: border-box;
+}
+
 @media (max-width: 900px) {
     .plan-view-with-clock .plan-clock-stack {
-        position: static;
-        margin: 1rem auto 0;
+        position: fixed;
+        right: 0.75rem;
         width: min(90vw, 320px);
     }
 
@@ -512,7 +538,7 @@
 }
 
 .kiosk-view .plan-list-head .plan-list-cell {
-    font-size: clamp(1rem, 1.6vw, 1.9rem);
+    font-size: clamp(1.15rem, 1.8vw, 2.2rem);
     letter-spacing: 0.12em;
 }
 
