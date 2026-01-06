@@ -54,6 +54,34 @@ $canAufguesse = has_permission('aufguesse');
 $canStatistik = has_permission('statistik');
 $canUmfragen = has_permission('umfragen');
 $canBildschirme = has_permission('bildschirme');
+
+$screenAdStatus = [
+    'label' => 'Werbung: nicht verfuegbar',
+    'screens' => [],
+];
+$screenConfigFile = __DIR__ . '/../../storage/bildschirme.json';
+if (is_file($screenConfigFile)) {
+    $screenConfigRaw = file_get_contents($screenConfigFile);
+    $screenConfig = json_decode($screenConfigRaw, true);
+    if (is_array($screenConfig)) {
+        $globalAd = $screenConfig['global_ad'] ?? [];
+        $enabled = !empty($globalAd['enabled']);
+        $order = array_map('intval', $globalAd['order'] ?? []);
+        $order = array_values(array_filter($order, function ($id) {
+            return $id > 0;
+        }));
+
+        if ($enabled && !empty($order)) {
+            $screenAdStatus['label'] = 'Werbung aktiv';
+            $screenAdStatus['screens'] = $order;
+        } elseif ($enabled) {
+            $screenAdStatus['label'] = 'Werbung aktiv';
+            $screenAdStatus['screens'] = [];
+        } else {
+            $screenAdStatus['label'] = 'Werbung deaktiviert';
+        }
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -149,6 +177,22 @@ $canBildschirme = has_permission('bildschirme');
                     <h3 class="text-lg font-semibold mb-2">Bildschirme</h3>
                     <p class="text-gray-600">Verwalten Sie die TV-Bildschirme</p>
                     <a href="bildschirme.php" class="mt-4 inline-block bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600">Verwalten</a>
+                    <div class="mt-4 border-t border-gray-200 pt-4">
+                        <div class="text-xs text-gray-500 mb-2">
+                            <?php echo htmlspecialchars($screenAdStatus['label']); ?>
+                        </div>
+                        <?php if (!empty($screenAdStatus['screens'])): ?>
+                            <div class="flex flex-wrap gap-2">
+                                <?php foreach ($screenAdStatus['screens'] as $screenId): ?>
+                                    <span class="inline-flex items-center rounded-full bg-indigo-50 px-2 py-1 text-xs font-semibold text-indigo-700">
+                                        Bildschirm <?php echo (int)$screenId; ?>
+                                    </span>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php else: ?>
+                            <div class="text-xs text-gray-400">Keine Bildschirme in der Rotation.</div>
+                        <?php endif; ?>
+                    </div>
                 </div>
             <?php endif; ?>
         </div>
