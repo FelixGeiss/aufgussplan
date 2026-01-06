@@ -258,8 +258,8 @@ function renderScreenImage() {
 
     const safePath = escapeHtml(imagePath);
     container.innerHTML = `
-        <div class="w-full min-h-screen flex items-center justify-center">
-            <img src="${safePath}" alt="Bildschirm" class="max-w-full max-h-screen object-contain">
+        <div class="w-full h-screen">
+            <img src="${safePath}" alt="Bildschirm" class="w-full h-full object-cover">
         </div>
     `;
 }
