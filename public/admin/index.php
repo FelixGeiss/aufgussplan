@@ -39,15 +39,15 @@ require_login();
 /**
  * DATEN FUER DAS DASHBOARD LADEN
  *
- * Aktuell braucht die Seite nur die Plaene fuer die Uebersicht.
+ * Aktuell braucht die Seite nur die Pläene fuer die Uebersicht.
  */
 
 // Datenbankverbindung herstellen
 require_once __DIR__ . '/../../src/db/connection.php';
 $db = Database::getInstance()->getConnection();
 
-// Plaene fuer die Uebersicht laden (neueste zuerst)
-$plaene = $db->query("SELECT id, name, beschreibung, erstellt_am FROM plaene ORDER BY erstellt_am DESC")->fetchAll();
+// Pläene fuer die Uebersicht laden (neueste zuerst)
+$Pläene = $db->query("SELECT id, name, beschreibung, erstellt_am FROM plaene ORDER BY erstellt_am DESC")->fetchAll();
 
 $canMitarbeiter = has_permission('mitarbeiter');
 $canAufguesse = has_permission('aufguesse');
@@ -114,13 +114,13 @@ $canUmfragen = has_permission('umfragen');
                 <?php endif; ?>
 
                 <div class="mt-6 border-t border-gray-200 pt-6">
-                    <?php if (empty($plaene)): ?>
+                    <?php if (empty($Pläene)): ?>
                         <div class="rounded-md border border-dashed border-gray-300 bg-white px-4 py-6 text-center text-sm text-gray-500">
-                            Noch keine Plaene vorhanden. Erstelle zuerst einen Plan in der Planung.
+                            Noch keine Pläene vorhanden. Erstelle zuerst einen Plan in der Planung.
                         </div>
                     <?php else: ?>
                         <div id="plan-list" class="flex flex-wrap gap-4">
-                            <?php foreach ($plaene as $p): ?>
+                            <?php foreach ($Pläene as $p): ?>
                                 <div class="plan-item flex w-full flex-col gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3 sm:w-[calc(50%-0.5rem)] lg:w-[calc(25%-0.75rem)]" data-plan-id="<?php echo (int)$p['id']; ?>">
                                     <div>
                                         <div class="text-base font-semibold text-gray-900">
@@ -191,4 +191,3 @@ $canUmfragen = has_permission('umfragen');
 </body>
 
 </html>
-

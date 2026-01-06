@@ -65,7 +65,7 @@ try {
             sendResponse(false, 'HTTP-Methode nicht unterstützt', null, 405);
     }
 } catch (Exception $e) {
-    error_log('API-Fehler in plaene.php: ' . $e->getMessage());
+    error_log('API-Fehler in Pläene.php: ' . $e->getMessage());
     sendResponse(false, 'Interner Serverfehler', null, 500);
 }
 
@@ -73,8 +73,8 @@ try {
  * GET: Alle Pläne abrufen
  */
 function handleGetPlans($aufgussModel) {
-    $plaene = $aufgussModel->getAllPlans();
-    sendResponse(true, 'Pläne erfolgreich abgerufen', ['plaene' => $plaene]);
+    $Pläene = $aufgussModel->getAllPlans();
+    sendResponse(true, 'Pläne erfolgreich abgerufen', ['Pläene' => $Pläene]);
 }
 
 /**

@@ -1,5 +1,5 @@
 const screensApiUrl = '../api/bildschirme.php';
-const plansApiUrl = '../api/plaene.php';
+const plansApiUrl = '../api/Pläene.php';
 const uploadUrl = 'upload_screen_media.php';
 const globalAdUploadUrl = 'upload_global_ad.php';
 const screenCount = 5;
@@ -37,13 +37,13 @@ function fetchJson(url, options) {
     return fetch(url, options).then(response => response.ok ? response.json() : null);
 }
 
-// Extrahiert Plaene aus API-Payload.
+// Extrahiert Pläene aus API-Payload.
 function extractPlans(payload) {
-    if (payload && payload.data && Array.isArray(payload.data.plaene)) {
-        return payload.data.plaene;
+    if (payload && payload.data && Array.isArray(payload.data.Pläene)) {
+        return payload.data.Pläene;
     }
-    if (payload && Array.isArray(payload.plaene)) {
-        return payload.plaene;
+    if (payload && Array.isArray(payload.Pläene)) {
+        return payload.Pläene;
     }
     return [];
 }
@@ -62,10 +62,10 @@ function extractScreens(payload) {
     return screens;
 }
 
-// Baut Select-Optionen fuer Plaene.
+// Baut Select-Optionen fuer Pläene.
 function buildPlanOptions(plans, selectedId) {
     if (!plans.length) {
-        return '<option value="">Keine Plaene</option>';
+        return '<option value="">Keine Pläene</option>';
     }
     return [
         '<option value="">Plan waehlen</option>',

@@ -42,7 +42,7 @@ require_once __DIR__ . '/../../src/models/aufguss.php';
 $aufgussModel = new Aufguss();
 
 // Pläne aus Datenbank laden
-$plaene = $aufgussModel->getAllPlans();
+$Pläene = $aufgussModel->getAllPlans();
 // Daten für Formular-Select-Felder laden
 $mitarbeiter = $db->query("SELECT id, name, bild FROM mitarbeiter ORDER BY name")->fetchAll();
 $saunen = $db->query("SELECT id, name, bild, beschreibung, temperatur FROM saunen ORDER BY name")->fetchAll();
@@ -66,7 +66,7 @@ $addUploadedFile = function ($bereich, $name, $datei, $typ, $extra = []) use (&$
     ], $extra);
 };
 
-foreach ($plaene as $plan) {
+foreach ($Pläene as $plan) {
     $addUploadedFile('Plan', $plan['name'] ?? '', $plan['hintergrund_bild'] ?? '', 'Hintergrundbild', [
         'plan_id' => $plan['id'] ?? null
     ]);
@@ -530,7 +530,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
 
-        <?php if (empty($plaene)): ?>
+        <?php if (empty($Pläene)): ?>
             <!-- Keine Pläne vorhanden -->
             <div class="bg-white rounded-lg shadow-md">
                 <div class="p-6">
@@ -544,7 +544,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         <?php else: ?>
             <!-- Pläne mit ihren Aufgüssen -->
-            <?php foreach ($plaene as $plan): ?>
+            <?php foreach ($Pläene as $plan): ?>
                 <?php
                 // Aufgüsse für diesen Plan laden
                 $planAufgüsse = $aufgussModel->getAufgüsseByPlan($plan['id']);
@@ -1336,11 +1336,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                         <?php if (!empty($plan['hintergrund_bild'])): ?>
                                             <button type="button" onclick="deletePlanBackgroundImage(<?php echo $plan['id']; ?>, '<?php echo htmlspecialchars($plan['name'] ?? ''); ?>')" class="w-full rounded-md bg-red-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500">
-                                                Hintergrundbild loeschen
+                                                Hintergrundbild Löschen
                                             </button>
                                         <?php else: ?>
                                             <button type="button" class="w-full rounded-md bg-red-200 px-4 py-2 text-sm font-semibold text-white shadow-sm cursor-not-allowed" disabled>
-                                                Hintergrundbild loeschen
+                                                Hintergrundbild Löschen
                                             </button>
                                         <?php endif; ?>
                                     </div>
@@ -1475,11 +1475,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                                     <?php if (!empty($plan['werbung_media'])): ?>
                                                         <button type="button" id="plan-ad-delete-btn-<?php echo $plan['id']; ?>" onclick="deletePlanAdMedia(<?php echo $plan['id']; ?>, '<?php echo htmlspecialchars($plan['name'] ?? ''); ?>')" class="w-full rounded-md bg-red-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500">
-                                                            Werbung loeschen
+                                                            Werbung Löschen
                                                         </button>
                                                     <?php else: ?>
                                                         <button type="button" id="plan-ad-delete-btn-<?php echo $plan['id']; ?>" class="w-full rounded-md bg-red-200 px-4 py-2 text-sm font-semibold text-white shadow-sm cursor-not-allowed" disabled>
-                                                            Werbung loeschen
+                                                            Werbung Löschen
                                                         </button>
                                                     <?php endif; ?>
                                                 </div>
@@ -2061,7 +2061,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <button type="button"
                                                     onclick="deleteUploadFile('werbung', <?php echo htmlspecialchars(json_encode($fileRelPath), ENT_QUOTES, 'UTF-8'); ?>)"
                                                     class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition-colors duration-150"
-                                                    title="Datei loeschen">
+                                                    title="Datei Löschen">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                     </svg>
@@ -2138,7 +2138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <button type="button"
                                                     onclick="deleteUploadFile('plan', <?php echo htmlspecialchars(json_encode($fileRelPath), ENT_QUOTES, 'UTF-8'); ?>)"
                                                     class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition-colors duration-150"
-                                                    title="Datei loeschen">
+                                                    title="Datei Löschen">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                     </svg>
@@ -2783,7 +2783,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         async function deleteUploadFile(type, path) {
-            if (!confirm('Datei wirklich loeschen?')) {
+            if (!confirm('Datei wirklich Löschen?')) {
                 return;
             }
 
@@ -2800,12 +2800,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 });
                 const result = await response.json();
                 if (!result.success) {
-                    alert(result.error || 'Fehler beim Loeschen der Datei.');
+                    alert(result.error || 'Fehler beim Löschen der Datei.');
                     return;
                 }
                 location.reload();
             } catch (error) {
-                alert('Netzwerkfehler beim Loeschen der Datei.');
+                alert('Netzwerkfehler beim Löschen der Datei.');
             }
         }
 
@@ -3761,7 +3761,7 @@ function savePlanSettings(planId, options = {}) {
         }
 
         async function deletePlanAdMedia(planId, planName) {
-            if (!confirm(`Werbung von "${planName}" loeschen?`)) {
+            if (!confirm(`Werbung von "${planName}" Löschen?`)) {
                 return;
             }
 
@@ -3777,7 +3777,7 @@ function savePlanSettings(planId, options = {}) {
                 });
                 const result = await response.json();
                 if (!result.success) {
-                    alert(result.error || 'Fehler beim Loeschen der Werbung.');
+                    alert(result.error || 'Fehler beim Löschen der Werbung.');
                     return;
                 }
 
@@ -3791,7 +3791,7 @@ function savePlanSettings(planId, options = {}) {
                 schedulePlanAd(planId);
             notifyPublicPlanChange(planId);
             } catch (error) {
-                alert('Netzwerkfehler beim Loeschen der Werbung.');
+                alert('Netzwerkfehler beim Löschen der Werbung.');
             }
         }
 

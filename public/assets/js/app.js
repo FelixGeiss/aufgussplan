@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 let lastAufguesse = [];
-let lastPlaene = [];
+let lastPläene = [];
 let selectedPlanId = null;
 const selectedPlansStorageKey = 'aufgussplanSelectedPlan';
 const planChangeStorageKey = 'aufgussplanPlanChanged';
@@ -264,18 +264,18 @@ function renderScreenImage() {
     `;
 }
 
-// Laedt Plaene und aktualisiert die Anzeige.
+// Laedt Pläene und aktualisiert die Anzeige.
 function loadPlans() {
-    fetch('api/plaene.php')
+    fetch('api/Pläene.php')
         .then(response => response.json())
         .then(data => {
-            const plaene = extractPlaene(data);
-            lastPlaene = Array.isArray(plaene) ? plaene : [];
-            ensureSelectedPlan(lastPlaene);
+            const Pläene = extractPläene(data);
+            lastPläene = Array.isArray(Pläene) ? Pläene : [];
+            ensureSelectedPlan(lastPläene);
             renderFilteredAufguesse();
         })
         .catch(error => {
-            console.error('Fehler beim Laden der Plaene:', error);
+            console.error('Fehler beim Laden der Pläene:', error);
         });
 }
 
@@ -286,7 +286,7 @@ function renderFilteredAufguesse() {
         return;
     }
     const filtered = filterAufguesseByPlan(lastAufguesse);
-    renderPlanView(selectedPlanId, lastPlaene, filtered);
+    renderPlanView(selectedPlanId, lastPläene, filtered);
 }
 
 
@@ -511,13 +511,13 @@ function preloadPlanAdVideo(mediaPath) {
 }
 
 // Setzt Default-Plan falls keiner gewaehlt.
-function ensureSelectedPlan(plaene) {
+function ensureSelectedPlan(Pläene) {
     if (screenPlanLocked) {
         return;
     }
     restoreSelectedPlans();
-    if (!selectedPlanId && Array.isArray(plaene) && plaene.length > 0) {
-        selectedPlanId = String(plaene[0].id);
+    if (!selectedPlanId && Array.isArray(Pläene) && Pläene.length > 0) {
+        selectedPlanId = String(Pläene[0].id);
         saveSelectedPlan();
     }
 }
@@ -539,14 +539,14 @@ function extractAufguesse(payload) {
     return [];
 }
 
-// Extrahiert Plaene aus API-Payload.
-function extractPlaene(payload) {
-    if (payload && payload.data && Array.isArray(payload.data.plaene)) {
-        return payload.data.plaene;
+// Extrahiert Pläene aus API-Payload.
+function extractPläene(payload) {
+    if (payload && payload.data && Array.isArray(payload.data.Pläene)) {
+        return payload.data.Pläene;
     }
 
-    if (payload && Array.isArray(payload.plaene)) {
-        return payload.plaene;
+    if (payload && Array.isArray(payload.Pläene)) {
+        return payload.Pläene;
     }
 
     return [];
@@ -570,8 +570,8 @@ function loadAufgussplan() {
             lastAufguesse = extractAufguesse(data);
             aufgussById = new Map(lastAufguesse.map(item => [String(item.id), item]));
             restoreSelectedPlans();
-            if (!selectedPlanId && lastPlaene.length > 0) {
-                ensureSelectedPlan(lastPlaene);
+            if (!selectedPlanId && lastPläene.length > 0) {
+                ensureSelectedPlan(lastPläene);
             }
             renderFilteredAufguesse();
         })
@@ -599,15 +599,15 @@ function initPlanChangeListener() {
 }
 
 // Baut die komplette Plan-Ansicht.
-function renderPlanView(planId, plaene, aufguesse) {
+function renderPlanView(planId, Pläene, aufguesse) {
     const container = document.getElementById('aufgussplan');
     const hideHeader = !!(container && container.dataset && container.dataset.hidePlanHeader === 'true');
     if (screenMode === 'image') {
         renderScreenImage();
         return;
     }
-    const plan = Array.isArray(plaene)
-        ? plaene.find(item => String(item.id) === String(planId))
+    const plan = Array.isArray(Pläene)
+        ? Pläene.find(item => String(item.id) === String(planId))
         : null;
 
     if (!plan) {

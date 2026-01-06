@@ -54,7 +54,7 @@ try {
                 exit;
             }
 
-            // Aufgussname loeschen
+            // Aufgussname Löschen
             $stmt = $db->prepare("DELETE FROM aufguss_namen WHERE id = ?");
             $stmt->execute([$id]);
             $_SESSION['delete_message'] = 'Aufgussname erfolgreich geloescht.';

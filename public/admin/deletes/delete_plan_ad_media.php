@@ -1,6 +1,6 @@
 <?php
 /**
- * Plan-Werbung loeschen
+ * Plan-Werbung Löschen
  */
 
 session_start();

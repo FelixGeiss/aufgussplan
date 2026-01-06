@@ -91,7 +91,7 @@ function buildRow(mitarbeiter) {
             <td class="px-4 py-2 text-center">
                 <div class="flex justify-center gap-2">
                     <button type="button" data-action="save" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">Speichern</button>
-                    <button type="button" data-action="delete" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">Loeschen</button>
+                    <button type="button" data-action="delete" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">Löschen</button>
                 </div>
             </td>
         </tr>
@@ -195,7 +195,7 @@ async function deleteRow(row) {
     const id = row.getAttribute('data-id');
     if (!id) return;
 
-    if (!confirm('Mitarbeiter wirklich loeschen?')) return;
+    if (!confirm('Mitarbeiter wirklich Löschen?')) return;
 
     try {
         const response = await fetch(`${apiUrl}?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
@@ -204,14 +204,14 @@ async function deleteRow(row) {
             notify('Mitarbeiter geloescht.', 'success');
             await loadMitarbeiter();
         } else {
-            notify(result && result.message ? result.message : 'Loeschen fehlgeschlagen.', 'error');
+            notify(result && result.message ? result.message : 'Löschen fehlgeschlagen.', 'error');
         }
     } catch (error) {
-        notify('Netzwerkfehler beim Loeschen.', 'error');
+        notify('Netzwerkfehler beim Löschen.', 'error');
     }
 }
 
-// Bindet Tabellen-Events fuer Speichern/Loeschen.
+// Bindet Tabellen-Events fuer Speichern/Löschen.
 function setupTableHandlers() {
     const table = document.getElementById('mitarbeiterTable');
     if (!table) return;

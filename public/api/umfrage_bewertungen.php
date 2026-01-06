@@ -1,6 +1,6 @@
 <?php
 /**
- * API: Umfrage-Bewertungen loeschen
+ * API: Umfrage-Bewertungen Löschen
  *
  * Erwartet: DELETE mit JSON {"kriterium": "...", "aufguss_name_id": 12|null, "plan_ids": [1,2]}
  */

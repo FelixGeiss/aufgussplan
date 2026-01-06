@@ -187,12 +187,12 @@ function testDatabaseConnection() {
 
         // PLÄNE TABELLE
         echo "<h3>Pläne-Tabelle:</h3>";
-        $plaene = $db->query("SELECT id, name FROM plaene LIMIT 3")->fetchAll();
+        $Pläene = $db->query("SELECT id, name FROM plaene LIMIT 3")->fetchAll();
 
-        if ($plaene) {
+        if ($Pläene) {
             echo "<p class='success'>✅ Plan-Daten gefunden:</p>";
             echo "<ul>";
-            foreach ($plaene as $p) {
+            foreach ($Pläene as $p) {
                 echo "<li><strong>ID {$p['id']}:</strong> {$p['name']}</li>";
             }
             echo "</ul>";

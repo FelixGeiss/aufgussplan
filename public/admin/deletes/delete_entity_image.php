@@ -1,6 +1,6 @@
 <?php
 /**
- * Entity-Bild LOESCHEN
+ * Entity-Bild Löschen
  */
 
 // Session fuer Sicherheit starten

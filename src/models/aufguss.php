@@ -613,7 +613,7 @@ class Aufguss {
      * - LEFT JOIN mitarbeiter (m) - für Mitarbeiter-Namen
      * - LEFT JOIN saunen (s) - für Sauna-Namen
      * - LEFT JOIN duftmittel (d) - für Duftmittel-Namen
-     * - LEFT JOIN plaene (p) - für Plan-Namen
+     * - LEFT JOIN Pläene (p) - für Plan-Namen
      *
      * LEFT JOIN bedeutet: Auch Aufgüsse ohne Mitarbeiter/Sauna/etc. werden angezeigt
      *

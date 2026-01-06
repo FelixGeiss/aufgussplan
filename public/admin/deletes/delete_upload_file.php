@@ -1,6 +1,6 @@
 <?php
 /**
- * Datei direkt aus dem Upload-Ordner loeschen
+ * Datei direkt aus dem Upload-Ordner Löschen
  */
 
 session_start();

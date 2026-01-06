@@ -17,7 +17,7 @@ require_login();
 require_permission('umfragen');
 
 $aufgussModel = new Aufguss();
-$plaene = $aufgussModel->getAllPlans();
+$Pläene = $aufgussModel->getAllPlans();
 
 $planId = isset($_GET['plan_id']) ? (int)$_GET['plan_id'] : 0;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -26,12 +26,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $planId = $postedPlanId;
     }
 }
-if ($planId <= 0 && !empty($plaene)) {
-    $planId = (int)$plaene[0]['id'];
+if ($planId <= 0 && !empty($Pläene)) {
+    $planId = (int)$Pläene[0]['id'];
 }
 
 $selectedPlan = null;
-foreach ($plaene as $plan) {
+foreach ($Pläene as $plan) {
     if ((int)$plan['id'] === $planId) {
         $selectedPlan = $plan;
         break;
@@ -39,8 +39,8 @@ foreach ($plaene as $plan) {
 }
 
 $fallbackPlan = $selectedPlan;
-if ($planId > 0 && !$selectedPlan && !empty($plaene)) {
-    $fallbackPlan = $plaene[0];
+if ($planId > 0 && !$selectedPlan && !empty($Pläene)) {
+    $fallbackPlan = $Pläene[0];
     $planId = (int)$fallbackPlan['id'];
 }
 if (!$selectedPlan) {
@@ -134,13 +134,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $planId > 0) {
 
         <div class="bg-white rounded-lg p-6 mb-6">
             <h3 class="text-lg font-semibold mb-4">Plan auswaehlen</h3>
-            <?php if (empty($plaene)): ?>
+            <?php if (empty($Pläene)): ?>
                 <div class="rounded-md border border-dashed border-gray-300 bg-white px-4 py-6 text-center text-sm text-gray-500">
-                    Noch keine Plaene vorhanden. Erstelle zuerst einen Plan in der Planung.
+                    Noch keine Pläene vorhanden. Erstelle zuerst einen Plan in der Planung.
                 </div>
             <?php else: ?>
                 <div class="flex flex-wrap gap-3">
-                    <?php foreach ($plaene as $plan): ?>
+                    <?php foreach ($Pläene as $plan): ?>
                         <button type="button" class="plan-select-btn" data-plan-id="<?php echo (int)$plan['id']; ?>">
                             <?php echo htmlspecialchars($plan['name'] ?? 'Plan'); ?>
                         </button>
@@ -213,7 +213,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $planId > 0) {
                             Umfrage speichern
                         </button>
                         <button type="button" id="survey-delete" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
-                            Umfrage loeschen
+                            Umfrage Löschen
                         </button>
                         <span class="text-sm text-gray-500 self-center">Die Umfrage wird beim ausgewaehlten Plan gespeichert.</span>
                     </div>

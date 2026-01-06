@@ -5,7 +5,7 @@
  * Diese Seite ermoeglicht es Administratoren, Mitarbeiter zu verwalten:
  * - Neue Mitarbeiter hinzufuegen
  * - Bestehende Mitarbeiter anzeigen
- * - Mitarbeiter bearbeiten/loeschen (zukuenftig)
+ * - Mitarbeiter bearbeiten/Löschen (zukuenftig)
  *
  * URL: http://localhost/aufgussplan/admin/mitarbeiter.php
  */

@@ -809,10 +809,10 @@ if (defined('STATISTIK_JSON')) {
         <h3 id="more-stats" class="text-lg font-semibold text-gray-900 mb-4">Weitere Statistiken (immer sichtbar)</h3>
         <?php if (!empty($planRows)) : ?>
         <div class="mb-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-3">Plaene (ein-/ausblenden)</h3>
+            <h3 class="text-lg font-semibold text-gray-900 mb-3">Pläene (ein-/ausblenden)</h3>
             <div class="bg-white rounded-lg shadow-md p-6">
                 <div class="flex flex-wrap items-center gap-4">
-                    <span class="text-sm font-semibold text-gray-700">Plaene anzeigen:</span>
+                    <span class="text-sm font-semibold text-gray-700">Pläene anzeigen:</span>
                     <?php foreach ($planRows as $planRow) :
                         $planId = (int)$planRow['id'];
                         $isActive = empty($selectedPlanIds) || in_array($planId, $selectedPlanIds, true);
@@ -932,7 +932,7 @@ if (defined('STATISTIK_JSON')) {
                                         <?php echo number_format($avg, 1, '.', ''); ?> / 5
                                     </span>
                                     <button type="button" class="admin-btn admin-btn-danger" data-umfrage-delete>
-                                        Loeschen
+                                        Löschen
                                     </button>
                                 </div>
                             </div>
@@ -1492,7 +1492,7 @@ if (defined('STATISTIK_JSON')) {
                 const aufgussNameId = aufgussIdRaw !== '' && /^\d+$/.test(aufgussIdRaw) ? Number(aufgussIdRaw) : null;
                 if (!kriterium) return;
 
-                const confirmText = `Umfrage "${kriterium}" wirklich loeschen?`;
+                const confirmText = `Umfrage "${kriterium}" wirklich Löschen?`;
                 if (!window.confirm(confirmText)) return;
 
                 const payload = { kriterium, aufguss_name_id: aufgussNameId };
@@ -1509,14 +1509,14 @@ if (defined('STATISTIK_JSON')) {
                     });
                     const data = await response.json().catch(() => null);
                     if (!response.ok || !data || data.success !== true) {
-                        const message = data && data.message ? data.message : 'Loeschen fehlgeschlagen.';
+                        const message = data && data.message ? data.message : 'Löschen fehlgeschlagen.';
                         alert(message);
                         return;
                     }
                     window.location.reload();
                 } catch (error) {
-                    console.error('Fehler beim Loeschen der Umfrage', error);
-                    alert('Loeschen fehlgeschlagen.');
+                    console.error('Fehler beim Löschen der Umfrage', error);
+                    alert('Löschen fehlgeschlagen.');
                 }
             };
 

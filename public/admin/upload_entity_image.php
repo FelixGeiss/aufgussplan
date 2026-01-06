@@ -90,7 +90,7 @@ try {
         mkdir($uploadDir, 0755, true);
     }
 
-    // Altes Bild nur loeschen, wenn es kein Plan-Hintergrund ist
+    // Altes Bild nur Löschen, wenn es kein Plan-Hintergrund ist
     if ($entityType !== 'plan') {
         $stmt = $db->prepare("SELECT {$column} FROM {$table} WHERE id = ?");
         $stmt->execute([$entityId]);

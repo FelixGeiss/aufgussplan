@@ -19,9 +19,9 @@ $isSubmit = isset($_POST['submit_ratings']) && $_POST['submit_ratings'] === '1';
 
 $aufgussModel = new Aufguss();
 if ($planId <= 0) {
-    $plaene = $aufgussModel->getAllPlans();
-    if (!empty($plaene)) {
-        $planId = (int)$plaene[0]['id'];
+    $Pläene = $aufgussModel->getAllPlans();
+    if (!empty($Pläene)) {
+        $planId = (int)$Pläene[0]['id'];
     }
 }
 
