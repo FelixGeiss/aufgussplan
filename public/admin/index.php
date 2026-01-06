@@ -120,7 +120,7 @@ if (is_file($screenConfigFile)) {
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-lg font-semibold mb-2">Statistiken</h3>
                     <p class="text-gray-600">Uebersicht ueber Aktivitaeten</p>
-                    <a href="statistik.php" class="mt-4 inline-block bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Anzeigen</a>
+                    <a href="statistik.php" class="mt-4 inline-block bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Verwalten</a>
                 </div>
             <?php endif; ?>
 
@@ -128,7 +128,7 @@ if (is_file($screenConfigFile)) {
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-lg font-semibold mb-2">Umfrage</h3>
                     <p class="text-gray-600">Umfrage Erstellen</p>
-                    <a href="umfragen.php" class="mt-4 inline-block bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Anzeigen</a>
+                    <a href="umfragen.php" class="mt-4 inline-block bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Verwalten</a>
                 </div>
             <?php endif; ?>
         </div>
