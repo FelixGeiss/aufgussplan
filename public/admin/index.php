@@ -79,7 +79,7 @@ $canBildschirme = has_permission('bildschirme');
 
         <!-- DASHBOARD-INHALTE -->
         <!-- 3-spaltiges Grid-Layout fuer verschiedene Bereiche -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div class="grid gap-6 mb-8 grid-cols-[repeat(auto-fit,minmax(220px,1fr))]">
             <?php if ($canMitarbeiter): ?>
                 <div class="bg-white rounded-lg  p-6">
                     <h3 class="text-lg font-semibold mb-2">Mitarbeiter</h3>
@@ -106,7 +106,7 @@ $canBildschirme = has_permission('bildschirme');
         </div>
 
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="grid gap-6 grid-cols-[repeat(auto-fit,minmax(260px,1fr))]">
             <div class="bg-white rounded-lg p-6">
                 <h3 class="text-lg font-semibold mb-2">Aufgüsse</h3>
                 <p class="text-gray-600">Planen Sie Ihre Aufgüsse</p>
