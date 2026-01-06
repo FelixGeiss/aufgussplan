@@ -702,6 +702,20 @@
 }
 
 @media (max-width: 1000px) {
+    .plan-view-with-clock .plan-clock-stack {
+        display: none;
+    }
+
+    .plan-view-with-clock .plan-table-wrap {
+        padding: 0 1rem 0;
+    }
+
+    .plan-view-with-clock .plan-list-head {
+        right: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
     .screen-lock {
         display: flex;
     }
