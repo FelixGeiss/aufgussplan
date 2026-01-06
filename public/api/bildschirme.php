@@ -48,14 +48,23 @@ function handleGetScreens($storageFile, $screenCount) {
     $screenId = isset($_GET['screen_id']) ? (int)$_GET['screen_id'] : 0;
     $config = readScreenConfig($storageFile, $screenCount);
     $globalAd = $config['global_ad'] ?? defaultGlobalAd();
+    $serverTime = date('c');
 
     if ($screenId > 0) {
         $screen = $config['screens'][$screenId] ?? defaultScreen($screenId);
-        sendResponse(true, 'Bildschirm geladen', ['screen' => $screen, 'global_ad' => $globalAd]);
+        sendResponse(true, 'Bildschirm geladen', [
+            'screen' => $screen,
+            'global_ad' => $globalAd,
+            'server_time' => $serverTime
+        ]);
     }
 
     $screens = array_values($config['screens']);
-    sendResponse(true, 'Bildschirme geladen', ['screens' => $screens, 'global_ad' => $globalAd]);
+    sendResponse(true, 'Bildschirme geladen', [
+        'screens' => $screens,
+        'global_ad' => $globalAd,
+        'server_time' => $serverTime
+    ]);
 }
 
 function handleSaveScreen($storageDir, $storageFile, $screenCount) {
@@ -64,7 +73,12 @@ function handleSaveScreen($storageDir, $storageFile, $screenCount) {
         $input = $_POST;
     }
 
-    $hasGlobalAd = array_key_exists('global_ad_path', $input) || array_key_exists('global_ad_type', $input);
+    $hasGlobalAd = array_key_exists('global_ad_path', $input)
+        || array_key_exists('global_ad_type', $input)
+        || array_key_exists('global_ad_enabled', $input)
+        || array_key_exists('global_ad_order', $input)
+        || array_key_exists('global_ad_display_seconds', $input)
+        || array_key_exists('global_ad_pause_seconds', $input);
     $screenId = (int)($input['screen_id'] ?? 0);
     if (!$hasGlobalAd || $screenId > 0) {
         if ($screenId < 1 || $screenId > $screenCount) {
@@ -104,10 +118,24 @@ function handleSaveScreen($storageDir, $storageFile, $screenCount) {
         if (!$globalAdType || !in_array($globalAdType, ['image', 'video'], true)) {
             $globalAdType = inferAdType($globalAdPath);
         }
-        $config['global_ad'] = [
+        $enabled = isset($input['global_ad_enabled']) ? (bool)$input['global_ad_enabled'] : false;
+        $order = sanitizeScreenOrder($input['global_ad_order'] ?? [], $screenCount);
+        $displaySeconds = isset($input['global_ad_display_seconds'])
+            ? max(1, (int)$input['global_ad_display_seconds'])
+            : defaultGlobalAd($screenCount)['display_seconds'];
+        $pauseSeconds = isset($input['global_ad_pause_seconds'])
+            ? max(0, (int)$input['global_ad_pause_seconds'])
+            : defaultGlobalAd($screenCount)['pause_seconds'];
+
+        $config['global_ad'] = array_merge(defaultGlobalAd($screenCount), [
             'path' => $globalAdPath,
-            'type' => $globalAdPath ? $globalAdType : null
-        ];
+            'type' => $globalAdPath ? $globalAdType : null,
+            'enabled' => $enabled,
+            'order' => $order,
+            'display_seconds' => $displaySeconds,
+            'pause_seconds' => $pauseSeconds,
+            'rotation_started_at' => date('c')
+        ]);
     }
 
     writeScreenConfig($storageDir, $storageFile, $config);
@@ -119,7 +147,7 @@ function handleSaveScreen($storageDir, $storageFile, $screenCount) {
 }
 
 function readScreenConfig($storageFile, $screenCount) {
-    $config = ['screens' => [], 'global_ad' => defaultGlobalAd()];
+    $config = ['screens' => [], 'global_ad' => defaultGlobalAd($screenCount)];
 
     if (file_exists($storageFile)) {
         $raw = file_get_contents($storageFile);
@@ -128,7 +156,8 @@ function readScreenConfig($storageFile, $screenCount) {
             $config['screens'] = $data['screens'];
         }
         if (is_array($data) && isset($data['global_ad']) && is_array($data['global_ad'])) {
-            $config['global_ad'] = array_merge(defaultGlobalAd(), $data['global_ad']);
+            $config['global_ad'] = array_merge(defaultGlobalAd($screenCount), $data['global_ad']);
+            $config['global_ad']['order'] = sanitizeScreenOrder($config['global_ad']['order'] ?? [], $screenCount);
         }
     }
 
@@ -159,10 +188,19 @@ function defaultScreen($screenId) {
     ];
 }
 
-function defaultGlobalAd() {
+function defaultGlobalAd($screenCount = 5) {
+    $order = [];
+    for ($i = 1; $i <= $screenCount; $i++) {
+        $order[] = $i;
+    }
     return [
         'path' => null,
-        'type' => null
+        'type' => null,
+        'enabled' => false,
+        'order' => $order,
+        'display_seconds' => 10,
+        'pause_seconds' => 10,
+        'rotation_started_at' => null
     ];
 }
 
@@ -186,6 +224,27 @@ function inferAdType($path) {
     }
     $clean = strtolower(pathinfo($path, PATHINFO_EXTENSION));
     return in_array($clean, ['mp4', 'webm', 'ogg'], true) ? 'video' : 'image';
+}
+
+function sanitizeScreenOrder($order, $screenCount) {
+    if (is_string($order)) {
+        $order = array_map('trim', explode(',', $order));
+    }
+    if (!is_array($order)) {
+        return [];
+    }
+    $clean = [];
+    foreach ($order as $value) {
+        $id = (int)$value;
+        if ($id < 1 || $id > $screenCount) {
+            continue;
+        }
+        if (in_array($id, $clean, true)) {
+            continue;
+        }
+        $clean[] = $id;
+    }
+    return $clean;
 }
 
 function sendResponse($success, $message, $data = null, $statusCode = 200) {

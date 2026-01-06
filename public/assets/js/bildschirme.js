@@ -4,7 +4,14 @@ const uploadUrl = 'upload_screen_media.php';
 const globalAdUploadUrl = 'upload_global_ad.php';
 const screenCount = 5;
 const mediaOptions = window.ScreenMediaOptions || { screens: [], backgrounds: [], ads: [] };
-let globalAd = { path: '', type: '' };
+let globalAd = {
+    path: '',
+    type: '',
+    enabled: false,
+    order: [],
+    displaySeconds: 10,
+    pauseSeconds: 10
+};
 
 function escapeHtml(value) {
     return String(value ?? '')
@@ -108,22 +115,58 @@ function buildMediaPreview(path) {
 
 function buildGlobalAdCard() {
     const options = buildFileOptions(mediaOptions.ads, globalAd.path, '-- Werbung waehlen --');
+    const orderOptions = buildScreenOrderOptions(globalAd.order);
     return `
         <div class="border border-gray-200 rounded-lg p-4 bg-gray-50" data-global-ad-card>
             <div class="text-lg font-semibold mb-3">Globale Werbung</div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Aktiv</label>
+                    <label class="inline-flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                        <input type="checkbox" name="global_ad_enabled" class="sr-only peer" ${globalAd.enabled ? 'checked' : ''}>
+                        <span class="h-4 w-4 rounded border border-gray-300 bg-white flex items-center justify-center text-white peer-checked:bg-indigo-600 peer-checked:border-indigo-600">
+                            <svg class="h-3 w-3 hidden peer-checked:block" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.25 7.25a1 1 0 0 1-1.414 0l-3.25-3.25a1 1 0 1 1 1.414-1.414l2.543 2.543 6.543-6.543a1 1 0 0 1 1.408 0Z" clip-rule="evenodd"></path>
+                            </svg>
+                        </span>
+                        <span>Werbung einblenden</span>
+                    </label>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Anzeigedauer (Sek.)</label>
+                    <input type="number" name="global_ad_display_seconds" min="1" value="${Number(globalAd.displaySeconds) || 10}" class="w-full border rounded px-3 py-2">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Pause (Sek.)</label>
+                    <input type="number" name="global_ad_pause_seconds" min="0" value="${Number(globalAd.pauseSeconds) || 10}" class="w-full border rounded px-3 py-2">
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Reihenfolge</label>
+                    <select name="global_ad_order" multiple size="${Math.max(3, screenCount)}" class="w-full border rounded px-3 py-2">
+                        ${orderOptions}
+                    </select>
+                    <div class="mt-2 flex gap-2">
+                        <button type="button" data-action="order-up" class="text-xs bg-white border border-gray-300 rounded px-2 py-1 hover:bg-gray-50">Hoch</button>
+                        <button type="button" data-action="order-down" class="text-xs bg-white border border-gray-300 rounded px-2 py-1 hover:bg-gray-50">Runter</button>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-2">Mehrfachauswahl: Strg/Cmd + Klick.</div>
+                </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Werbung auswaehlen</label>
                     <select name="global_ad_select" class="w-full border rounded px-3 py-2">
                         ${options}
                     </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Werbung hochladen</label>
-                    <input type="file" name="global_ad_upload" data-kind="global-ad" class="w-full text-sm" accept="image/*,video/*">
                     <div class="mt-2" data-preview="global-ad">
                         ${buildMediaPreview(globalAd.path)}
                     </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Werbung hochladen</label>
+                    <input type="file" name="global_ad_upload" data-kind="global-ad" class="w-full text-sm" accept="image/*,video/*">
                 </div>
             </div>
             <div class="mt-4 flex items-center gap-3">
@@ -132,6 +175,25 @@ function buildGlobalAdCard() {
             </div>
         </div>
     `;
+}
+
+function buildScreenOrderOptions(order) {
+    const selected = Array.isArray(order) ? order.map(value => Number(value)) : [];
+    const uniqueSelected = [];
+    selected.forEach(value => {
+        if (!Number.isFinite(value)) return;
+        if (value < 1 || value > screenCount) return;
+        if (!uniqueSelected.includes(value)) {
+            uniqueSelected.push(value);
+        }
+    });
+    const all = Array.from({ length: screenCount }, (_, i) => i + 1);
+    const remaining = all.filter(value => !uniqueSelected.includes(value));
+    const list = uniqueSelected.concat(remaining);
+    return list.map(value => {
+        const isSelected = uniqueSelected.includes(value);
+        return `<option value="${value}"${isSelected ? ' selected' : ''}>Bildschirm ${value}</option>`;
+    }).join('');
 }
 
 function buildScreenCard(screenId, screen, plans) {
@@ -234,6 +296,7 @@ function renderGlobalAd() {
     const root = document.getElementById('global-ad-card');
     if (!root) return;
     root.innerHTML = buildGlobalAdCard();
+    bindGlobalAdEvents();
 }
 
 function getCardConfig(card) {
@@ -387,7 +450,11 @@ function handleGlobalAdUpload(input) {
 function handleGlobalAdSave() {
     const payload = {
         global_ad_path: globalAd.path || null,
-        global_ad_type: globalAd.path ? (globalAd.type || null) : null
+        global_ad_type: globalAd.path ? (globalAd.type || null) : null,
+        global_ad_enabled: !!globalAd.enabled,
+        global_ad_order: Array.isArray(globalAd.order) ? globalAd.order : [],
+        global_ad_display_seconds: Number(globalAd.displaySeconds) || 10,
+        global_ad_pause_seconds: Number(globalAd.pauseSeconds) || 10
     };
 
     fetchJson(screensApiUrl, {
@@ -451,6 +518,8 @@ function bindEvents() {
 function bindGlobalAdEvents() {
     const root = document.getElementById('global-ad-card');
     if (!root) return;
+    if (root.dataset.bound === 'true') return;
+    root.dataset.bound = 'true';
 
     root.addEventListener('change', event => {
         const target = event.target;
@@ -461,6 +530,18 @@ function bindGlobalAdEvents() {
             updateGlobalAdType(path);
             updateGlobalAdPreview(path);
         }
+        if (target.name === 'global_ad_enabled') {
+            globalAd.enabled = !!target.checked;
+        }
+        if (target.name === 'global_ad_display_seconds') {
+            globalAd.displaySeconds = Number(target.value) || 10;
+        }
+        if (target.name === 'global_ad_pause_seconds') {
+            globalAd.pauseSeconds = Number(target.value) || 10;
+        }
+        if (target.name === 'global_ad_order') {
+            globalAd.order = getSelectOrder(target);
+        }
         if (target.type === 'file') {
             handleGlobalAdUpload(target);
         }
@@ -469,6 +550,13 @@ function bindGlobalAdEvents() {
     root.addEventListener('click', event => {
         const target = event.target;
         if (!(target instanceof HTMLElement)) return;
+        if (target.matches('[data-action="order-up"], [data-action="order-down"]')) {
+            const select = root.querySelector('[name="global_ad_order"]');
+            if (!select) return;
+            moveSelectedOptions(select, target.dataset.action === 'order-up' ? -1 : 1);
+            globalAd.order = getSelectOrder(select);
+            return;
+        }
         if (!target.matches('[data-action="save-global-ad"]')) return;
         handleGlobalAdSave();
     });
@@ -481,15 +569,20 @@ function initScreens() {
             const screens = extractScreens(screensPayload);
             const global = extractGlobalAd(screensPayload);
             if (global) {
+                const fallbackOrder = Array.from({ length: screenCount }, (_, i) => i + 1);
+                const order = Array.isArray(global.order) && global.order.length ? global.order : fallbackOrder;
                 globalAd = {
                     path: global.path || '',
-                    type: global.type || ''
+                    type: global.type || '',
+                    enabled: !!global.enabled,
+                    order,
+                    displaySeconds: Number(global.display_seconds) || 10,
+                    pauseSeconds: Number(global.pause_seconds) || 10
                 };
             }
             renderScreens(plans, screens);
             renderGlobalAd();
             bindEvents();
-            bindGlobalAdEvents();
         })
         .catch(() => {
             notify('Fehler beim Laden der Bildschirme.', 'error');
@@ -508,4 +601,32 @@ function extractGlobalAd(payload) {
         return payload.global_ad;
     }
     return null;
+}
+
+function getSelectOrder(select) {
+    return Array.from(select.options)
+        .filter(option => option.selected)
+        .map(option => Number(option.value))
+        .filter(value => Number.isFinite(value) && value > 0);
+}
+
+function moveSelectedOptions(select, direction) {
+    const options = Array.from(select.options);
+    if (direction < 0) {
+        for (let i = 1; i < options.length; i++) {
+            const option = options[i];
+            if (option.selected && !options[i - 1].selected) {
+                select.insertBefore(option, options[i - 1]);
+                options.splice(i - 1, 0, options.splice(i, 1)[0]);
+            }
+        }
+    } else if (direction > 0) {
+        for (let i = options.length - 2; i >= 0; i--) {
+            const option = options[i];
+            if (option.selected && !options[i + 1].selected) {
+                select.insertBefore(options[i + 1], option);
+                options.splice(i + 1, 0, options.splice(i, 1)[0]);
+            }
+        }
+    }
 }

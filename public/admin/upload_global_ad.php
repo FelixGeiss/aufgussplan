@@ -73,10 +73,11 @@ try {
     $storageDir = __DIR__ . '/../../storage';
     $storageFile = $storageDir . '/bildschirme.json';
     $config = readScreenConfig($storageFile);
-    $config['global_ad'] = [
+    $currentGlobal = $config['global_ad'] ?? [];
+    $config['global_ad'] = array_merge($currentGlobal, [
         'path' => $relativePath,
         'type' => $mediaType
-    ];
+    ]);
 
     writeScreenConfig($storageDir, $storageFile, $config);
 
@@ -95,7 +96,15 @@ try {
 }
 
 function readScreenConfig($storageFile) {
-    $config = ['screens' => [], 'global_ad' => ['path' => null, 'type' => null]];
+    $config = ['screens' => [], 'global_ad' => [
+        'path' => null,
+        'type' => null,
+        'enabled' => false,
+        'order' => [],
+        'display_seconds' => 10,
+        'pause_seconds' => 10,
+        'rotation_started_at' => null
+    ]];
     if (file_exists($storageFile)) {
         $raw = file_get_contents($storageFile);
         $data = $raw ? json_decode($raw, true) : null;

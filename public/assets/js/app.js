@@ -100,6 +100,20 @@ let screenGlobalAdSignature = '';
 let screenConfigUpdatedAt = null;
 let screenPlanLocked = false;
 let screenConfigSyncTimer = null;
+let globalAdTimer = null;
+let globalAdServerOffsetMs = 0;
+let globalAdConfig = {
+    enabled: false,
+    path: '',
+    type: '',
+    order: [],
+    displaySeconds: 10,
+    pauseSeconds: 10,
+    rotationStartedAt: null
+};
+let globalAdVisible = false;
+let globalAdCurrentPath = '';
+let globalAdCurrentType = '';
 
 function startAufgussApp() {
     loadPlans();
@@ -109,6 +123,7 @@ function startAufgussApp() {
     initNextAufgussTimer();
     loadStatsLogged();
     initVideoAutoplayUnlock();
+    initGlobalAdTicker();
 }
 
 function getScreenId() {
@@ -126,7 +141,7 @@ function initScreenConfig() {
 
     return fetchScreenConfig()
         .then(result => {
-            applyScreenConfig(result ? result.screen : null, result ? result.globalAd : null);
+            applyScreenConfig(result ? result.screen : null, result ? result.globalAd : null, result ? result.serverTime : null);
             initScreenConfigSync();
         })
         .catch(error => {
@@ -150,7 +165,7 @@ function initScreenConfigSync() {
                 if (!screenUpdated && !globalUpdated) {
                     return;
                 }
-                applyScreenConfig(screen, globalAd);
+                applyScreenConfig(screen, globalAd, result ? result.serverTime : null);
                 renderFilteredAufguesse();
             })
             .catch(() => {});
@@ -164,12 +179,13 @@ function fetchScreenConfig() {
             const payload = data && data.data ? data.data : null;
             return payload ? {
                 screen: payload.screen || null,
-                globalAd: payload.global_ad || null
+                globalAd: payload.global_ad || null,
+                serverTime: payload.server_time || null
             } : null;
         });
 }
 
-function applyScreenConfig(screen, globalAd) {
+function applyScreenConfig(screen, globalAd, serverTime) {
     const wasLocked = screenPlanLocked;
     if (!screen) return;
     screenConfigUpdatedAt = screen.updated_at || null;
@@ -179,6 +195,7 @@ function applyScreenConfig(screen, globalAd) {
     screenGlobalAdPath = globalAd && globalAd.path ? String(globalAd.path) : '';
     screenGlobalAdType = globalAd && globalAd.type ? String(globalAd.type) : '';
     screenGlobalAdSignature = buildGlobalAdSignature(globalAd);
+    updateGlobalAdConfig(globalAd, serverTime);
 
     if (screenMode === 'image') {
         screenPlanLocked = true;
@@ -665,10 +682,6 @@ function renderPlanView(planId, plaene, aufguesse) {
     const createdAt = formatPlanDate(plan.erstellt_am);
     const forcedBackgroundImage = screenBackgroundPath ? normalizeScreenAssetPath(screenBackgroundPath) : '';
     const backgroundImage = forcedBackgroundImage || (plan.hintergrund_bild ? `uploads/${plan.hintergrund_bild}` : '');
-    const globalAdPath = screenGlobalAdPath ? normalizeBannerImagePath(screenGlobalAdPath) : '';
-    const globalAdType = screenGlobalAdType
-        ? screenGlobalAdType
-        : (globalAdPath && isBannerVideoPath(globalAdPath) ? 'video' : 'image');
     const planAdEnabled = !!plan.werbung_aktiv && !!plan.werbung_media;
     const adConfig = planAdEnabled
         ? {
@@ -678,15 +691,7 @@ function renderPlanView(planId, plaene, aufguesse) {
             mediaPath: `uploads/${plan.werbung_media}`,
             mediaType: plan.werbung_media_typ || ''
         }
-        : (globalAdPath
-            ? {
-                enabled: true,
-                intervalMinutes: 10,
-                durationSeconds: 10,
-                mediaPath: globalAdPath,
-                mediaType: globalAdType
-            }
-            : { enabled: false, mediaPath: '', mediaType: '' });
+        : { enabled: false, mediaPath: '', mediaType: '' };
     const adMediaPath = adConfig.mediaPath || '';
     const adMediaType = adConfig.mediaType || '';
     const planSettings = getNextAufgussSettings(plan.id);
@@ -865,7 +870,50 @@ function renderPlanView(planId, plaene, aufguesse) {
 
 function buildGlobalAdSignature(globalAd) {
     if (!globalAd) return '';
-    return `${globalAd.path || ''}|${globalAd.type || ''}`;
+    const order = Array.isArray(globalAd.order) ? globalAd.order.join(',') : '';
+    return [
+        globalAd.path || '',
+        globalAd.type || '',
+        globalAd.enabled ? '1' : '0',
+        order,
+        globalAd.display_seconds || '',
+        globalAd.pause_seconds || '',
+        globalAd.rotation_started_at || ''
+    ].join('|');
+}
+
+function updateGlobalAdConfig(globalAd, serverTime) {
+    const serverMs = serverTime ? Date.parse(serverTime) : NaN;
+    if (!Number.isNaN(serverMs)) {
+        globalAdServerOffsetMs = serverMs - Date.now();
+    }
+
+    if (!globalAd) {
+        globalAdConfig = {
+            enabled: false,
+            path: '',
+            type: '',
+            order: [],
+            displaySeconds: 10,
+            pauseSeconds: 10,
+            rotationStartedAt: null
+        };
+        updateGlobalAdOverlay();
+        return;
+    }
+
+    globalAdConfig = {
+        enabled: !!globalAd.enabled,
+        path: globalAd.path ? String(globalAd.path) : '',
+        type: globalAd.type ? String(globalAd.type) : '',
+        order: Array.isArray(globalAd.order)
+            ? globalAd.order.map(Number).filter(value => Number.isFinite(value))
+            : [],
+        displaySeconds: Number(globalAd.display_seconds) || 10,
+        pauseSeconds: Number(globalAd.pause_seconds) || 10,
+        rotationStartedAt: globalAd.rotation_started_at ? String(globalAd.rotation_started_at) : null
+    };
+    updateGlobalAdOverlay();
 }
 
 function applyPlanBackground(imagePath) {
@@ -977,6 +1025,117 @@ function normalizeBannerImagePath(path) {
         return trimmed;
     }
     return `uploads/${trimmed.replace(/^\/+/, '')}`;
+}
+
+function initGlobalAdTicker() {
+    if (globalAdTimer) return;
+    globalAdTimer = setInterval(updateGlobalAdOverlay, 500);
+    updateGlobalAdOverlay();
+}
+
+function getGlobalAdNowMs() {
+    return Date.now() + globalAdServerOffsetMs;
+}
+
+function updateGlobalAdOverlay() {
+    const state = computeGlobalAdState();
+    if (!state.show) {
+        hideGlobalAd();
+        return;
+    }
+    showGlobalAd(state.mediaPath, state.mediaType);
+}
+
+function computeGlobalAdState() {
+    if (!screenId || !globalAdConfig.enabled) {
+        return { show: false };
+    }
+    const order = Array.isArray(globalAdConfig.order)
+        ? globalAdConfig.order.map(Number).filter(value => Number.isFinite(value))
+        : [];
+    if (!order.length || !order.includes(Number(screenId))) {
+        return { show: false };
+    }
+    const mediaPath = globalAdConfig.path ? normalizeBannerImagePath(globalAdConfig.path) : '';
+    if (!mediaPath) {
+        return { show: false };
+    }
+
+    const displayMs = Math.max(1, Number(globalAdConfig.displaySeconds) || 10) * 1000;
+    const pauseMs = Math.max(0, Number(globalAdConfig.pauseSeconds) || 10) * 1000;
+    const slotMs = displayMs + pauseMs;
+    const cycleMs = slotMs * order.length;
+    if (!cycleMs) {
+        return { show: false };
+    }
+
+    const nowMs = getGlobalAdNowMs();
+    const startMs = globalAdConfig.rotationStartedAt
+        ? Date.parse(globalAdConfig.rotationStartedAt)
+        : nowMs;
+    const elapsed = ((nowMs - startMs) % cycleMs + cycleMs) % cycleMs;
+    const index = Math.floor(elapsed / slotMs);
+    const inSlot = elapsed % slotMs;
+    const activeScreenId = order[index];
+    const shouldShow = inSlot < displayMs && Number(activeScreenId) === Number(screenId);
+    if (!shouldShow) {
+        return { show: false };
+    }
+
+    const mediaType = globalAdConfig.type
+        ? globalAdConfig.type
+        : (isBannerVideoPath(mediaPath) ? 'video' : 'image');
+    return {
+        show: true,
+        mediaPath,
+        mediaType
+    };
+}
+
+function ensureGlobalAdElements() {
+    let wrap = document.getElementById('global-ad-wrap');
+    if (wrap) {
+        return {
+            wrap,
+            media: wrap.querySelector('.plan-ad-media')
+        };
+    }
+    wrap = document.createElement('div');
+    wrap.id = 'global-ad-wrap';
+    wrap.className = 'plan-ad-wrap is-fullscreen global-ad-wrap';
+    const media = document.createElement('div');
+    media.className = 'plan-ad-media';
+    wrap.appendChild(media);
+    document.body.appendChild(wrap);
+    return { wrap, media };
+}
+
+function showGlobalAd(mediaPath, mediaType) {
+    const { wrap, media } = ensureGlobalAdElements();
+    if (!wrap || !media) return;
+
+    if (mediaPath !== globalAdCurrentPath || mediaType !== globalAdCurrentType) {
+        if (mediaType === 'video') {
+            media.innerHTML = `<video src="${escapeHtml(mediaPath)}" class="plan-ad-asset" autoplay muted loop playsinline></video>`;
+        } else {
+            media.innerHTML = `<img src="${escapeHtml(mediaPath)}" alt="Werbung" class="plan-ad-asset">`;
+        }
+        globalAdCurrentPath = mediaPath;
+        globalAdCurrentType = mediaType;
+    }
+
+    if (!globalAdVisible) {
+        wrap.classList.add('is-visible');
+        globalAdVisible = true;
+    }
+}
+
+function hideGlobalAd() {
+    const wrap = document.getElementById('global-ad-wrap');
+    if (wrap) {
+        wrap.classList.remove('is-visible');
+    }
+    globalAdVisible = false;
 }
 
 function formatClockTime(value) {

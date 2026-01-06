@@ -238,6 +238,10 @@
     background: rgba(0, 0, 0, 0.85);
 }
 
+.global-ad-wrap {
+    z-index: 70;
+}
+
 .plan-ad-wrap.is-visible {
     opacity: 1;
     transform: translateX(0);
