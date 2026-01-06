@@ -52,7 +52,7 @@ try {
 
 function handleGetMitarbeiter($db) {
     $stmt = $db->query(
-        "SELECT id, name, position, username, aktiv, can_aufguesse, can_statistik, can_umfragen, can_mitarbeiter, is_admin
+        "SELECT id, name, position, username, aktiv, can_aufguesse, can_statistik, can_umfragen, can_mitarbeiter, can_bildschirme, is_admin
          FROM mitarbeiter
          ORDER BY name ASC"
     );
@@ -90,11 +90,12 @@ function handleCreateMitarbeiter($db) {
     $canStatistik = normalizeBool($input['can_statistik'] ?? false);
     $canUmfragen = normalizeBool($input['can_umfragen'] ?? false);
     $canMitarbeiter = normalizeBool($input['can_mitarbeiter'] ?? false);
+    $canBildschirme = normalizeBool($input['can_bildschirme'] ?? false);
     $isAdmin = normalizeBool($input['is_admin'] ?? false);
 
     $stmt = $db->prepare(
-        "INSERT INTO mitarbeiter (name, position, username, password_hash, aktiv, can_aufguesse, can_statistik, can_umfragen, can_mitarbeiter, is_admin)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        "INSERT INTO mitarbeiter (name, position, username, password_hash, aktiv, can_aufguesse, can_statistik, can_umfragen, can_mitarbeiter, can_bildschirme, is_admin)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     );
     $stmt->execute([
         $name,
@@ -106,6 +107,7 @@ function handleCreateMitarbeiter($db) {
         $canStatistik,
         $canUmfragen,
         $canMitarbeiter,
+        $canBildschirme,
         $isAdmin
     ]);
 
@@ -163,11 +165,12 @@ function handleUpdateMitarbeiter($db) {
     $canStatistik = normalizeBool($input['can_statistik'] ?? false);
     $canUmfragen = normalizeBool($input['can_umfragen'] ?? false);
     $canMitarbeiter = normalizeBool($input['can_mitarbeiter'] ?? false);
+    $canBildschirme = normalizeBool($input['can_bildschirme'] ?? false);
     $isAdmin = normalizeBool($input['is_admin'] ?? false);
 
     $stmt = $db->prepare(
         "UPDATE mitarbeiter
-         SET name = ?, position = ?, username = ?, password_hash = ?, aktiv = ?, can_aufguesse = ?, can_statistik = ?, can_umfragen = ?, can_mitarbeiter = ?, is_admin = ?
+         SET name = ?, position = ?, username = ?, password_hash = ?, aktiv = ?, can_aufguesse = ?, can_statistik = ?, can_umfragen = ?, can_mitarbeiter = ?, can_bildschirme = ?, is_admin = ?
          WHERE id = ?"
     );
     $stmt->execute([
@@ -180,6 +183,7 @@ function handleUpdateMitarbeiter($db) {
         $canStatistik,
         $canUmfragen,
         $canMitarbeiter,
+        $canBildschirme,
         $isAdmin,
         $mitarbeiterId
     ]);

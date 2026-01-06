@@ -53,6 +53,7 @@ $canMitarbeiter = has_permission('mitarbeiter');
 $canAufguesse = has_permission('aufguesse');
 $canStatistik = has_permission('statistik');
 $canUmfragen = has_permission('umfragen');
+$canBildschirme = has_permission('bildschirme');
 ?>
 
 <!DOCTYPE html>
@@ -143,11 +144,13 @@ $canUmfragen = has_permission('umfragen');
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg p-6">
-                <h3 class="text-lg font-semibold mb-2">Bildschirme</h3>
-                <p class="text-gray-600">Verwalten Sie die TV-Bildschirme</p>
-                <a href="bildschirme.php" class="mt-4 inline-block bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600">Verwalten</a>
-            </div>
+            <?php if ($canBildschirme): ?>
+                <div class="bg-white rounded-lg p-6">
+                    <h3 class="text-lg font-semibold mb-2">Bildschirme</h3>
+                    <p class="text-gray-600">Verwalten Sie die TV-Bildschirme</p>
+                    <a href="bildschirme.php" class="mt-4 inline-block bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600">Verwalten</a>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 

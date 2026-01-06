@@ -35,6 +35,9 @@ try {
         if (!is_admin_logged_in()) {
             sendResponse(false, 'Nicht angemeldet', null, 401);
         }
+        if (!has_permission('bildschirme')) {
+            sendResponse(false, 'Keine Berechtigung', null, 403);
+        }
         handleSaveScreen($storageDir, $storageFile, $screenCount);
     }
 
@@ -46,6 +49,14 @@ try {
 
 function handleGetScreens($storageFile, $screenCount) {
     $screenId = isset($_GET['screen_id']) ? (int)$_GET['screen_id'] : 0;
+    if ($screenId <= 0) {
+        if (!is_admin_logged_in()) {
+            sendResponse(false, 'Nicht angemeldet', null, 401);
+        }
+        if (!has_permission('bildschirme')) {
+            sendResponse(false, 'Keine Berechtigung', null, 403);
+        }
+    }
     $config = readScreenConfig($storageFile, $screenCount);
     $globalAd = $config['global_ad'] ?? defaultGlobalAd();
     $serverTime = date('c');

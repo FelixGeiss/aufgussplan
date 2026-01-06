@@ -11,6 +11,7 @@ require_once __DIR__ . '/../../src/config/config.php';
 require_once __DIR__ . '/../../src/auth.php';
 
 require_login();
+require_permission('bildschirme');
 
 function listUploadFiles($subDir, $allowedExtensions = []) {
     $files = [];

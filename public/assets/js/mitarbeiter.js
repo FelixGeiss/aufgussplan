@@ -45,6 +45,7 @@ function buildRow(mitarbeiter) {
     const canStatistik = Number(mitarbeiter.can_statistik) === 1;
     const canUmfragen = Number(mitarbeiter.can_umfragen) === 1;
     const canMitarbeiter = Number(mitarbeiter.can_mitarbeiter) === 1;
+    const canBildschirme = Number(mitarbeiter.can_bildschirme) === 1;
     const isAdmin = Number(mitarbeiter.is_admin) === 1;
     const aktiv = Number(mitarbeiter.aktiv) === 1;
 
@@ -77,6 +78,7 @@ function buildRow(mitarbeiter) {
                     ${checkbox('can_statistik', 'Statistik', canStatistik)}
                     ${checkbox('can_umfragen', 'Umfrage', canUmfragen)}
                     ${checkbox('can_mitarbeiter', 'Mitarbeiter', canMitarbeiter)}
+                    ${checkbox('can_bildschirme', 'Bildschirme', canBildschirme)}
                     ${checkbox('is_admin', 'Admin', isAdmin)}
                 </div>
             </td>
@@ -145,6 +147,7 @@ function getRowData(row) {
         can_statistik: getValue('can_statistik')?.checked || false,
         can_umfragen: getValue('can_umfragen')?.checked || false,
         can_mitarbeiter: getValue('can_mitarbeiter')?.checked || false,
+        can_bildschirme: getValue('can_bildschirme')?.checked || false,
         is_admin: getValue('is_admin')?.checked || false,
         aktiv: getValue('aktiv')?.checked || false
     };
@@ -164,6 +167,7 @@ async function saveRow(row) {
         can_statistik: data.can_statistik,
         can_umfragen: data.can_umfragen,
         can_mitarbeiter: data.can_mitarbeiter,
+        can_bildschirme: data.can_bildschirme,
         is_admin: data.is_admin,
         aktiv: data.aktiv
     };
@@ -251,6 +255,7 @@ function setupAddForm() {
             can_statistik: formData.get('can_statistik') === 'on',
             can_umfragen: formData.get('can_umfragen') === 'on',
             can_mitarbeiter: formData.get('can_mitarbeiter') === 'on',
+            can_bildschirme: formData.get('can_bildschirme') === 'on',
             is_admin: formData.get('is_admin') === 'on',
             aktiv: formData.get('aktiv') === 'on'
         };
