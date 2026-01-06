@@ -65,108 +65,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 /**
  * ============================================================================
- * MODAL-FENSTER FUNKTIONEN
- * ============================================================================
- *
- * Modals sind Overlay-Fenster für Formulare und Dialoge.
- * Diese Funktionen zeigen/verstecken Modals mit CSS-Klassen.
- */
-
-/**
- * Modal-Fenster anzeigen
- *
- * @param {string} modalId - ID des Modal-Elements
- */
-function showModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        // Versteckt entfernen, Flex-Layout aktivieren
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-    }
-}
-
-/**
- * Modal-Fenster verstecken
- *
- * @param {string} modalId - ID des Modal-Elements
- */
-function hideModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        // Versteckt aktivieren, Flex-Layout entfernen
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-    }
-}
-
-/**
- * ============================================================================
- * AJAX-HILFSFUNKTIONEN
- * ============================================================================
- *
- * AJAX ermöglicht Datenübertragung ohne Seitenreload.
- * Diese Funktionen kapseln XMLHttpRequest für einfachere Verwendung.
- */
-
-/**
- * AJAX-Request senden (Promise-basiert)
- *
- * Beispiel:
- * ajaxRequest('api/users.php', 'POST', {name: 'Max'})
- *   .then(data => console.log(data))
- *   .catch(error => console.error(error));
- *
- * @param {string} url - API-Endpunkt
- * @param {string} method - HTTP-Methode (GET, POST, PUT, DELETE)
- * @param {Object} data - Zu sendende Daten (werden zu JSON)
- * @returns {Promise} - Promise mit Response oder Error
- */
-function ajaxRequest(url, method = 'GET', data = null) {
-    return new Promise((resolve, reject) => {
-        // XMLHttpRequest-Objekt erstellen
-        const xhr = new XMLHttpRequest();
-
-        // Request konfigurieren
-        xhr.open(method, url, true);
-
-        // Headers für JSON und AJAX setzen
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-
-        // ERFOLG: Response verarbeiten
-        xhr.onload = function() {
-            if (xhr.status >= 200 && xhr.status < 300) {
-                try {
-                    // JSON parsen falls möglich
-                    const response = JSON.parse(xhr.responseText);
-                    resolve(response);
-                } catch (e) {
-                    // Reine Text-Response
-                    resolve(xhr.responseText);
-                }
-            } else {
-                // HTTP-Fehler (404, 500, etc.)
-                reject(new Error(`HTTP ${xhr.status}: ${xhr.statusText}`));
-            }
-        };
-
-        // NETZWERKFEHLER behandeln
-        xhr.onerror = function() {
-            reject(new Error('Netzwerkfehler'));
-        };
-
-        // Request senden
-        if (data) {
-            xhr.send(JSON.stringify(data)); // Daten als JSON
-        } else {
-            xhr.send(); // Leerer Request
-        }
-    });
-}
-
-/**
- * ============================================================================
  * TOAST-BENACHRICHTIGUNGEN
  * ============================================================================
  *
@@ -203,111 +101,6 @@ function showToast(message, type = 'info') {
     }, 3000);
 }
 
-// Bestätigungsdialog
-function confirmAction(message) {
-    return new Promise((resolve) => {
-        if (confirm(message)) {
-            resolve(true);
-        } else {
-            resolve(false);
-        }
-    });
-}
-
-// Form-Daten zu Object konvertieren
-function formToObject(form) {
-    const data = new FormData(form);
-    const result = {};
-
-    for (let [key, value] of data.entries()) {
-        result[key] = value;
-    }
-
-    return result;
-}
-
-// Loading-Spinner anzeigen/verstecken
-function showLoading(elementId) {
-    const element = document.getElementById(elementId);
-    if (element) {
-        element.innerHTML = '<div class="spinner"></div>';
-    }
-}
-
-function hideLoading(elementId, content = '') {
-    const element = document.getElementById(elementId);
-    if (element) {
-        element.innerHTML = content;
-    }
-}
-
-// Drag & Drop Funktionalität
-function initDragAndDrop(dropZoneId, callback) {
-    const dropZone = document.getElementById(dropZoneId);
-    if (!dropZone) return;
-
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        dropZone.addEventListener(eventName, preventDefaults, false);
-    });
-
-    function preventDefaults(e) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
-
-    ['dragenter', 'dragover'].forEach(eventName => {
-        dropZone.addEventListener(eventName, highlight, false);
-    });
-
-    ['dragleave', 'drop'].forEach(eventName => {
-        dropZone.addEventListener(eventName, unhighlight, false);
-    });
-
-    function highlight(e) {
-        dropZone.classList.add('dragover');
-    }
-
-    function unhighlight(e) {
-        dropZone.classList.remove('dragover');
-    }
-
-    dropZone.addEventListener('drop', handleDrop, false);
-
-    function handleDrop(e) {
-        const dt = e.dataTransfer;
-        const files = dt.files;
-
-        if (callback && typeof callback === 'function') {
-            callback(files);
-        }
-    }
-}
-
-// Date-Helper-Funktionen
-function formatDate(date) {
-    const d = new Date(date);
-    return d.toLocaleDateString('de-DE');
-}
-
-function formatTime(time) {
-    return time.substring(0, 5); // HH:MM format
-}
-
-function getCurrentDate() {
-    const today = new Date();
-    return today.toISOString().split('T')[0];
-}
-
-// Input-Validierung
-function validateEmail(email) {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-}
-
-function validateRequired(value) {
-    return value && value.trim() !== '';
-}
-
 /**
  * ============================================================================
  * EXPORT FÜR ANDERE MODULE
@@ -318,25 +111,11 @@ function validateRequired(value) {
  *
  * Beispiel in mitarbeiter.js:
  * AdminUtils.showToast('Erfolgreich gespeichert!', 'success');
- * AdminUtils.ajaxRequest('api/save.php', 'POST', data);
  */
 
 // Alle wichtigen Funktionen in window.AdminUtils exportieren
 window.AdminUtils = {
-    showModal,           // Modal ein/ausblenden
-    hideModal,           // Modal ein/ausblenden
-    ajaxRequest,         // AJAX-Requests senden
     showToast,           // Toast-Nachrichten
-    confirmAction,       // Bestätigungsdialoge
-    formToObject,        // Formular → Objekt konvertieren
-    showLoading,         // Lade-Spinner anzeigen
-    hideLoading,         // Lade-Spinner verstecken
-    initDragAndDrop,     // Drag & Drop initialisieren
-    formatDate,          // Datum formatieren
-    formatTime,          // Zeit formatieren
-    getCurrentDate,      // Aktuelles Datum
-    validateEmail,       // E-Mail validieren
-    validateRequired     // Pflichtfelder prüfen
 };
 
 /**
@@ -418,6 +197,7 @@ function toggleEdit(aufgussId, field) {
     }
 }
 
+// Inline-Editing abbrechen und Anzeige zuruecksetzen.
 function cancelEdit(aufgussId, field) {
     const row = document.querySelector(`tr[data-aufguss-id="${aufgussId}"]`) ||
                event.target.closest('tr');
@@ -498,6 +278,7 @@ function handleFieldInput(aufgussId, field) {
     }
 }
 
+// Leert den Freitext-Input, wenn ein Select gewaehlt wird.
 function handleFieldSelect(aufgussId, field) {
     const editMode = document.querySelector(`.edit-mode[data-aufguss-id="${aufgussId}"]`);
     if (editMode) {
@@ -522,6 +303,7 @@ function handleFieldSelect(aufgussId, field) {
     }
 }
 
+// Speichert Inline-Aenderungen per Fetch.
 function saveEdit(aufgussId, field) {
     const row = document.querySelector(`tr[data-aufguss-id="${aufgussId}"]`) ||
         event.target.closest('tr');
@@ -624,6 +406,7 @@ function saveEdit(aufgussId, field) {
     }
 }
 
+// Loescht einen Plan nach Sicherheitsabfrage.
 function deletePlan(planId, planName) {
     // Sicherheitsabfrage vor dem Löschen
     if (!confirm(`Bist du sicher, dass du den Plan "${planName}" löschen möchtest?\n\nAlle Aufgüsse in diesem Plan bleiben erhalten, werden aber keinem Plan mehr zugeordnet.`)) {
@@ -692,6 +475,7 @@ function validateTimeFields(container) {
     });
 }
 
+// Prueft, ob Endzeit vor Startzeit liegt.
 function validateTimeOrder(anfangField, endeField) {
     if (!anfangField.value || !endeField.value) return;
 

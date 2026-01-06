@@ -1,5 +1,6 @@
 const apiUrl = '../api/mitarbeiter.php';
 
+// HTML in Text sicher escapen.
 function escapeHtml(value) {
     return String(value ?? '')
         .replace(/&/g, '&amp;')
@@ -9,6 +10,7 @@ function escapeHtml(value) {
         .replace(/'/g, '&#39;');
 }
 
+// Zeigt Toast oder Fallback-Alert.
 function notify(message, type = 'info') {
     if (window.AdminUtils && typeof window.AdminUtils.showToast === 'function') {
         window.AdminUtils.showToast(message, type);
@@ -17,6 +19,7 @@ function notify(message, type = 'info') {
     alert(message);
 }
 
+// Oeffnet das Modal zum Hinzufuegen.
 function openAddModal() {
     const modal = document.getElementById('addModal');
     if (!modal) return;
@@ -24,6 +27,7 @@ function openAddModal() {
     modal.classList.add('flex');
 }
 
+// Schliesst das Hinzufuegen-Modal.
 function closeAddModal() {
     const modal = document.getElementById('addModal');
     if (!modal) return;
@@ -31,6 +35,7 @@ function closeAddModal() {
     modal.classList.remove('flex');
 }
 
+// Baut eine Tabellenzeile fuer einen Mitarbeiter.
 function buildRow(mitarbeiter) {
     const id = Number(mitarbeiter.id || 0);
     const name = escapeHtml(mitarbeiter.name || '');
@@ -93,6 +98,7 @@ function buildRow(mitarbeiter) {
     `;
 }
 
+// Laedt die Mitarbeiterliste und rendert die Tabelle.
 async function loadMitarbeiter() {
     const table = document.getElementById('mitarbeiterTable');
     if (!table) return;
@@ -121,6 +127,7 @@ async function loadMitarbeiter() {
     }
 }
 
+// Liest die Werte aus einer Tabellenzeile.
 function getRowData(row) {
     const getValue = (name) => row.querySelector(`[name="${name}"]`);
     const nameInput = getValue('name');
@@ -143,6 +150,7 @@ function getRowData(row) {
     };
 }
 
+// Speichert eine Zeile per API.
 async function saveRow(row) {
     const data = getRowData(row);
     if (!data.id) return;
@@ -182,6 +190,7 @@ async function saveRow(row) {
     }
 }
 
+// Loescht einen Mitarbeiter per API.
 async function deleteRow(row) {
     const id = row.getAttribute('data-id');
     if (!id) return;
@@ -202,6 +211,7 @@ async function deleteRow(row) {
     }
 }
 
+// Bindet Tabellen-Events fuer Speichern/Loeschen.
 function setupTableHandlers() {
     const table = document.getElementById('mitarbeiterTable');
     if (!table) return;
@@ -223,6 +233,7 @@ function setupTableHandlers() {
     });
 }
 
+// Bindet das Formular fuer neue Mitarbeiter.
 function setupAddForm() {
     const form = document.getElementById('addMitarbeiterForm');
     if (!form) return;

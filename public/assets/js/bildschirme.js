@@ -13,6 +13,7 @@ let globalAd = {
     pauseSeconds: 10
 };
 
+// HTML in Text sicher escapen.
 function escapeHtml(value) {
     return String(value ?? '')
         .replace(/&/g, '&amp;')
@@ -22,6 +23,7 @@ function escapeHtml(value) {
         .replace(/'/g, '&#39;');
 }
 
+// Zeigt Toast oder Fallback-Alert.
 function notify(message, type = 'info') {
     if (window.AdminUtils && typeof window.AdminUtils.showToast === 'function') {
         window.AdminUtils.showToast(message, type);
@@ -30,10 +32,12 @@ function notify(message, type = 'info') {
     alert(message);
 }
 
+// JSON-Request mit einfachem Error-Handling.
 function fetchJson(url, options) {
     return fetch(url, options).then(response => response.ok ? response.json() : null);
 }
 
+// Extrahiert Plaene aus API-Payload.
 function extractPlans(payload) {
     if (payload && payload.data && Array.isArray(payload.data.plaene)) {
         return payload.data.plaene;
@@ -44,6 +48,7 @@ function extractPlans(payload) {
     return [];
 }
 
+// Extrahiert Bildschirmdaten aus API-Payload.
 function extractScreens(payload) {
     const screens = {};
     const list = payload && payload.data && Array.isArray(payload.data.screens)
@@ -57,6 +62,7 @@ function extractScreens(payload) {
     return screens;
 }
 
+// Baut Select-Optionen fuer Plaene.
 function buildPlanOptions(plans, selectedId) {
     if (!plans.length) {
         return '<option value="">Keine Plaene</option>';
@@ -72,12 +78,14 @@ function buildPlanOptions(plans, selectedId) {
     ].join('');
 }
 
+// Prueft, ob der Pfad ein Video ist.
 function isVideoPath(path) {
     if (!path) return false;
     const clean = String(path).split('?')[0].split('#')[0];
     return /\.(mp4|webm|ogg)$/i.test(clean);
 }
 
+// Baut Select-Optionen fuer Dateien.
 function buildFileOptions(paths, selectedPath, placeholder) {
     const list = Array.isArray(paths) ? [...paths] : [];
     if (selectedPath && !list.includes(selectedPath)) {
@@ -94,6 +102,7 @@ function buildFileOptions(paths, selectedPath, placeholder) {
     return options.join('');
 }
 
+// Erstellt Bild-Preview-HTML.
 function buildPreview(path) {
     if (!path) {
         return '<div class="text-xs text-gray-500">Kein Bild hinterlegt.</div>';
@@ -102,6 +111,7 @@ function buildPreview(path) {
     return `<img src="${safe}" alt="Preview" class="w-full max-h-40 object-contain rounded border">`;
 }
 
+// Erstellt Bild-/Video-Preview-HTML.
 function buildMediaPreview(path) {
     if (!path) {
         return '<div class="text-xs text-gray-500">Keine Datei hinterlegt.</div>';
@@ -113,6 +123,7 @@ function buildMediaPreview(path) {
     return `<img src="${safe}" alt="Preview" class="w-full max-h-40 object-contain rounded border">`;
 }
 
+// Rendert den Block fuer globale Werbung.
 function buildGlobalAdCard() {
     const options = buildFileOptions(mediaOptions.ads, globalAd.path, '-- Werbung waehlen --');
     const orderOptions = buildScreenOrderOptions(globalAd.order);
@@ -180,6 +191,7 @@ function buildGlobalAdCard() {
     `;
 }
 
+// Baut Optionen fuer die Bildschirm-Reihenfolge.
 function buildScreenOrderOptions(order) {
     const selected = Array.isArray(order) ? order.map(value => Number(value)) : [];
     const uniqueSelected = [];
@@ -199,6 +211,7 @@ function buildScreenOrderOptions(order) {
     }).join('');
 }
 
+// Erstellt Badges fuer die ausgewaehlte Reihenfolge.
 function renderSelectedOrderBadges(order) {
     const list = Array.isArray(order) ? order : [];
     if (!list.length) {
@@ -211,6 +224,7 @@ function renderSelectedOrderBadges(order) {
         .join('');
 }
 
+// Rendert eine Bildschirm-Karte.
 function buildScreenCard(screenId, screen, plans) {
     const mode = screen && screen.mode === 'image' ? 'image' : 'plan';
     const planId = screen && screen.plan_id ? String(screen.plan_id) : '';
@@ -278,6 +292,7 @@ function buildScreenCard(screenId, screen, plans) {
     `;
 }
 
+// Aktiviert/Deaktiviert Inputs je Modus.
 function updateCardState(card) {
     const mode = card.querySelector('[name="mode"]')?.value || 'plan';
     const planSelect = card.querySelector('[name="plan_id"]');
@@ -301,6 +316,7 @@ function updateCardState(card) {
     }
 }
 
+// Rendert alle Bildschirm-Karten.
 function renderScreens(plans, screens) {
     const root = document.getElementById('screen-list');
     if (!root) return;
@@ -317,6 +333,7 @@ function renderScreens(plans, screens) {
     });
 }
 
+// Rendert den Global-Ad-Bereich.
 function renderGlobalAd() {
     const root = document.getElementById('global-ad-card');
     if (!root) return;
@@ -325,6 +342,7 @@ function renderGlobalAd() {
     updateSelectedOrderBadges();
 }
 
+// Liest Kartenwerte aus dem DOM.
 function getCardConfig(card) {
     const mode = card.querySelector('[name="mode"]')?.value || 'plan';
     const planId = card.querySelector('[name="plan_id"]')?.value || '';
@@ -341,12 +359,14 @@ function getCardConfig(card) {
     };
 }
 
+// Aktualisiert die Vorschau der Karte.
 function updatePreview(card, kind, path) {
     const preview = card.querySelector(`[data-preview="${kind}"]`);
     if (!preview) return;
     preview.innerHTML = buildPreview(path);
 }
 
+// Aktualisiert die Global-Ad-Vorschau.
 function updateGlobalAdPreview(path) {
     const root = document.getElementById('global-ad-card');
     if (!root) return;
@@ -355,6 +375,7 @@ function updateGlobalAdPreview(path) {
     preview.innerHTML = buildMediaPreview(path);
 }
 
+// Setzt den Werbe-Typ anhand des Pfads.
 function updateGlobalAdType(path) {
     if (!path) {
         globalAd.type = '';
@@ -363,6 +384,7 @@ function updateGlobalAdType(path) {
     globalAd.type = isVideoPath(path) ? 'video' : 'image';
 }
 
+// Speichert eine Bildschirm-Konfiguration.
 function handleSave(card) {
     const screenId = Number(card.dataset.screenId || 0);
     if (!screenId) return;
@@ -392,6 +414,7 @@ function handleSave(card) {
         .catch(() => notify('Netzwerkfehler beim Speichern.', 'error'));
 }
 
+// Verarbeitet Uploads fuer Bild/Hintergrund.
 function handleUpload(card, input) {
     const file = input.files && input.files[0];
     if (!file) return;
@@ -445,6 +468,7 @@ function handleUpload(card, input) {
         });
 }
 
+// Verarbeitet Uploads fuer globale Werbung.
 function handleGlobalAdUpload(input) {
     const file = input.files && input.files[0];
     if (!file) return;
@@ -476,6 +500,7 @@ function handleGlobalAdUpload(input) {
         });
 }
 
+// Speichert die globale Werbung.
 function handleGlobalAdSave() {
     const payload = {
         global_ad_path: globalAd.path || null,
@@ -506,6 +531,7 @@ function handleGlobalAdSave() {
         .catch(() => notify('Netzwerkfehler beim Speichern.', 'error'));
 }
 
+// Bindet Events fuer Bildschirmkarten.
 function bindEvents() {
     const root = document.getElementById('screen-list');
     if (!root) return;
@@ -544,6 +570,7 @@ function bindEvents() {
     });
 }
 
+// Bindet Events fuer globale Werbung.
 function bindGlobalAdEvents() {
     const root = document.getElementById('global-ad-card');
     if (!root) return;
@@ -606,6 +633,7 @@ function bindGlobalAdEvents() {
     });
 }
 
+// Initialisiert Daten und UI fuer die Bildschirme.
 function initScreens() {
     Promise.all([fetchJson(plansApiUrl), fetchJson(screensApiUrl)])
         .then(([plansPayload, screensPayload]) => {
@@ -637,6 +665,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initScreens();
 });
 
+// Extrahiert globale Werbung aus Payload.
 function extractGlobalAd(payload) {
     if (payload && payload.data && payload.data.global_ad) {
         return payload.data.global_ad;
@@ -647,6 +676,7 @@ function extractGlobalAd(payload) {
     return null;
 }
 
+// Aktualisiert die Reihenfolge-Badges.
 function updateSelectedOrderBadges() {
     const root = document.getElementById('global-ad-card');
     if (!root) return;
@@ -655,6 +685,7 @@ function updateSelectedOrderBadges() {
     container.innerHTML = renderSelectedOrderBadges(globalAd.order);
 }
 
+// Liest die Reihenfolge aus dem Mehrfach-Select.
 function getSelectOrder(select) {
     return Array.from(select.options)
         .filter(option => option.selected)
@@ -662,6 +693,7 @@ function getSelectOrder(select) {
         .filter(value => Number.isFinite(value) && value > 0);
 }
 
+// Verschiebt ausgewaehlte Optionen im Select.
 function moveSelectedOptions(select, direction) {
     const options = Array.from(select.options);
     if (direction < 0) {

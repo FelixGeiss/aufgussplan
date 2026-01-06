@@ -118,6 +118,7 @@ let globalAdCurrentType = '';
 let planAdExitTimer = null;
 let globalAdExitTimer = null;
 
+// Startet die Initialisierung der Anzeige.
 function startAufgussApp() {
     loadPlans();
     loadAufgussplan();
@@ -129,6 +130,7 @@ function startAufgussApp() {
     initGlobalAdTicker();
 }
 
+// Liest die Bildschirm-ID aus dem DOM.
 function getScreenId() {
     const container = document.getElementById('aufgussplan');
     const raw = container && container.dataset ? container.dataset.screenId : null;
@@ -136,6 +138,7 @@ function getScreenId() {
     return Number.isFinite(parsed) ? Math.max(0, parsed) : 0;
 }
 
+// Laedt die Bildschirm-Konfiguration vom Server.
 function initScreenConfig() {
     screenId = getScreenId();
     if (!screenId) {
@@ -152,6 +155,7 @@ function initScreenConfig() {
         });
 }
 
+// Startet das Polling fuer Bildschirm-Config.
 function initScreenConfigSync() {
     if (!screenId) return;
     if (screenConfigSyncTimer) {
@@ -175,6 +179,7 @@ function initScreenConfigSync() {
     }, 5000);
 }
 
+// Holt die Bildschirm-Config per API.
 function fetchScreenConfig() {
     return fetch(`${screenConfigApiUrl}?screen_id=${encodeURIComponent(screenId)}`, { cache: 'no-store' })
         .then(response => response.ok ? response.json() : null)
@@ -188,6 +193,7 @@ function fetchScreenConfig() {
         });
 }
 
+// Uebernimmt die Bildschirm-Config in den State.
 function applyScreenConfig(screen, globalAd, serverTime) {
     const wasLocked = screenPlanLocked;
     if (!screen) return;
@@ -228,6 +234,7 @@ function applyScreenConfig(screen, globalAd, serverTime) {
     }
 }
 
+// Normalisiert Pfade fuer Uploads.
 function normalizeScreenAssetPath(path) {
     if (!path) return '';
     if (String(path).startsWith('uploads/')) {
@@ -236,6 +243,7 @@ function normalizeScreenAssetPath(path) {
     return `uploads/${path}`;
 }
 
+// Rendert den Bildmodus fuer den Bildschirm.
 function renderScreenImage() {
     const container = document.getElementById('aufgussplan');
     if (!container) return;
@@ -256,6 +264,7 @@ function renderScreenImage() {
     `;
 }
 
+// Laedt Plaene und aktualisiert die Anzeige.
 function loadPlans() {
     fetch('api/plaene.php')
         .then(response => response.json())
@@ -270,6 +279,7 @@ function loadPlans() {
         });
 }
 
+// Rendert Aufguesse basierend auf Filter.
 function renderFilteredAufguesse() {
     if (screenMode === 'image') {
         renderScreenImage();
@@ -280,6 +290,7 @@ function renderFilteredAufguesse() {
 }
 
 
+// Filtert Aufguesse nach Plan.
 function filterAufguesseByPlan(aufguesse) {
     if (!Array.isArray(aufguesse) || !selectedPlanId) {
         return aufguesse;
@@ -288,6 +299,7 @@ function filterAufguesseByPlan(aufguesse) {
     return aufguesse.filter(aufguss => String(aufguss.plan_id) === selectedPlanId);
 }
 
+// Liest die Plan-Auswahl aus LocalStorage.
 function restoreSelectedPlans() {
     if (screenPlanLocked) {
         return;
@@ -300,6 +312,7 @@ function restoreSelectedPlans() {
     }
 }
 
+// Speichert die Plan-Auswahl in LocalStorage.
 function saveSelectedPlan() {
     if (!selectedPlanId) {
         localStorage.removeItem(selectedPlansStorageKey);
@@ -308,6 +321,7 @@ function saveSelectedPlan() {
     localStorage.setItem(selectedPlansStorageKey, String(selectedPlanId));
 }
 
+// Holt den aktuell gewaehlten Plan vom Server.
 function fetchSelectedPlanId() {
     return fetch(selectedPlanApiUrl, { cache: 'no-store' })
         .then(response => response.ok ? response.json() : null)
@@ -325,6 +339,7 @@ function fetchSelectedPlanId() {
         });
 }
 
+// Holt die Next-Aufguss-Settings vom Server.
 function fetchNextAufgussSettings(planId) {
     if (!planId) {
         return Promise.resolve(null);
@@ -341,6 +356,7 @@ function fetchNextAufgussSettings(planId) {
         });
 }
 
+// Synchronisiert Plan-Auswahl mit Server.
 function syncSelectedPlanIdFromServer() {
     if (screenPlanLocked) return;
     if (serverPlanSyncInFlight) return;
@@ -377,6 +393,7 @@ function syncSelectedPlanIdFromServer() {
         });
 }
 
+// Startet das Plan-Sync-Intervall.
 function initServerPlanSync() {
     if (screenPlanLocked) return;
     if (serverPlanSyncTimer) {
@@ -386,6 +403,7 @@ function initServerPlanSync() {
     serverPlanSyncTimer = setInterval(syncSelectedPlanIdFromServer, 5000);
 }
 
+// Erlaubt Autoplay nach Nutzeraktion.
 function initVideoAutoplayUnlock() {
     const unlock = () => {
         if (videoAutoplayUnlocked) return;
@@ -416,6 +434,7 @@ function initVideoAutoplayUnlock() {
     window.addEventListener('pageshow', resumePlanAdVideo);
 }
 
+// Stellt ein Preload-Video bereit.
 function ensurePlanAdPreloadVideo() {
     if (planAdPreloadVideo) return planAdPreloadVideo;
     const video = document.createElement('video');
@@ -430,6 +449,7 @@ function ensurePlanAdPreloadVideo() {
     return video;
 }
 
+// Erstellt Offscreen-Container fuer Video.
 function ensurePlanAdOffscreenContainer() {
     if (planAdOffscreenContainer) return planAdOffscreenContainer;
     const container = document.createElement('div');
@@ -444,6 +464,7 @@ function ensurePlanAdOffscreenContainer() {
     return container;
 }
 
+// Verschiebt Werbevideo offscreen.
 function movePlanAdVideoOffscreen(video) {
     const container = ensurePlanAdOffscreenContainer();
     if (video.parentElement !== container) {
@@ -457,6 +478,7 @@ function movePlanAdVideoOffscreen(video) {
     video.style.height = '1px';
 }
 
+// Bringt Werbevideo in die Anzeige.
 function movePlanAdVideoVisible(video, media) {
     if (!video || !media) return;
     if (video.parentElement !== media) {
@@ -471,6 +493,7 @@ function movePlanAdVideoVisible(video, media) {
     video.style.height = '';
 }
 
+// Laedt Werbevideo vor.
 function preloadPlanAdVideo(mediaPath) {
     if (!mediaPath || !document.body) return;
     const video = ensurePlanAdPreloadVideo();
@@ -487,6 +510,7 @@ function preloadPlanAdVideo(mediaPath) {
     }
 }
 
+// Setzt Default-Plan falls keiner gewaehlt.
 function ensureSelectedPlan(plaene) {
     if (screenPlanLocked) {
         return;
@@ -498,6 +522,7 @@ function ensureSelectedPlan(plaene) {
     }
 }
 
+// Extrahiert Aufguesse aus API-Payload.
 function extractAufguesse(payload) {
     if (Array.isArray(payload)) {
         return payload;
@@ -514,6 +539,7 @@ function extractAufguesse(payload) {
     return [];
 }
 
+// Extrahiert Plaene aus API-Payload.
 function extractPlaene(payload) {
     if (payload && payload.data && Array.isArray(payload.data.plaene)) {
         return payload.data.plaene;
@@ -556,93 +582,7 @@ function loadAufgussplan() {
         });
 }
 
-/**
- * AUFGUSSPLAN DARSTELLEN
- *
- * Wandelt die JSON-Daten vom Server in HTML um.
- * Findet den aktuell laufenden Aufguss und zeigt alle Aufguesse an.
- *
- * @param {Array} aufguesse - Array mit Aufguss-Objekten aus der API
- */
-function displayAufgussplan(aufguesse) {
-    // HTML-Container fuer den Aufgussplan finden
-    const container = document.getElementById('aufgussplan');
-
-    // LEERE LISTE: Keine Aufguesse vorhanden
-    if (!aufguesse || aufguesse.length === 0) {
-        container.innerHTML = '<p class="text-center text-gray-500 py-8">Keine Aufguesse geplant fuer heute.</p>';
-        return; // Funktion beenden
-    }
-
-    // AKTUELLE ZEIT fuer Vergleiche
-    const now = new Date();
-    let currentAufguss = null;
-
-    /**
-     * AKTUELLEN AUFGUSS FINDEN
-     *
-     * Durchsucht alle Aufguesse und findet heraus, welcher gerade luft.
-     * Ein Aufguss "luft" von startZeit bis startZeit + Dauer.
-     */
-    for (let aufguss of aufguesse) {
-        // Startzeit des Aufgusses als Date-Objekt
-        const aufgussTime = new Date(aufguss.datum + ' ' + aufguss.zeit);
-
-        // Endzeit = Startzeit + Dauer (Standard: 15 Minuten)
-        const nextAufgussTime = new Date(aufgussTime.getTime() + (aufguss.dauer || 15) * 60000);
-
-        // Prfen, ob aktuelle Zeit zwischen Start und Ende liegt
-        if (now >= aufgussTime && now <= nextAufgussTime) {
-            currentAufguss = aufguss;
-            break; // Ersten passenden Aufguss nehmen
-        }
-    }
-
-    /**
-     * HTML GENERIEREN
-     *
-     * Erstellt fuer jeden Aufguss eine Karte mit Zeit, Mitarbeiter, etc.
-     * Der aktuelle Aufguss bekommt eine spezielle CSS-Klasse.
-     */
-    let html = '<div class="space-y-4">'; // Container mit Abstnden
-
-    aufguesse.forEach((aufguss, index) => {
-        // Prfen, ob dies der aktuelle Aufguss ist
-        const isCurrent = currentAufguss && currentAufguss.id === aufguss.id;
-
-        // CSS-Klassen: Normal oder hervorgehoben
-        const classes = isCurrent ? 'aufguss-card current' : 'aufguss-card';
-
-        // HTML fuer eine Aufguss-Karte generieren
-        html += `
-            <div class="${classes}">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <h3 class="text-xl font-bold">${aufguss.zeit}</h3>
-                        <p class="text-lg">${aufguss.mitarbeiter_name}</p>
-                        ${aufguss.beschreibung ? `<p class="text-sm opacity-90 mt-2">${aufguss.beschreibung}</p>` : ''}
-                    </div>
-                    ${isCurrent ? '<div class="timer" id="timer">Laeuft...</div>' : ''}
-                </div>
-            </div>
-        `;
-    });
-
-    html += '</div>';
-
-    // Generiertes HTML in den Container einfgen
-    container.innerHTML = html;
-
-    /**
-     * TIMER STARTEN
-     *
-     * Wenn ein Aufguss luft, wird ein Countdown-Timer gestartet.
-     */
-    if (currentAufguss) {
-        startTimer(currentAufguss);
-    }
-}
-
+// Reagiert auf Plan-Wechsel im Storage.
 function initPlanChangeListener() {
     window.addEventListener('storage', event => {
         if (!event || !event.key) return;
@@ -658,6 +598,7 @@ function initPlanChangeListener() {
     });
 }
 
+// Baut die komplette Plan-Ansicht.
 function renderPlanView(planId, plaene, aufguesse) {
     const container = document.getElementById('aufgussplan');
     const hideHeader = !!(container && container.dataset && container.dataset.hidePlanHeader === 'true');
@@ -872,6 +813,7 @@ function renderPlanView(planId, plaene, aufguesse) {
     updateNextAufgussIndicators();
 }
 
+// Erstellt Signatur fuer globale Werbung.
 function buildGlobalAdSignature(globalAd) {
     if (!globalAd) return '';
     const order = Array.isArray(globalAd.order) ? globalAd.order.join(',') : '';
@@ -886,6 +828,7 @@ function buildGlobalAdSignature(globalAd) {
     ].join('|');
 }
 
+// Uebernimmt globale Werbe-Config.
 function updateGlobalAdConfig(globalAd, serverTime) {
     const serverMs = serverTime ? Date.parse(serverTime) : NaN;
     if (!Number.isNaN(serverMs)) {
@@ -920,6 +863,7 @@ function updateGlobalAdConfig(globalAd, serverTime) {
     updateGlobalAdOverlay();
 }
 
+// Setzt Hintergrundbild fuer Plan.
 function applyPlanBackground(imagePath) {
     const body = document.body;
     if (!body) return;
@@ -938,6 +882,7 @@ function applyPlanBackground(imagePath) {
     }
 }
 
+// Initialisiert Plan-Werbung.
 function setupPlanAd(planId, adConfig) {
     const enabled = !!(adConfig && adConfig.enabled);
     const intervalMinutes = Number(adConfig && adConfig.intervalMinutes) || 10;
@@ -975,6 +920,7 @@ function setupPlanAd(planId, adConfig) {
     schedulePlanAd(intervalMs, durationMs, adMediaPath, adMediaType, planAdAnchorTimeMs);
 }
 
+// Plant die Anzeige der Plan-Werbung.
 function schedulePlanAd(intervalMs, durationMs, mediaPath, mediaType, anchorMs) {
     const now = Date.now();
     let nextDelay = 0;
@@ -1000,6 +946,7 @@ function schedulePlanAd(intervalMs, durationMs, mediaPath, mediaType, anchorMs) 
     }, Math.max(0, nextDelay));
 }
 
+// Startet Werbevideo, falls moeglich.
 function tryPlayPlanAdVideo(video, forceLoad = false) {
     if (!video) return;
     if (forceLoad && typeof video.load === 'function') {
@@ -1018,6 +965,7 @@ function tryPlayPlanAdVideo(video, forceLoad = false) {
     }
 }
 
+// Normalisiert Banner-Bildpfad.
 function normalizeBannerImagePath(path) {
     if (!path) return '';
     const trimmed = String(path).trim();
@@ -1031,16 +979,19 @@ function normalizeBannerImagePath(path) {
     return `uploads/${trimmed.replace(/^\/+/, '')}`;
 }
 
+// Startet Rotation fuer globale Werbung.
 function initGlobalAdTicker() {
     if (globalAdTimer) return;
     globalAdTimer = setInterval(updateGlobalAdOverlay, 500);
     updateGlobalAdOverlay();
 }
 
+// Berechnet Zeitbasis fuer globale Werbung.
 function getGlobalAdNowMs() {
     return Date.now() + globalAdServerOffsetMs;
 }
 
+// Aktualisiert globales Werbe-Overlay.
 function updateGlobalAdOverlay() {
     const state = computeGlobalAdState();
     if (!state.show) {
@@ -1050,6 +1001,7 @@ function updateGlobalAdOverlay() {
     showGlobalAd(state.mediaPath, state.mediaType);
 }
 
+// Berechnet aktuellen Werbe-Status.
 function computeGlobalAdState() {
     if (!screenId || !globalAdConfig.enabled) {
         return { show: false };
@@ -1098,6 +1050,7 @@ function computeGlobalAdState() {
     };
 }
 
+// Erstellt DOM-Elemente fuer globale Werbung.
 function ensureGlobalAdElements() {
     let wrap = document.getElementById('global-ad-wrap');
     if (wrap) {
@@ -1116,6 +1069,7 @@ function ensureGlobalAdElements() {
     return { wrap, media };
 }
 
+// Zeigt globale Werbung an.
 function showGlobalAd(mediaPath, mediaType) {
     const { wrap, media } = ensureGlobalAdElements();
     if (!wrap || !media) return;
@@ -1143,6 +1097,7 @@ function showGlobalAd(mediaPath, mediaType) {
     }
 }
 
+// Blendet globale Werbung aus.
 function hideGlobalAd() {
     const wrap = document.getElementById('global-ad-wrap');
     if (!wrap || !globalAdVisible) {
@@ -1160,14 +1115,17 @@ function hideGlobalAd() {
     }, 320);
 }
 
+// Formatiert Uhrzeit.
 function formatClockTime(value) {
     return value.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
 }
 
+// Formatiert Datum.
 function formatClockDate(value) {
     return value.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
+// Aktualisiert die Uhr im Plan.
 function updatePlanClock(clockEl) {
     if (!clockEl) return;
     const now = new Date();
@@ -1177,6 +1135,7 @@ function updatePlanClock(clockEl) {
     if (dateEl) dateEl.textContent = formatClockDate(now);
 }
 
+// Initialisiert die Plan-Uhr.
 function initPlanClock(clockEl) {
     if (planClockTimer) {
         clearInterval(planClockTimer);
@@ -1187,6 +1146,7 @@ function initPlanClock(clockEl) {
     planClockTimer = setInterval(() => updatePlanClock(clockEl), 1000);
 }
 
+// Aktualisiert Clock/Banner Layout.
 function updatePlanClockLayout(container) {
     if (!container) return;
     const stack = container.querySelector('.plan-clock-stack');
@@ -1198,6 +1158,7 @@ function updatePlanClockLayout(container) {
     container.style.setProperty('--plan-clock-stack-height', `${height + 8}px`);
 }
 
+// Setzt Werbevideo fort.
 function resumePlanAdVideo() {
     const wrap = document.getElementById('plan-ad-wrap');
     if (!wrap || !wrap.classList.contains('is-visible')) return;
@@ -1208,6 +1169,7 @@ function resumePlanAdVideo() {
     }
 }
 
+// Zeigt Plan-Werbung an.
 function showPlanAd(mediaPath, mediaType, durationMs) {
     const wrap = document.getElementById('plan-ad-wrap');
     const media = document.getElementById('plan-ad-media');
@@ -1271,6 +1233,7 @@ function showPlanAd(mediaPath, mediaType, durationMs) {
     }, durationMs);
 }
 
+// Blendet Plan-Werbung aus.
 function hidePlanAd() {
     const wrap = document.getElementById('plan-ad-wrap');
     if (!wrap) return;
@@ -1285,6 +1248,7 @@ function hidePlanAd() {
     }, 320);
 }
 
+// Setzt CSS-Variablen fuer Richtung.
 function setPlanAdDirectionVars(wrap) {
     const direction = screenAdDirection || 'right';
     let enterX = '-110%';
@@ -1311,6 +1275,7 @@ function setPlanAdDirectionVars(wrap) {
     wrap.style.setProperty('--plan-ad-exit-y', exitY);
 }
 
+// Stoppt Timer der Plan-Werbung.
 function clearPlanAdTimers() {
     if (planAdStartTimeout) {
         clearTimeout(planAdStartTimeout);
@@ -1326,6 +1291,7 @@ function clearPlanAdTimers() {
     }
 }
 
+// Rendert eine Tabellenzeile fuer Aufguss.
 function renderPlanRow(aufguss) {
     const timeText = formatAufgussTime(aufguss);
     const nameText = aufguss.name || aufguss.aufguss_name || 'Aufguss';
@@ -1351,6 +1317,7 @@ function renderPlanRow(aufguss) {
     `;
 }
 
+// Rendert eine Aufgusskarte im Grid.
 function renderPlanRowDiv(aufguss) {
     const timeParts = formatAufgussTimeParts(aufguss);
     const nameText = aufguss.name || aufguss.aufguss_name || 'Aufguss';
@@ -1379,6 +1346,7 @@ function renderPlanRowDiv(aufguss) {
     `;
 }
 
+// Ermittelt Start/Ende fuer Anzeige.
 function formatAufgussTimeParts(aufguss) {
     const start = aufguss.zeit_anfang || aufguss.zeit || '';
     const end = aufguss.zeit_ende || '';
@@ -1391,6 +1359,7 @@ function formatAufgussTimeParts(aufguss) {
     return { start: '--:--', end: '' };
 }
 
+// Baut Sauna-Block fuer Anzeige.
 function formatSaunaHtmlStacked(aufguss) {
     const name = aufguss.sauna_name || aufguss.sauna || '-';
     const image = aufguss.sauna_bild || '';
@@ -1411,6 +1380,7 @@ function formatSaunaHtmlStacked(aufguss) {
     `;
 }
 
+// Formatiert die Aufgusszeit.
 function formatAufgussTime(aufguss) {
     const start = aufguss.zeit_anfang || '';
     const end = aufguss.zeit_ende || '';
@@ -1423,6 +1393,7 @@ function formatAufgussTime(aufguss) {
     return '--:--';
 }
 
+// Formatiert Zeitwerte.
 function formatTime(value) {
     if (!value) return '--:--';
     const parts = String(value).split(':');
@@ -1432,6 +1403,7 @@ function formatTime(value) {
     return value;
 }
 
+// Berechnet Start-Zeitstempel.
 function getAufgussStartTimestamp(aufguss) {
     let dateValue = aufguss.datum || '';
     const timeValue = aufguss.zeit_anfang || aufguss.zeit || '';
@@ -1459,6 +1431,7 @@ function getAufgussStartTimestamp(aufguss) {
     return ts;
 }
 
+// Formatiert Datum fuer Kopfzeile.
 function formatPlanDate(value) {
     if (!value) return '';
     const date = new Date(value);
@@ -1468,6 +1441,7 @@ function formatPlanDate(value) {
     return `${day}.${month}.${date.getFullYear()}`;
 }
 
+// Formatiert Staerke-Anzeige.
 function formatStaerke(value) {
     const level = Number(value) || 0;
     const map = {
@@ -1481,6 +1455,7 @@ function formatStaerke(value) {
     return map[level] || { text: 'Unbekannt', bgClass: 'bg-gray-100', textClass: 'text-gray-800' };
 }
 
+// Formatiert Aufgiesser-Text.
 function formatAufgiesser(aufguss) {
     if (aufguss.aufgieser_namen) {
         return aufguss.aufgieser_namen;
@@ -1488,6 +1463,7 @@ function formatAufgiesser(aufguss) {
     return aufguss.mitarbeiter_name || aufguss.aufgieser_name || 'Unbekannt';
 }
 
+// Baut Aufgiesser-HTML.
 function formatAufgiesserHtml(aufguss) {
     const people = parseAufgiesserItems(aufguss);
     if (!people.length) {
@@ -1518,6 +1494,7 @@ function formatAufgiesserHtml(aufguss) {
     return `<div class="flex flex-wrap justify-center gap-4 w-full plan-list-people-wrap">${cards.join('')}</div>`;
 }
 
+// Extrahiert Aufgiesser aus Daten.
 function parseAufgiesserItems(aufguss) {
     const raw = aufguss.aufgieser_items || '';
     const people = [];
@@ -1544,6 +1521,7 @@ function parseAufgiesserItems(aufguss) {
     return people;
 }
 
+// Baut Sauna-HTML.
 function formatSaunaHtml(aufguss) {
     const name = aufguss.sauna_name || aufguss.sauna || '-';
     const image = aufguss.sauna_bild || '';
@@ -1563,6 +1541,7 @@ function formatSaunaHtml(aufguss) {
     `;
 }
 
+// Formatiert Sauna-Temperatur.
 function formatSaunaTempText(aufguss) {
     const tempValue = aufguss.sauna_temperatur;
     if (tempValue === null || tempValue === undefined || tempValue === '') {
@@ -1575,18 +1554,21 @@ function formatSaunaTempText(aufguss) {
     return String(numeric);
 }
 
+// Baut Temperatur-Badge.
 function formatSaunaTempBadge(aufguss) {
     const tempText = formatSaunaTempText(aufguss);
     if (!tempText) return '';
     return `<span class="plan-temp-badge absolute -top-1 -right-8 text-sm leading-none px-3 py-1.5 rounded-full border">${escapeHtml(tempText)}&deg;C</span>`;
 }
 
+// Prueft Banner-Pfad auf Video.
 function isBannerVideoPath(path) {
     if (!path) return false;
     const cleanPath = String(path).split('?')[0].split('#')[0];
     return /\.(mp4|webm|ogg)$/i.test(cleanPath);
 }
 
+// Escaped HTML fuer sichere Ausgabe.
 function escapeHtml(value) {
     return String(value ?? '')
         .replace(/&/g, '&amp;')
@@ -1653,6 +1635,7 @@ function startTimer(aufguss) {
     // Alle 1000ms (1 Sekunde) aktualisieren
     setInterval(updateTimer, 1000);
 }
+// Berechnet End-Zeitstempel.
 function getAufgussEndTimestamp(aufguss, startTs) {
     const baseTs = startTs || getAufgussStartTimestamp(aufguss);
     if (!baseTs) return null;
@@ -1664,6 +1647,7 @@ function getAufgussEndTimestamp(aufguss, startTs) {
     return baseTs + (minutes * 60000);
 }
 
+// Baut Zeitstempel aus Datum/Zeit.
 function buildAufgussTimestamp(dateValue, timeValue) {
     if (!timeValue) return null;
     const today = new Date();
@@ -1676,11 +1660,13 @@ function buildAufgussTimestamp(dateValue, timeValue) {
     return Number.isNaN(ts) ? null : ts;
 }
 
+// Erzeugt Statistik-Schluessel.
 function getStatsKey(aufguss) {
     const datum = aufguss.datum || '';
     return `${aufguss.id}:${datum}`;
 }
 
+// Laedt bereits geloggte Stats.
 function loadStatsLogged() {
     try {
         const raw = localStorage.getItem(statsLoggedStorageKey);
@@ -1693,6 +1679,7 @@ function loadStatsLogged() {
     }
 }
 
+// Speichert geloggte Stats.
 function saveStatsLogged() {
     try {
         localStorage.setItem(statsLoggedStorageKey, JSON.stringify(Array.from(statsLogged)));
@@ -1701,6 +1688,7 @@ function saveStatsLogged() {
     }
 }
 
+// Sendet Abschluss-Statistik.
 function logAufgussCompleted(aufguss) {
     const key = getStatsKey(aufguss);
     if (statsLogged.has(key)) return;
@@ -1750,11 +1738,13 @@ function showError(message) {
     </div>`;
 }
 
+// Startet Timer fuer Naechster-Aufguss.
 function initNextAufgussTimer() {
     if (nextAufgussTimer) return;
     nextAufgussTimer = setInterval(updateNextAufgussIndicators, 1000);
 }
 
+// Aktualisiert Next-Aufguss-Status.
 function updateNextAufgussIndicators() {
     if (!selectedPlanId) {
         clearNextAufgussHighlight();
@@ -1831,6 +1821,7 @@ function updateNextAufgussIndicators() {
     }
 }
 
+// Scrollt zur naechsten Zeile.
 function focusNextRow(row) {
     if (!row) return;
     const rect = row.getBoundingClientRect();
@@ -1840,10 +1831,12 @@ function focusNextRow(row) {
     }
 }
 
+// Entfernt Next-Aufguss-Markierung.
 function clearNextAufgussHighlight() {
     document.querySelectorAll('[data-start-ts]').forEach(row => row.classList.remove('next-aufguss-row'));
 }
 
+// Liest Next-Aufguss-Settings.
 function getNextAufgussSettings(planId) {
     const enabledKey = `nextAufgussEnabled_${planId}`;
     const leadKey = `nextAufgussLeadSeconds_${planId}`;
@@ -1924,6 +1917,7 @@ function getNextAufgussSettings(planId) {
     };
 }
 
+// Baut HTML fuer Next-Aufguss.
 function buildNextAufgussHtml(aufguss) {
     const aufgussName = aufguss.name || aufguss.aufguss_name || 'Aufguss';
     const staerkeText = aufguss.staerke ? `Staerke: ${aufguss.staerke}` : 'Staerke: -';
@@ -1980,6 +1974,7 @@ function buildNextAufgussHtml(aufguss) {
     `;
 }
 
+// Zeigt Next-Aufguss-Popup.
 function showNextAufgussPopup(aufguss, startTs) {
     if (nextAufgussActive && nextAufgussActivePlanId !== String(selectedPlanId)) {
         return;
@@ -2008,6 +2003,7 @@ function showNextAufgussPopup(aufguss, startTs) {
     nextAufgussHideTimer = setTimeout(hideNextAufgussPopup, 10000);
 }
 
+// Aktualisiert Countdown im Popup.
 function updateNextAufgussCountdown() {
     const countdown = document.getElementById('next-aufguss-countdown');
     if (!countdown || !nextAufgussCountdownTarget) return;
@@ -2020,6 +2016,7 @@ function updateNextAufgussCountdown() {
     countdown.textContent = `${seconds}s`;
 }
 
+// Blendet Popup aus.
 function hideNextAufgussPopup() {
     const overlay = document.getElementById('next-aufguss-overlay');
     if (overlay) {
