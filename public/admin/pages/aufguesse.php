@@ -385,6 +385,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: var(--plan-text-color, #111827);
         }
 
+        .plan-table-scope .plan-table-head th {
+            text-align: center;
+        }
+
         .plan-table-wrap {
             transition: opacity 300ms ease, transform 300ms ease;
         }
@@ -473,6 +477,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .plan-table-scope .text-gray-900 {
             color: var(--plan-text-color, #111827) !important;
+        }
+
+        .plan-table-scope .mitarbeiter-cell .display-mode > .flex {
+            flex-direction: column;
+            flex-wrap: nowrap;
+            align-items: center;
         }
 
     </style>
@@ -569,7 +579,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
                             </div>
                             <div class="flex-1 flex items-center justify-center gap-2">
-                                <span id="plan-banner-status-<?php echo $plan['id']; ?>" class="plan-banner-status inline-flex flex-col items-center justify-center text-xs font-semibold text-white bg-[#2563eb] border border-[#2563eb] rounded-lg px-3 py-2 shadow-sm">Banner: Text/Video</span>
+                                <span id="plan-banner-status-<?php echo $plan['id']; ?>" class="plan-banner-status hidden inline-flex flex-col items-center justify-center text-xs font-semibold text-white bg-[#2563eb] border border-[#2563eb] rounded-lg px-3 py-2 shadow-sm"></span>
                                 <div id="plan-clock-admin-<?php echo $plan['id']; ?>" class="plan-clock-admin hidden inline-flex flex-col items-center justify-center bg-white/70 border border-gray-200 rounded-lg px-3 py-2 shadow-sm">
                                     <div class="plan-clock-admin-time text-lg font-semibold text-gray-900">--:--</div>
                                     <div class="plan-clock-admin-date text-xs text-gray-600">--.--.----</div>
@@ -3259,15 +3269,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const statusEl = document.getElementById(`plan-banner-status-${planId}`);
             if (!statusEl) return;
             const settings = nextAufgussSettings.get(String(planId)) || getPlanSettings(planId);
-            let label = 'Banner: Aus';
-            if (settings && settings.bannerEnabled) {
-                if (settings.bannerMode === 'image') {
-                    label = isPlanBannerVideoPath(settings.bannerImage) ? 'Banner: Video' : 'Banner: Bild';
-                } else {
-                    label = 'Banner: Text';
-                }
+            const hasBanner = settings
+                && settings.bannerEnabled
+                && ((settings.bannerMode === 'image' && settings.bannerImage)
+                    || (settings.bannerMode !== 'image' && settings.bannerText));
+            if (!hasBanner) {
+                statusEl.classList.add('hidden');
+                statusEl.textContent = '';
+                return;
             }
+            const label = settings.bannerMode === 'image'
+                ? (isPlanBannerVideoPath(settings.bannerImage) ? 'Banner: Video' : 'Banner: Bild')
+                : 'Banner: Text';
             statusEl.textContent = label;
+            statusEl.classList.remove('hidden');
         }
 
 function savePlanSettings(planId, options = {}) {
