@@ -5,3 +5,7 @@ RewriteCond %{REQUEST_URI} !^/aufgussplan/public/
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ public/$1 [L]
+
+# PHP upload limits (requires mod_php with AllowOverride Options)
+php_value post_max_size 64M
+php_value upload_max_filesize 64M

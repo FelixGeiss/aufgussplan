@@ -7,6 +7,7 @@ $canAufguesse = has_permission('aufguesse');
 $canStatistik = has_permission('statistik');
 $canUmfragen = has_permission('umfragen');
 $canBildschirme = has_permission('bildschirme');
+$isAdminUser = is_admin_user();
 
 $navId = $navId ?? '';
 $navClass = $navClass ?? 'bg-blue-600 text-white p-4';
@@ -53,6 +54,9 @@ $navClassAttr = htmlspecialchars($navClass, ENT_QUOTES, 'UTF-8');
                 <?php endif; ?>
                 <?php if ($canUmfragen): ?>
                     <a href="<?php echo $adminBase; ?>umfragen.php" class="mr-4 hover:underline">Umfrage erstellen</a>
+                <?php endif; ?>
+                <?php if ($isAdminUser): ?>
+                    <a href="<?php echo $adminBase; ?>backup.php" class="mr-4 hover:underline">Backup</a>
                 <?php endif; ?>
                 <a href="<?php echo $adminAuthBase; ?>logout.php" class="hover:underline">Logout</a>
             <?php else: ?>
