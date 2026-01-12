@@ -12,6 +12,12 @@ $db = Database::getInstance()->getConnection();
 
 $errors = [];
 $messages = [];
+$localStorageRestoreJson = null;
+
+if (!empty($_SESSION['localstorage_restore_json'])) {
+    $localStorageRestoreJson = $_SESSION['localstorage_restore_json'];
+    unset($_SESSION['localstorage_restore_json']);
+}
 $dbOverview = [
     'plaene' => 0,
     'aufguesse' => 0,
@@ -199,7 +205,7 @@ function add_folder_to_zip(ZipArchive $zip, $sourcePath, $zipRoot) {
     }
 }
 
-function create_backup_zip(PDO $db, $destinationPath) {
+function create_backup_zip(PDO $db, $destinationPath, $localStorageJson = null) {
     $zip = new ZipArchive();
     if ($zip->open($destinationPath, ZipArchive::OVERWRITE) !== true) {
         throw new RuntimeException('Konnte Backup ZIP nicht erstellen.');
@@ -207,6 +213,9 @@ function create_backup_zip(PDO $db, $destinationPath) {
     $sql = build_sql_backup($db, DB_NAME);
     $zip->addFromString('database.sql', $sql);
     add_folder_to_zip($zip, UPLOAD_PATH, 'uploads');
+    if ($localStorageJson !== null && $localStorageJson !== '') {
+        $zip->addFromString('localstorage.json', $localStorageJson);
+    }
     $zip->close();
 }
 
@@ -360,7 +369,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $errors[] = 'Konnte temporaere Backup-Datei nicht erstellen.';
             } else {
                 try {
-                    create_backup_zip($db, $tmpFile);
+                    $localStorageJson = null;
+                    if (!empty($_POST['localstorage_json'])) {
+                        $decoded = base64_decode((string)$_POST['localstorage_json'], true);
+                        if ($decoded !== false && trim($decoded) !== '') {
+                            $localStorageJson = $decoded;
+                        }
+                    }
+                    create_backup_zip($db, $tmpFile, $localStorageJson);
 
                     $metaDir = dirname($backupMetaPath);
                     if (!is_dir($metaDir)) {
@@ -434,6 +450,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         throw new RuntimeException('Die SQL-Datei ist leer oder konnte nicht gelesen werden.');
                     }
 
+                    $localStoragePath = $extractRoot . DIRECTORY_SEPARATOR . 'localstorage.json';
+                    if (is_file($localStoragePath)) {
+                        $localStorageRaw = file_get_contents($localStoragePath);
+                        if ($localStorageRaw !== false && trim($localStorageRaw) !== '') {
+                            $localStorageRestoreJson = $localStorageRaw;
+                        }
+                    }
+
                     $db->exec('SET FOREIGN_KEY_CHECKS=0');
                     execute_sql_dump($db, $sql);
                     $db->exec('SET FOREIGN_KEY_CHECKS=1');
@@ -444,6 +468,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
 
                     $messages[] = 'Backup wurde erfolgreich wiederhergestellt (Datenbank und Uploads).';
+                    if ($localStorageRestoreJson !== null) {
+                        $_SESSION['localstorage_restore_json'] = $localStorageRestoreJson;
+                        header('Location: ' . BASE_URL . 'admin/pages/backup.php?restored=1');
+                        exit;
+                    }
                 } else {
                     $sql = file_get_contents($tmpUpload);
                     if ($sql === false || trim($sql) === '') {
@@ -497,9 +526,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="grid gap-6 lg:grid-cols-2">
             <div class="bg-white rounded-lg shadow-md p-6">
                 <h3 class="text-lg font-semibold mb-2">Backup erstellen</h3>
-                <p class="text-gray-600 mb-4">Erstellt ein ZIP-Backup der Datenbank und aller Upload-Bilder.</p>
-                <form method="post">
+                <p class="text-gray-600 mb-4">Erstellt ein ZIP-Backup der Datenbank, Uploads und LocalStorage.</p>
+                <form method="post" id="backup-download-form">
                     <input type="hidden" name="action" value="backup">
+                    <input type="hidden" name="localstorage_json" id="localstorage-json">
                     <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Backup herunterladen</button>
                 </form>
             </div>
@@ -585,3 +615,95 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 </body>
 </html>
+<script>
+    (function() {
+        const form = document.getElementById('backup-download-form');
+        const localStorageInput = document.getElementById('localstorage-json');
+        if (form && localStorageInput) {
+            form.addEventListener('submit', () => {
+                const data = {};
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key) {
+                        data[key] = localStorage.getItem(key);
+                    }
+                }
+                const json = JSON.stringify(data);
+                localStorageInput.value = btoa(unescape(encodeURIComponent(json)));
+            });
+        }
+
+        const restorePayload = <?php echo $localStorageRestoreJson ? json_encode($localStorageRestoreJson) : 'null'; ?>;
+        if (restorePayload) {
+            try {
+                const parsed = JSON.parse(restorePayload);
+                if (parsed && typeof parsed === 'object') {
+                    localStorage.clear();
+                    Object.keys(parsed).forEach((key) => {
+                        localStorage.setItem(key, String(parsed[key]));
+                    });
+                    location.reload();
+                }
+            } catch (error) {
+                // Ignore invalid payload.
+            }
+        }
+    })();
+</script>
+<script>
+    (function() {
+        const exportBtn = document.getElementById('export-localstorage');
+        const importBtn = document.getElementById('import-localstorage');
+        const importFile = document.getElementById('import-localstorage-file');
+
+        if (exportBtn) {
+            exportBtn.addEventListener('click', () => {
+                const data = {};
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key) {
+                        data[key] = localStorage.getItem(key);
+                    }
+                }
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `localstorage_backup_${new Date().toISOString().slice(0, 10)}.json`;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                URL.revokeObjectURL(url);
+            });
+        }
+
+        if (importBtn) {
+            importBtn.addEventListener('click', () => {
+                const file = importFile && importFile.files ? importFile.files[0] : null;
+                if (!file) {
+                    alert('Bitte eine JSON-Datei auswaehlen.');
+                    return;
+                }
+                if (!confirm('LocalStorage importieren und vorhandene Werte ueberschreiben?')) {
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = () => {
+                    try {
+                        const payload = JSON.parse(reader.result || '{}');
+                        if (payload && typeof payload === 'object') {
+                            localStorage.clear();
+                            Object.keys(payload).forEach((key) => {
+                                localStorage.setItem(key, String(payload[key]));
+                            });
+                            alert('LocalStorage importiert. Bitte Seite neu laden.');
+                        }
+                    } catch (error) {
+                        alert('JSON konnte nicht gelesen werden.');
+                    }
+                };
+                reader.readAsText(file);
+            });
+        }
+    })();
+</script>
