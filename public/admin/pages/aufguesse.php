@@ -2114,7 +2114,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <?php
                                                 $isVideo = stripos($file['typ'], 'video') !== false;
-                                                $filePath = '../../uploads/' . $file['datei'];
+                                                $fileRelPath = $file['datei'] ?? '';
+                                                $filePath = '../../uploads/' . $fileRelPath;
                                                 ?>
                                                 <?php if ($isVideo): ?>
                                                     <video src="<?php echo htmlspecialchars($filePath); ?>" class="h-12 w-20 object-cover rounded border border-gray-200" muted></video>

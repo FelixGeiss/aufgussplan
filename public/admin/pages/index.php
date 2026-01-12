@@ -54,6 +54,7 @@ $canAufguesse = has_permission('aufguesse');
 $canStatistik = has_permission('statistik');
 $canUmfragen = has_permission('umfragen');
 $canBildschirme = has_permission('bildschirme');
+$canBackup = has_permission('backup');
 
 $screenAdStatus = [
     'label' => 'Werbung: nicht verfuegbar',
@@ -113,6 +114,14 @@ if (is_file($screenConfigFile)) {
                     <h3 class="text-lg font-semibold mb-2">Mitarbeiter</h3>
                     <p class="text-gray-600">Verwalten Sie Ihre Mitarbeiter</p>
                     <a href="mitarbeiter.php" class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Verwalten</a>
+                </div>
+            <?php endif; ?>
+
+            <?php if ($canBackup): ?>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold mb-2">Backup</h3>
+                    <p class="text-gray-600">Datenbank und Uploads sichern</p>
+                    <a href="backup.php" class="mt-4 inline-block bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600">Verwalten</a>
                 </div>
             <?php endif; ?>
 

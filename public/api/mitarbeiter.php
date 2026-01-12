@@ -26,6 +26,7 @@ if (!has_permission('mitarbeiter')) {
 }
 
 $db = Database::getInstance()->getConnection();
+ensureBackupPermissionColumn($db);
 $method = $_SERVER['REQUEST_METHOD'];
 
 try {
@@ -52,7 +53,7 @@ try {
 
 function handleGetMitarbeiter($db) {
     $stmt = $db->query(
-        "SELECT id, name, position, username, aktiv, can_aufguesse, can_statistik, can_umfragen, can_mitarbeiter, can_bildschirme, is_admin
+        "SELECT id, name, position, username, aktiv, can_aufguesse, can_statistik, can_umfragen, can_mitarbeiter, can_bildschirme, can_backup, is_admin
          FROM mitarbeiter
          ORDER BY name ASC"
     );
@@ -91,11 +92,12 @@ function handleCreateMitarbeiter($db) {
     $canUmfragen = normalizeBool($input['can_umfragen'] ?? false);
     $canMitarbeiter = normalizeBool($input['can_mitarbeiter'] ?? false);
     $canBildschirme = normalizeBool($input['can_bildschirme'] ?? false);
+    $canBackup = normalizeBool($input['can_backup'] ?? false);
     $isAdmin = normalizeBool($input['is_admin'] ?? false);
 
     $stmt = $db->prepare(
-        "INSERT INTO mitarbeiter (name, position, username, password_hash, aktiv, can_aufguesse, can_statistik, can_umfragen, can_mitarbeiter, can_bildschirme, is_admin)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        "INSERT INTO mitarbeiter (name, position, username, password_hash, aktiv, can_aufguesse, can_statistik, can_umfragen, can_mitarbeiter, can_bildschirme, can_backup, is_admin)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     );
     $stmt->execute([
         $name,
@@ -108,6 +110,7 @@ function handleCreateMitarbeiter($db) {
         $canUmfragen,
         $canMitarbeiter,
         $canBildschirme,
+        $canBackup,
         $isAdmin
     ]);
 
@@ -166,11 +169,12 @@ function handleUpdateMitarbeiter($db) {
     $canUmfragen = normalizeBool($input['can_umfragen'] ?? false);
     $canMitarbeiter = normalizeBool($input['can_mitarbeiter'] ?? false);
     $canBildschirme = normalizeBool($input['can_bildschirme'] ?? false);
+    $canBackup = normalizeBool($input['can_backup'] ?? false);
     $isAdmin = normalizeBool($input['is_admin'] ?? false);
 
     $stmt = $db->prepare(
         "UPDATE mitarbeiter
-         SET name = ?, position = ?, username = ?, password_hash = ?, aktiv = ?, can_aufguesse = ?, can_statistik = ?, can_umfragen = ?, can_mitarbeiter = ?, can_bildschirme = ?, is_admin = ?
+         SET name = ?, position = ?, username = ?, password_hash = ?, aktiv = ?, can_aufguesse = ?, can_statistik = ?, can_umfragen = ?, can_mitarbeiter = ?, can_bildschirme = ?, can_backup = ?, is_admin = ?
          WHERE id = ?"
     );
     $stmt->execute([
@@ -184,6 +188,7 @@ function handleUpdateMitarbeiter($db) {
         $canUmfragen,
         $canMitarbeiter,
         $canBildschirme,
+        $canBackup,
         $isAdmin,
         $mitarbeiterId
     ]);
@@ -219,6 +224,19 @@ function normalizeBool($value) {
     }
     $value = strtolower(trim((string)$value));
     return in_array($value, ['1', 'true', 'on', 'yes'], true) ? 1 : 0;
+}
+
+function ensureBackupPermissionColumn(PDO $db) {
+    try {
+        $stmt = $db->prepare("SHOW COLUMNS FROM mitarbeiter LIKE 'can_backup'");
+        $stmt->execute();
+        if ($stmt->fetch()) {
+            return;
+        }
+        $db->exec("ALTER TABLE mitarbeiter ADD COLUMN can_backup TINYINT(1) NOT NULL DEFAULT 0 AFTER can_bildschirme");
+    } catch (Exception $e) {
+        error_log('Migration can_backup fehlgeschlagen: ' . $e->getMessage());
+    }
 }
 
 function sendResponse($success, $message, $data = null, $statusCode = 200) {

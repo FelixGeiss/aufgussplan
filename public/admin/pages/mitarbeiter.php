@@ -91,7 +91,7 @@ require_permission('mitarbeiter');
                                     <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.25 7.25a1 1 0 0 1-1.414 0l-3.25-3.25a1 1 0 1 1 1.414-1.414l2.543 2.543 6.543-6.543a1 1 0 0 1 1.408 0Z" clip-rule="evenodd"></path>
                                 </svg>
                             </span>
-                            Aufgüsse
+                            Aufguesse
                         </label>
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="checkbox" name="can_statistik" class="peer sr-only">
@@ -124,10 +124,19 @@ require_permission('mitarbeiter');
                             <input type="checkbox" name="can_bildschirme" class="peer sr-only">
                             <span class="h-4 w-4 rounded border border-gray-300 bg-white flex items-center justify-center text-white peer-checked:bg-indigo-600 peer-checked:border-indigo-600">
                                 <svg class="h-3 w-3 hidden peer-checked:block" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                    <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.25 7.25a1 1 0 0 1-1.414 0l-3.25-3.25a1 1 0 1 1 1.414-1.414l2.543 2.543 6.543-6.543a1 1 0 0 1 1.408 0Z" clip-rule="evenodd"></path>
+                                    <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.25 7.25a1 1 0 1 1 1.414-1.414l2.543 2.543 6.543-6.543a1 1 0 0 1 1.408 0Z" clip-rule="evenodd"></path>
                                 </svg>
                             </span>
                             Bildschirme
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="can_backup" class="peer sr-only">
+                            <span class="h-4 w-4 rounded border border-gray-300 bg-white flex items-center justify-center text-white peer-checked:bg-indigo-600 peer-checked:border-indigo-600">
+                                <svg class="h-3 w-3 hidden peer-checked:block" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.25 7.25a1 1 0 1 1 1.414-1.414l2.543 2.543 6.543-6.543a1 1 0 0 1 1.408 0Z" clip-rule="evenodd"></path>
+                                </svg>
+                            </span>
+                            Backup
                         </label>
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="checkbox" name="is_admin" class="peer sr-only">
@@ -138,6 +147,73 @@ require_permission('mitarbeiter');
                             </span>
                             Admin
                         </label>
+                    </div>
+                        <div class="flex items-center gap-2">
+                            <input id="add-can-statistik" type="checkbox" name="can_statistik" class="peer sr-only">
+                            <label for="add-can-statistik" class="flex items-center gap-2 cursor-pointer">
+                                <span class="h-4 w-4 rounded border border-gray-300 bg-white flex items-center justify-center text-white peer-checked:bg-indigo-600 peer-checked:border-indigo-600">
+                                    <svg class="h-3 w-3 hidden peer-checked:block" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.25 7.25a1 1 0 0 1-1.414 0l-3.25-3.25a1 1 0 1 1 1.414-1.414l2.543 2.543 6.543-6.543a1 1 0 0 1 1.408 0Z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </span>
+                                Statistik
+                            </label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input id="add-can-umfragen" type="checkbox" name="can_umfragen" class="peer sr-only">
+                            <label for="add-can-umfragen" class="flex items-center gap-2 cursor-pointer">
+                                <span class="h-4 w-4 rounded border border-gray-300 bg-white flex items-center justify-center text-white peer-checked:bg-indigo-600 peer-checked:border-indigo-600">
+                                    <svg class="h-3 w-3 hidden peer-checked:block" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.25 7.25a1 1 0 0 1-1.414 0l-3.25-3.25a1 1 0 1 1 1.414-1.414l2.543 2.543 6.543-6.543a1 1 0 0 1 1.408 0Z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </span>
+                                Umfrage
+                            </label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input id="add-can-mitarbeiter" type="checkbox" name="can_mitarbeiter" class="peer sr-only">
+                            <label for="add-can-mitarbeiter" class="flex items-center gap-2 cursor-pointer">
+                                <span class="h-4 w-4 rounded border border-gray-300 bg-white flex items-center justify-center text-white peer-checked:bg-indigo-600 peer-checked:border-indigo-600">
+                                    <svg class="h-3 w-3 hidden peer-checked:block" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.25 7.25a1 1 0 0 1-1.414 0l-3.25-3.25a1 1 0 1 1 1.414-1.414l2.543 2.543 6.543-6.543a1 1 0 0 1 1.408 0Z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </span>
+                                Mitarbeiter
+                            </label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input id="add-can-bildschirme" type="checkbox" name="can_bildschirme" class="peer sr-only">
+                            <label for="add-can-bildschirme" class="flex items-center gap-2 cursor-pointer">
+                                <span class="h-4 w-4 rounded border border-gray-300 bg-white flex items-center justify-center text-white peer-checked:bg-indigo-600 peer-checked:border-indigo-600">
+                                    <svg class="h-3 w-3 hidden peer-checked:block" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.25 7.25a1 1 0 0 1-1.414 0l-3.25-3.25a1 1 0 1 1 1.414-1.414l2.543 2.543 6.543-6.543a1 1 0 0 1 1.408 0Z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </span>
+                                Bildschirme
+                            </label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input id="add-can-backup" type="checkbox" name="can_backup" class="peer sr-only">
+                            <label for="add-can-backup" class="flex items-center gap-2 cursor-pointer">
+                                <span class="h-4 w-4 rounded border border-gray-300 bg-white flex items-center justify-center text-white peer-checked:bg-indigo-600 peer-checked:border-indigo-600">
+                                    <svg class="h-3 w-3 hidden peer-checked:block" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.25 7.25a1 1 0 0 1-1.414 0l-3.25-3.25a1 1 0 1 1 1.414-1.414l2.543 2.543 6.543-6.543a1 1 0 0 1 1.408 0Z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </span>
+                                Backup
+                            </label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input id="add-is-admin" type="checkbox" name="is_admin" class="peer sr-only">
+                            <label for="add-is-admin" class="flex items-center gap-2 cursor-pointer">
+                                <span class="h-4 w-4 rounded border border-gray-300 bg-white flex items-center justify-center text-white peer-checked:bg-indigo-600 peer-checked:border-indigo-600">
+                                    <svg class="h-3 w-3 hidden peer-checked:block" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.25 7.25a1 1 0 0 1-1.414 0l-3.25-3.25a1 1 0 1 1 1.414-1.414l2.543 2.543 6.543-6.543a1 1 0 0 1 1.408 0Z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </span>
+                                Admin
+                            </label>
+                        </div>
                     </div>
                 </div>
                 <div class="mb-4">

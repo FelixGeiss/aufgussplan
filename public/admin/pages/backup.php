@@ -6,7 +6,7 @@ require_once __DIR__ . '/../../../src/auth.php';
 require_once __DIR__ . '/../../../src/db/connection.php';
 
 require_login();
-require_admin();
+require_permission('backup');
 
 $db = Database::getInstance()->getConnection();
 

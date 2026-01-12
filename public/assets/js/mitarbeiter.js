@@ -46,6 +46,7 @@ function buildRow(mitarbeiter) {
     const canUmfragen = Number(mitarbeiter.can_umfragen) === 1;
     const canMitarbeiter = Number(mitarbeiter.can_mitarbeiter) === 1;
     const canBildschirme = Number(mitarbeiter.can_bildschirme) === 1;
+    const canBackup = Number(mitarbeiter.can_backup) === 1;
     const isAdmin = Number(mitarbeiter.is_admin) === 1;
     const aktiv = Number(mitarbeiter.aktiv) === 1;
 
@@ -73,12 +74,13 @@ function buildRow(mitarbeiter) {
                 <input type="text" name="username" class="w-full border rounded px-2 py-1" value="${username}" autocomplete="off">
             </td>
             <td class="px-4 py-2">
-                <div class="flex flex-col gap-1 text-sm">
+                <div class="grid grid-cols-2 gap-2 text-sm">
                     ${checkbox('can_aufguesse', 'Aufgüsse', canAufguesse)}
                     ${checkbox('can_statistik', 'Statistik', canStatistik)}
                     ${checkbox('can_umfragen', 'Umfrage', canUmfragen)}
                     ${checkbox('can_mitarbeiter', 'Mitarbeiter', canMitarbeiter)}
                     ${checkbox('can_bildschirme', 'Bildschirme', canBildschirme)}
+                    ${checkbox('can_backup', 'Backup', canBackup)}
                     ${checkbox('is_admin', 'Admin', isAdmin)}
                 </div>
             </td>
@@ -148,6 +150,7 @@ function getRowData(row) {
         can_umfragen: getValue('can_umfragen')?.checked || false,
         can_mitarbeiter: getValue('can_mitarbeiter')?.checked || false,
         can_bildschirme: getValue('can_bildschirme')?.checked || false,
+        can_backup: getValue('can_backup')?.checked || false,
         is_admin: getValue('is_admin')?.checked || false,
         aktiv: getValue('aktiv')?.checked || false
     };
@@ -168,6 +171,7 @@ async function saveRow(row) {
         can_umfragen: data.can_umfragen,
         can_mitarbeiter: data.can_mitarbeiter,
         can_bildschirme: data.can_bildschirme,
+        can_backup: data.can_backup,
         is_admin: data.is_admin,
         aktiv: data.aktiv
     };
@@ -256,6 +260,7 @@ function setupAddForm() {
             can_umfragen: formData.get('can_umfragen') === 'on',
             can_mitarbeiter: formData.get('can_mitarbeiter') === 'on',
             can_bildschirme: formData.get('can_bildschirme') === 'on',
+            can_backup: formData.get('can_backup') === 'on',
             is_admin: formData.get('is_admin') === 'on',
             aktiv: formData.get('aktiv') === 'on'
         };

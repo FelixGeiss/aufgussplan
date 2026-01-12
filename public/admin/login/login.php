@@ -5,6 +5,19 @@ require_once __DIR__ . '/../../../src/config/config.php';
 require_once __DIR__ . '/../../../src/db/connection.php';
 require_once __DIR__ . '/../../../src/auth.php';
 
+function ensureBackupPermissionColumn(PDO $db) {
+    try {
+        $stmt = $db->prepare("SHOW COLUMNS FROM mitarbeiter LIKE 'can_backup'");
+        $stmt->execute();
+        if ($stmt->fetch()) {
+            return;
+        }
+        $db->exec("ALTER TABLE mitarbeiter ADD COLUMN can_backup TINYINT(1) NOT NULL DEFAULT 0 AFTER can_bildschirme");
+    } catch (Exception $e) {
+        error_log('Migration can_backup fehlgeschlagen: ' . $e->getMessage());
+    }
+}
+
 if (is_admin_logged_in()) {
     header('Location: ' . BASE_URL . 'admin/pages/index.php');
     exit;
@@ -20,7 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Bitte Benutzername und Passwort eingeben.';
     } else {
         $db = Database::getInstance()->getConnection();
-        $stmt = $db->prepare('SELECT id, name, username, password_hash, aktiv, can_aufguesse, can_statistik, can_umfragen, can_mitarbeiter, can_bildschirme, is_admin FROM mitarbeiter WHERE username = ? LIMIT 1');
+        ensureBackupPermissionColumn($db);
+        $stmt = $db->prepare('SELECT id, name, username, password_hash, aktiv, can_aufguesse, can_statistik, can_umfragen, can_mitarbeiter, can_bildschirme, can_backup, is_admin FROM mitarbeiter WHERE username = ? LIMIT 1');
         $stmt->execute([$username]);
         $user = $stmt->fetch();
 
@@ -41,6 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'umfragen' => (int)$user['can_umfragen'] === 1,
                 'mitarbeiter' => (int)$user['can_mitarbeiter'] === 1,
                 'bildschirme' => (int)$user['can_bildschirme'] === 1,
+                'backup' => (int)($user['can_backup'] ?? 0) === 1,
             ];
 
             header('Location: ' . BASE_URL . 'admin/pages/index.php');
