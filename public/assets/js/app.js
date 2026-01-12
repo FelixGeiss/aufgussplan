@@ -259,8 +259,8 @@ function renderScreenImage() {
 
     const safePath = escapeHtml(imagePath);
     container.innerHTML = `
-        <div class="w-full h-screen">
-            <img src="${safePath}" alt="Bildschirm" class="w-full h-full object-cover">
+        <div class="w-full h-screen flex items-center justify-center">
+            <img src="${safePath}" alt="Bildschirm" class="h-full w-auto max-w-full object-contain object-center">
         </div>
     `;
 }
