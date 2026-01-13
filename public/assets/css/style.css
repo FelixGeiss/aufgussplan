@@ -829,8 +829,8 @@
 }
 
 .plan-media-stack .plan-temp-badge {
-    top: 30px !important;
-    right: -30px !important;
+    top: 15% !important;
+    right: -30% !important;
     transform: translate(50%, -50%);
 }
 
