@@ -709,8 +709,43 @@
     width: 100%;
 }
 
+.plan-list-people-wrap {
+    flex-wrap: nowrap;
+    overflow: visible;
+}
+
 .kiosk-view .plan-list-people-wrap {
     gap: clamp(0.6rem, 1.2vw, 3.6rem);
+}
+
+.plan-list-people-wrap.has-multiple .h-10,
+.plan-list-people-wrap.has-multiple .w-10 {
+    width: 2.25rem;
+    height: 2.25rem;
+}
+
+.plan-list-people-wrap.has-multiple .text-sm {
+    font-size: 0.8rem;
+    line-height: 1.25;
+}
+
+.plan-list-people-wrap.has-multiple .mt-2 {
+    margin-top: 0.35rem;
+}
+
+.kiosk-view .plan-list-people-wrap.has-multiple .h-10,
+.kiosk-view .plan-list-people-wrap.has-multiple .w-10 {
+    width: clamp(32px, 3.1vw, 240px) !important;
+    height: clamp(32px, 3.1vw, 240px) !important;
+}
+
+.kiosk-view .plan-list-people-wrap.has-multiple .text-sm {
+    font-size: clamp(0.8rem, 1vw, 3.8rem);
+    line-height: 1.25;
+}
+
+.kiosk-view .plan-list-people-wrap.has-multiple .mt-2 {
+    margin-top: clamp(0.35rem, 0.8vw, 1.6rem) !important;
 }
 
 .kiosk-view .plan-list-people .h-10,

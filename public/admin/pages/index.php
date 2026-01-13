@@ -98,7 +98,7 @@ if (is_file($screenConfigFile)) {
     <link rel="stylesheet" href="../../assets/css/admin.css">
 </head>
 
-<body class="bg-gray-100">
+<body class="bg-gray-100 admin-scale-borders">
     <!-- NAVIGATION -->
     <?php include __DIR__ . '/../partials/navbar.php'; ?>
 

@@ -54,7 +54,33 @@
 
     /* Legacy-Variablen (Rueckwaerts-kompatibel) */
     --primary-color: var(--admin-color-primary-500);
-    --border-color: var(--admin-color-border-strong);
+    
+/* ============================================================================
+   FLUIDE BORDER-BREITEN IM ADMIN (SKALIERT MIT SCHRIFT)
+   ============================================================================ */
+
+.admin-scale-borders {
+    --admin-border-width: clamp(1px, 0.0625em, 2px);
+}
+
+.admin-scale-borders .border {
+    border-width: var(--admin-border-width);
+}
+
+.admin-scale-borders .border-t {
+    border-top-width: var(--admin-border-width);
+}
+
+.admin-scale-borders .border-b {
+    border-bottom-width: var(--admin-border-width);
+}
+
+.admin-scale-borders .border-l {
+    border-left-width: var(--admin-border-width);
+}
+
+.admin-scale-borders .border-r {
+    border-right-width: var(--admin-border-width);
 }
 
 /* ============================================================================
@@ -428,6 +454,7 @@ button.focus\:ring-indigo-500:focus {
 button.focus\:ring-red-500:focus {
     --tw-ring-color: var(--admin-color-danger-600);
 }
+
 
 
 

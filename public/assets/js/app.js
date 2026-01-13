@@ -1492,7 +1492,8 @@ function formatAufgiesserHtml(aufguss) {
         `;
     });
 
-    return `<div class="flex flex-wrap justify-center gap-4 w-full plan-list-people-wrap">${cards.join('')}</div>`;
+    const wrapClass = people.length > 1 ? 'plan-list-people-wrap has-multiple' : 'plan-list-people-wrap';
+    return `<div class="flex flex-wrap justify-center gap-4 w-full ${wrapClass}">${cards.join('')}</div>`;
 }
 
 // Extrahiert Aufgiesser aus Daten.
