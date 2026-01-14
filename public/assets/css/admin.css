@@ -51,6 +51,8 @@
     --admin-color-danger-400: #fb7185;
     --admin-color-primary-200: #bfdbfe;
     --admin-color-primary-700: #1d4ed8;
+    --admin-color-primary-rgb: 59 130 246;
+    --admin-color-shadow-900-rgb: 15 23 42;
 
     /* Legacy-Variablen (Rueckwaerts-kompatibel) */
     --primary-color: var(--admin-color-primary-500);
@@ -218,12 +220,12 @@ input[type="radio"] {
 
 .toast {
     pointer-events: auto;
-    background-color: #ffffff;
+    background-color: var(--admin-color-surface);
     border: 1px solid var(--admin-color-border);
     border-left-width: 6px;
     border-radius: 0.5rem;
     padding: 0.75rem 1rem;
-    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.14);
+    box-shadow: 0 10px 22px rgba(var(--admin-color-shadow-900-rgb), 0.14);
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
@@ -296,12 +298,12 @@ table tbody tr:hover {
 .upload-area:hover {
     border-color: var(--primary-color);
     background-color: var(--admin-color-primary-50);
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08);
+    box-shadow: 0 0 0 4px rgba(var(--admin-color-primary-rgb), 0.08);
 }
 
 .upload-area:focus-within {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.16);
+    box-shadow: 0 0 0 4px rgba(var(--admin-color-primary-rgb), 0.16);
 }
 
 /* ========================================================================
@@ -522,6 +524,16 @@ button.focus\:ring-red-500:focus {
     --tw-ring-color: var(--admin-color-danger-600);
 }
 
+/* Validation borders for time fields */
+input.border-red-500,
+select.border-red-500,
+textarea.border-red-500 {
+    border-color: var(--admin-color-danger-600) !important;
+}
 
-
+input.border-green-500,
+select.border-green-500,
+textarea.border-green-500 {
+    border-color: var(--admin-color-success-600) !important;
+}
 

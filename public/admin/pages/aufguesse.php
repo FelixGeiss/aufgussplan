@@ -721,8 +721,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <div class="text-sm font-medium text-gray-900">
                                     <?php echo date('d.m.Y', strtotime($plan['erstellt_am'])); ?>
                                 </div>
-                                <button onclick="deletePlan(<?php echo $plan['id']; ?>, '<?php echo htmlspecialchars($plan['name'] ?? ''); ?>')"
-                                    class="mt-2 text-red-600 hover:text-red-900 text-sm font-medium">
+                                <button type="button" onclick="deletePlan(<?php echo $plan['id']; ?>, '<?php echo htmlspecialchars($plan['name'] ?? ''); ?>')"
+                                    class="mt-2 bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">
                                     Plan löschen
                                 </button>
                             </div>
@@ -1459,21 +1459,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <p class="text-sm font-semibold text-gray-900">PNG, JPG, GIF bis zu 10MB</p>
                                             </div>
                                         </label>
-
-                                        <button type="button" id="plan-upload-btn-<?php echo $plan['id']; ?>" onclick="uploadPlanBackgroundImage(<?php echo $plan['id']; ?>)" class="w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">
-                                            Hochladen
-                                        </button>
-
-                                        <?php if (!empty($plan['hintergrund_bild'])): ?>
-                                            <button type="button" onclick="deletePlanBackgroundImage(<?php echo $plan['id']; ?>, '<?php echo htmlspecialchars($plan['name'] ?? ''); ?>')" class="w-full rounded-md bg-red-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500">
-                                                Hintergrundbild Löschen
+                                        <div class="flex flex-col gap-3 sm:flex-row">
+                                            <button type="button" id="plan-upload-btn-<?php echo $plan['id']; ?>" onclick="uploadPlanBackgroundImage(<?php echo $plan['id']; ?>)" class="admin-btn-save flex-1 text-white px-4 py-2 rounded text-sm font-semibold inline-flex items-center justify-center gap-1 text-center">
+                                                Hochladen <span aria-hidden="true">+</span>
                                             </button>
-                                        <?php else: ?>
-                                            <button type="button" class="w-full rounded-md bg-red-200 px-4 py-2 text-sm font-semibold text-white shadow-sm cursor-not-allowed" disabled>
-                                                Hintergrundbild Löschen
-                                            </button>
-                                        <?php endif; ?>
-                                    </div>
+
+                                            <?php if (!empty($plan['hintergrund_bild'])): ?>
+                                                <button type="button" onclick="deletePlanBackgroundImage(<?php echo $plan['id']; ?>, '<?php echo htmlspecialchars($plan['name'] ?? ''); ?>')" class="flex-1 rounded-md bg-red-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500">
+                                                    Hintergrundbild L&ouml;schen
+                                                </button>
+                                            <?php else: ?>
+                                                <button type="button" class="flex-1 rounded-md bg-red-200 px-4 py-2 text-sm font-semibold text-white shadow-sm cursor-not-allowed" disabled>
+                                                    Hintergrundbild L&ouml;schen
+                                                </button>
+                                            <?php endif; ?>
+                                        </div>
 
                                     <div class="mt-6 border-t border-gray-200 pt-4 space-y-4" data-plan-id="<?php echo $plan['id']; ?>">
                                         <h4 class="text-base font-semibold text-gray-900 text-center">Nächster Aufguss Popup</h4>
@@ -1598,20 +1598,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                             Keine Datei gespeichert.
                                                         </div>
                                                     <?php endif; ?>
-
-                                                    <button type="button" id="plan-ad-upload-btn-<?php echo $plan['id']; ?>" onclick="uploadPlanAdMedia(<?php echo $plan['id']; ?>)" class="w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">
-                                                        Hochladen
-                                                    </button>
-
-                                                    <?php if (!empty($plan['werbung_media'])): ?>
-                                                        <button type="button" id="plan-ad-delete-btn-<?php echo $plan['id']; ?>" onclick="deletePlanAdMedia(<?php echo $plan['id']; ?>, '<?php echo htmlspecialchars($plan['name'] ?? ''); ?>')" class="w-full rounded-md bg-red-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500">
-                                                            Werbung Löschen
+                                                    <div class="flex flex-col gap-3 sm:flex-row">
+                                                        <button type="button" id="plan-ad-upload-btn-<?php echo $plan['id']; ?>" onclick="uploadPlanAdMedia(<?php echo $plan['id']; ?>)" class="admin-btn-save flex-1 text-white px-4 py-2 rounded text-sm font-semibold inline-flex items-center justify-center gap-1 text-center">
+                                                            Hochladen <span aria-hidden="true">+</span>
                                                         </button>
-                                                    <?php else: ?>
-                                                        <button type="button" id="plan-ad-delete-btn-<?php echo $plan['id']; ?>" class="w-full rounded-md bg-red-200 px-4 py-2 text-sm font-semibold text-white shadow-sm cursor-not-allowed" disabled>
-                                                            Werbung Löschen
-                                                        </button>
-                                                    <?php endif; ?>
+
+                                                        <?php if (!empty($plan['werbung_media'])): ?>
+                                                            <button type="button" id="plan-ad-delete-btn-<?php echo $plan['id']; ?>" onclick="deletePlanAdMedia(<?php echo $plan['id']; ?>, '<?php echo htmlspecialchars($plan['name'] ?? ''); ?>')" class="flex-1 rounded-md bg-red-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500">
+                                                                Werbung L&ouml;schen
+                                                            </button>
+                                                        <?php else: ?>
+                                                            <button type="button" id="plan-ad-delete-btn-<?php echo $plan['id']; ?>" class="flex-1 rounded-md bg-red-200 px-4 py-2 text-sm font-semibold text-white shadow-sm cursor-not-allowed" disabled>
+                                                                Werbung L&ouml;schen
+                                                            </button>
+                                                        <?php endif; ?>
+                                                    </div>
                                                 </div>
 
                                                 <div class="border-t border-gray-200 pt-4 space-y-3">
@@ -4615,6 +4616,10 @@ function savePlanSettings(planId, options = {}) {
 </body>
 
 </html>
+
+
+
+
 
 
 

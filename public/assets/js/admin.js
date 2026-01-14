@@ -378,33 +378,30 @@ function saveEdit(aufgussId, field) {
     const editMode = cell.querySelector('.edit-mode');
 
     if (editMode) {
-        // Zusätzliche Validierung für Zeit-Felder
+        // Zeit-Validierung (ohne Speichern zu blockieren)
         if (field === 'zeit') {
             const zeitAnfang = editMode.querySelector('input[name="zeit_anfang"]');
             const zeitEnde = editMode.querySelector('input[name="zeit_ende"]');
 
-            if (zeitAnfang && zeitEnde && zeitAnfang.value && zeitEnde.value) {
-                const zeitAnfangTime = new Date('1970-01-01T' + zeitAnfang.value + ':00');
-                const zeitEndeTime = new Date('1970-01-01T' + zeitEnde.value + ':00');
-
-                if (zeitEndeTime < zeitAnfangTime) {
-                    alert('Die Endzeit darf nicht vor der Anfangszeit liegen.');
-                    return; // Verhindere das Speichern
+            if (zeitAnfang && zeitEnde) {
+                const isValid = validateTimeOrder(zeitAnfang, zeitEnde, false);
+                if (!isValid && typeof window.showToast === 'function') {
+                    window.showToast('Endzeit darf nicht fr&uuml;her als Anfang sein.', 'error');
                 }
             }
         }
 
-        // Deaktiviere Buttons während des Speicherns
+        // Deaktiviere Buttons waehrend des Speicherns
         const buttons = editMode.querySelectorAll('button');
         buttons.forEach(button => button.disabled = true);
         const originalText = buttons[0].innerHTML;
-        buttons[0].innerHTML = '⏳ Speichere...';
+        buttons[0].innerHTML = 'Speichere...';
 
         const formData = new FormData();
         formData.append('aufguss_id', aufgussId);
         formData.append('field', field);
 
-        // Sammle alle Input-Werte (auch leere Werte für NULL-Updates)
+        // Sammle alle Input-Werte (auch leere Werte fuer NULL-Updates)
         const inputs = editMode.querySelectorAll('input, select');
         inputs.forEach(input => {
             if (input.tagName === 'SELECT' && input.multiple) {
@@ -428,13 +425,10 @@ function saveEdit(aufgussId, field) {
             formData.append(input.name, input.value ? input.value.trim() : '');
         });
 
-        // das ist nur zum debuggen
-        // Debug-Logging entfernt (lokaler Debug-Server nicht aktiv)
-
         // Debug: Zeige gesendete Daten
         console.log('Sending data for', field, ':', Array.from(formData.entries()));
 
-        // Zusätzliche Debug-Ausgabe
+        // Zusaetzliche Debug-Ausgabe
         console.log('All inputs found:', inputs);
         inputs.forEach(input => {
             console.log(`Input ${input.name}: "${input.value}"`);
@@ -474,8 +468,6 @@ function saveEdit(aufgussId, field) {
             });
     }
 }
-
-// Loescht einen Plan nach Sicherheitsabfrage.
 function deletePlan(planId, planName) {
     // Sicherheitsabfrage vor dem Löschen
     if (!confirm(`Bist du sicher, dass du den Plan "${planName}" löschen möchtest?\n\nAlle Aufgüsse in diesem Plan bleiben erhalten, werden aber keinem Plan mehr zugeordnet.`)) {
@@ -548,21 +540,31 @@ function validateTimeFields(container) {
 }
 
 // Prueft, ob Endzeit vor Startzeit liegt.
-function validateTimeOrder(anfangField, endeField) {
-    if (!anfangField.value || !endeField.value) return;
+function validateTimeOrder(anfangField, endeField, showToast = true) {
+    if (!anfangField.value || !endeField.value) {
+        anfangField.classList.remove('border-red-500', 'border-green-500');
+        endeField.classList.remove('border-red-500', 'border-green-500');
+        return true;
+    }
 
     const anfangTime = new Date('1970-01-01T' + anfangField.value + ':00');
     const endeTime = new Date('1970-01-01T' + endeField.value + ':00');
 
-    // Entferne vorherige Fehleranzeigen
-    anfangField.classList.remove('border-red-500');
-    endeField.classList.remove('border-red-500');
+    anfangField.classList.remove('border-red-500', 'border-green-500');
+    endeField.classList.remove('border-red-500', 'border-green-500');
 
     if (endeTime < anfangTime) {
         anfangField.classList.add('border-red-500');
         endeField.classList.add('border-red-500');
-        alert('Die Endzeit darf nicht vor der Anfangszeit liegen.');
+        if (showToast && typeof window.showToast === 'function') {
+            window.showToast('Endzeit darf nicht fr&uuml;her als Anfang sein.', 'error');
+        }
+        return false;
     }
+
+    anfangField.classList.add('border-green-500');
+    endeField.classList.add('border-green-500');
+    return true;
 }
 
 // DOM-Event-Listener für verschiedene Seiten
