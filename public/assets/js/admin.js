@@ -43,25 +43,20 @@ document.addEventListener('DOMContentLoaded', function() {
     /**
      * LOGOUT-FUNKTIONALITÄT
      *
-     * Sicherer Logout mit Bestätigung:
+     * Logout ohne Bestätigung:
      * - Klick auf Logout-Link abfangen
-     * - Bestätigungsdialog anzeigen
-     * - Bei "Ja": Zu login/logout.php weiterleiten
+     * - Direkt zu login/logout.php weiterleiten
      */
     const logoutBtn = document.querySelector('a[href*="logout"]');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', function(e) {
             // Standard-Link-Verhalten verhindern
             e.preventDefault();
-
-            // Bestätigung vom Benutzer einholen
-            if (confirm('Wirklich abmelden?')) {
-                // Zu Logout-Seite weiterleiten (beendet Session)
-                const path = window.location.pathname || '';
-                const parts = path.split('/admin/');
-                const base = parts.length > 1 ? parts[0] : '';
-                window.location.href = `${base}/admin/login/logout.php`;
-            }
+            // Zu Logout-Seite weiterleiten (beendet Session)
+            const path = window.location.pathname || '';
+            const parts = path.split('/admin/');
+            const base = parts.length > 1 ? parts[0] : '';
+            window.location.href = `${base}/admin/login/logout.php`;
         });
     }
 

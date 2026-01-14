@@ -184,7 +184,7 @@ if (is_file($screenConfigFile)) {
                     <p class="text-gray-600">Verwalten Sie die TV-Bildschirme</p>
                     <a href="bildschirme.php" class="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Verwalten</a>
                     <div class="mt-4 border-t border-gray-200 pt-4">
-                        <div class="text-xs text-gray-500 mb-2">
+                        <div class="text-xs mb-2" style="color: <?php echo $screenAdStatus['label'] === 'Werbung aktiv' ? 'var(--admin-color-success-700)' : 'var(--admin-color-danger-700)'; ?>">
                             <?php echo htmlspecialchars($screenAdStatus['label']); ?>
                         </div>
                         <?php if (!empty($screenAdStatus['screens'])): ?>
