@@ -82,23 +82,42 @@ document.addEventListener('DOMContentLoaded', function() {
  * @param {string} type - Typ: 'success', 'error', 'warning', 'info'
  */
 function showToast(message, type = 'info') {
-    // Toast-Element erstellen
-    const toast = document.createElement('div');
+    const stack = document.getElementById('toast-stack');
+    if (stack) {
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.setAttribute('data-toast', '');
+        toast.innerHTML = `
+            <div>${message}</div>
+            <button type="button" class="font-bold leading-none" aria-label="Meldung schliessen" data-toast-close>
+                &times;
+            </button>
+        `;
+        stack.appendChild(toast);
+        requestAnimationFrame(() => {
+            toast.classList.add('show');
+        });
 
-    // CSS-Klassen basierend auf Typ
+        const removeToast = () => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 220);
+        };
+        const closeButton = toast.querySelector('[data-toast-close]');
+        if (closeButton) {
+            closeButton.addEventListener('click', removeToast);
+        }
+        setTimeout(removeToast, 4500);
+        return;
+    }
+
+    const toast = document.createElement('div');
     toast.className = `fixed top-4 right-4 px-4 py-2 rounded-lg text-white z-50 ${
         type === 'success' ? 'bg-green-500' :
         type === 'error' ? 'bg-red-500' :
         type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
     }`;
-
-    // Nachricht einfügen
     toast.textContent = message;
-
-    // Toast zum Body hinzufügen
     document.body.appendChild(toast);
-
-    // Nach 3 Sekunden automatisch entfernen
     setTimeout(() => {
         toast.remove();
     }, 3000);
@@ -120,6 +139,8 @@ function showToast(message, type = 'info') {
 window.AdminUtils = {
     showToast,           // Toast-Nachrichten
 };
+
+window.showToast = showToast;
 
 /**
  * Admin-Funktionen für Aufgussplan
@@ -411,8 +432,10 @@ function saveEdit(aufgussId, field) {
             })
             .then(data => {
                 if (data.success) {
-                    // Erfolg: Seite neu laden um Änderungen anzuzeigen
-                    location.reload();
+                    if (typeof window.showToast === 'function') {
+                        window.showToast('Gespeichert', 'success');
+                    }
+                    setTimeout(() => location.reload(), 700);
                 } else {
                     // Fehler: Buttons wieder aktivieren
                     buttons.forEach(button => button.disabled = false);
@@ -454,11 +477,14 @@ function deletePlan(planId, planName) {
     })
     .then(data => {
         if (data.success) {
-            // Erfolg: Seite neu laden um Änderungen anzuzeigen
-            location.reload();
+            // Erfolg: Seite neu laden um Aenderungen anzuzeigen
+            if (typeof window.showToast === 'function') {
+                window.showToast('Gelöscht', 'success');
+            }
+            setTimeout(() => location.reload(), 700);
         } else {
             // Fehler anzeigen
-            alert('Fehler beim Löschen: ' + (data.error || 'Unbekannter Fehler'));
+            alert('Fehler beim Loeschen: ' + (data.error || 'Unbekannter Fehler'));
             console.error('Server Error:', data);
         }
     })
@@ -591,4 +617,11 @@ window.saveEdit = saveEdit;
 window.deletePlan = deletePlan;
 window.deleteAufguss = deleteAufguss;
 window.validateTimeFields = validateTimeFields;
+
+
+
+
+
+
+
 

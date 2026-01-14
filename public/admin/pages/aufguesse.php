@@ -236,6 +236,16 @@ if (isset($_SESSION['delete_message'])) {
     $errors[] = $_SESSION['delete_error'];
     unset($_SESSION['delete_error']);
 }
+
+$toastMessage = '';
+$toastType = 'success';
+if (isset($_SESSION['toast_message'])) {
+    $toastMessage = $_SESSION['toast_message'];
+    $toastType = $_SESSION['toast_type'] ?? 'success';
+    unset($_SESSION['toast_message'], $_SESSION['toast_type']);
+} elseif ($message) {
+    $toastMessage = $message;
+}
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!empty($_POST['form_type']) && $_POST['form_type'] === 'create_plan') {
         $planName = trim($_POST['plan_name'] ?? '');
@@ -250,6 +260,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'beschreibung' => $planBeschreibung !== '' ? $planBeschreibung : null
                 ]);
                 $message = 'Plan erfolgreich erstellt!';
+                $_SESSION['toast_message'] = $message;
+                $_SESSION['toast_type'] = 'success';
                 header('Location: ' . $_SERVER['REQUEST_URI']);
                 exit;
             } catch (Exception $e) {
@@ -278,6 +290,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $saunaTemperatur
                 ]);
                 $message = 'Sauna erfolgreich erstellt!';
+                $_SESSION['toast_message'] = $message;
+                $_SESSION['toast_type'] = 'success';
                 header('Location: ' . $_SERVER['REQUEST_URI']);
                 exit;
             } catch (Exception $e) {
@@ -297,6 +311,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $aufgussBeschreibung !== '' ? $aufgussBeschreibung : null
                 ]);
                 $message = 'Aufgussname erfolgreich erstellt!';
+                $_SESSION['toast_message'] = $message;
+                $_SESSION['toast_type'] = 'success';
                 header('Location: ' . $_SERVER['REQUEST_URI']);
                 exit;
             } catch (Exception $e) {
@@ -316,6 +332,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $duftBeschreibung !== '' ? $duftBeschreibung : null
                 ]);
                 $message = 'Duftmittel erfolgreich erstellt!';
+                $_SESSION['toast_message'] = $message;
+                $_SESSION['toast_type'] = 'success';
                 header('Location: ' . $_SERVER['REQUEST_URI']);
                 exit;
             } catch (Exception $e) {
@@ -595,6 +613,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             left: 80%;
         }
 
+        .toast-stack {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            width: min(92vw, 560px);
+            pointer-events: none;
+        }
+
+        .toast {
+            pointer-events: auto;
+            background-color: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-left-width: 6px;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            box-shadow: 0 10px 22px rgba(15, 23, 42, 0.14);
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 0.75rem;
+            opacity: 0;
+            transform: translateY(-12px);
+            transition: opacity 200ms ease, transform 200ms ease;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast-success {
+            border-color: #22c55e;
+            color: #166534;
+            background-color: #f0fdf4;
+        }
+
+        .toast-error {
+            border-color: #ef4444;
+            color: #991b1b;
+            background-color: #fef2f2;
+        }
+
     </style>
 </head>
 
@@ -604,28 +669,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div class="container mx-auto px-4 py-8 space-y-8">
 
-        <!-- Meldungen anzeigen -->
-        <?php if ($message): ?>
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 flex items-start justify-between gap-4">
-                <div><?php echo htmlspecialchars($message); ?></div>
-                <button type="button" class="text-green-700 hover:text-green-900 font-bold leading-none" aria-label="Meldung schliessen" onclick="this.parentElement.remove()">
-                    &times;
-                </button>
-            </div>
-        <?php endif; ?>
+        <div id="toast-stack" class="toast-stack">
+            <?php if ($toastMessage): ?>
+                <div class="toast toast-<?php echo htmlspecialchars($toastType); ?>" data-toast>
+                    <div><?php echo htmlspecialchars($toastMessage); ?></div>
+                    <button type="button" class="font-bold leading-none" aria-label="Meldung schliessen" data-toast-close>
+                        &times;
+                    </button>
+                </div>
+            <?php endif; ?>
 
-        <?php if (!empty($errors)): ?>
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 flex items-start justify-between gap-4">
-                <ul>
-                    <?php foreach ($errors as $error): ?>
-                        <li><?php echo htmlspecialchars($error); ?></li>
-                    <?php endforeach; ?>
-                </ul>
-                <button type="button" class="text-red-700 hover:text-red-900 font-bold leading-none" aria-label="Meldung schliessen" onclick="this.parentElement.remove()">
-                    &times;
-                </button>
-            </div>
-        <?php endif; ?>
+            <?php if (!empty($errors)): ?>
+                <div class="toast toast-error" data-toast>
+                    <ul>
+                        <?php foreach ($errors as $error): ?>
+                            <li><?php echo htmlspecialchars($error); ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                    <button type="button" class="font-bold leading-none" aria-label="Meldung schliessen" data-toast-close>
+                        &times;
+                    </button>
+                </div>
+            <?php endif; ?>
+        </div>
 
 
         <div class="bg-white rounded-lg shadow-md">
@@ -699,7 +765,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <div class="flex flex-wrap items-center justify-end gap-2">
                                     <button type="button"
                                         class="plan-select-btn"
-                                        data-plan-select="<?php echo (int)$plan['id']; ?>">
+                                        data-plan-select="<?php echo (int)$plan['id']; ?>"
+                                        data-plan-name="<?php echo htmlspecialchars($plan['name'] ?? ''); ?>">
                                         Plan auswählen
                                     </button>
                                     <button type="button"
@@ -2649,6 +2716,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         document.addEventListener('DOMContentLoaded', setupMultiSelects);
 
+        function setupToasts() {
+            const toasts = document.querySelectorAll('[data-toast]');
+            if (!toasts.length) {
+                return;
+            }
+
+            toasts.forEach(toast => {
+                requestAnimationFrame(() => {
+                    toast.classList.add('show');
+                });
+
+                const closeButton = toast.querySelector('[data-toast-close]');
+                const removeToast = () => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 220);
+                };
+
+                if (closeButton) {
+                    closeButton.addEventListener('click', removeToast);
+                }
+
+                setTimeout(removeToast, 4500);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', setupToasts);
+
+        function showToast(message, type = 'success') {
+            const stack = document.getElementById('toast-stack');
+            if (!stack) {
+                return;
+            }
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.setAttribute('data-toast', '');
+            toast.innerHTML = `
+                <div>${message}</div>
+                <button type="button" class="font-bold leading-none" aria-label="Meldung schliessen" data-toast-close>
+                    &times;
+                </button>
+            `;
+            stack.appendChild(toast);
+            requestAnimationFrame(() => {
+                toast.classList.add('show');
+            });
+
+            const removeToast = () => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 220);
+            };
+            const closeButton = toast.querySelector('[data-toast-close]');
+            if (closeButton) {
+                closeButton.addEventListener('click', removeToast);
+            }
+            setTimeout(removeToast, 4500);
+        }
+
+        window.showToast = showToast;
+
         // Datei entfernen
         function removeFile(type, planId) {
             const input = document.getElementById(`${type}-bild-${planId}`);
@@ -2831,6 +2957,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
 
                     cancelSaunaEdit(saunaId, field);
+                    if (window.showToast) {
+                        window.showToast('Gespeichert', 'success');
+                    }
                 } else {
                     alert('Fehler beim Speichern: ' + (result.error || 'Unbekannter Fehler'));
                 }
@@ -2889,6 +3018,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     displayMode.textContent = newValue;
 
                     cancelMitarbeiterEdit(mitarbeiterId, field);
+                    if (window.showToast) {
+                        window.showToast('Gespeichert', 'success');
+                    }
                 } else {
                     alert('Fehler beim Speichern: ' + (result.error || 'Unbekannter Fehler'));
                 }
@@ -2946,6 +3078,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     displayMode.textContent = field === 'beschreibung' && (!newValue || newValue.trim() === '') ? 'Keine Beschreibung' : newValue;
 
                     cancelAufgussNameEdit(aufgussId, field);
+                    if (window.showToast) {
+                        window.showToast('Gespeichert', 'success');
+                    }
                 } else {
                     alert('Fehler beim Speichern: ' + (result.error || 'Unbekannter Fehler'));
                 }
@@ -3004,6 +3139,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     displayMode.textContent = field === 'beschreibung' && (!newValue || newValue.trim() === '') ? 'Keine Beschreibung' : newValue;
 
                     cancelDuftmittelEdit(duftmittelId, field);
+                    if (window.showToast) {
+                        window.showToast('Gespeichert', 'success');
+                    }
                 } else {
                     alert('Fehler beim Speichern: ' + (result.error || 'Unbekannter Fehler'));
                 }
@@ -3754,6 +3892,9 @@ function savePlanSettings(planId, options = {}) {
         async function saveAllPlanSettings(planId) {
             savePlanSettings(planId, { persist: true });
             await savePlanAdSettings(planId);
+            if (window.showToast) {
+                window.showToast('Gespeichert', 'success');
+            }
         }
 
         function updateNextAufgussControls(planId) {
@@ -4375,6 +4516,10 @@ function savePlanSettings(planId, options = {}) {
                     setActive(planId);
                     localStorage.setItem(storageKey, String(planId));
                     notifyPublicPlanChange(planId);
+                    if (window.showToast) {
+                        const planName = button.getAttribute('data-plan-name') || `Plan ${planId}`;
+                        window.showToast(`Ausgewählt: ${planName}`, 'success');
+                    }
                 });
             });
         }
