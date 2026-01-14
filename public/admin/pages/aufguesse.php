@@ -519,6 +519,82 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #000000;
         }
 
+        .container input:focus,
+        .container textarea:focus,
+        .container select:focus {
+            outline: none;
+            box-shadow: none;
+            border-color: var(--border-color, #d1d5db);
+        }
+
+        .multi-select {
+            position: relative;
+            width: 100%;
+        }
+
+        .multi-select-trigger {
+            width: 100%;
+            text-align: center;
+            border: 1px solid #d1d5db;
+            background-color: #ffffff;
+            border-radius: 0.375rem;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            color: #111827;
+        }
+
+        .multi-select-panel {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 100%;
+            z-index: 200;
+            background-color: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
+            padding: 0.5rem;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+
+        .multi-select-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+        }
+
+        .multi-select-option:hover {
+            background-color: rgba(255, 255, 255, 0.35);
+        }
+
+        .multi-select-option.is-selected {
+            background-color: rgba(59, 130, 246, 0.18);
+        }
+
+        .plan-table-scope .plan-table-scroll td {
+            position: relative;
+        }
+
+        .plan-table-scope .plan-table-scroll .edit-mode {
+            position: absolute;
+            z-index: 20;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #ffffff;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+        }
+
+        .plan-table-scope .plan-table-scroll .zeit-cell .edit-mode {
+            left: 80%;
+        }
+
     </style>
 </head>
 
@@ -913,26 +989,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                             oninput="handleFieldInput(<?php echo $aufguss['id']; ?>, 'mitarbeiter')">
                                                                     </div>
 
-                                                                    <div>
-                                                                        <label class="block text-sm font-semibold text-gray-900 mb-1">Mitarbeiter wählen:</label>
-                                                                        <select name="mitarbeiter_id" class="rounded px-2 py-1 text-sm border border-gray-300 w-full"
-                                                                            onchange="handleFieldSelect(<?php echo $aufguss['id']; ?>, 'mitarbeiter')">
-                                                                            <option value="">-- Mitarbeiter wählen --</option>
-                                                                            <?php foreach ($mitarbeiter as $m): ?>
-                                                                                <option value="<?php echo $m['id']; ?>" <?php echo ($aufguss['mitarbeiter_id'] == $m['id']) ? 'selected' : ''; ?>>
-                                                                                    <?php echo htmlspecialchars($m['name'] ?? ''); ?>
-                                                                                </option>
-                                                                            <?php endforeach; ?>
-                                                                        </select>
-                                                                    </div>
+                                                                    
                                                                     <div class="border-t border-gray-200 pt-2">
-                                                                        <div class="text-center text-gray-400 text-xs mb-2">oder mehrere</div>
-                                                                        <label class="block text-sm font-semibold text-gray-900 mb-1">Mehrere Mitarbeiter:</label>
-                                                                        <select name="mitarbeiter_ids[]" multiple class="rounded px-2 py-1 text-sm border border-gray-300 w-full">
-                                                                            <?php foreach ($mitarbeiter as $m): ?>
-                                                                                <option value="<?php echo $m['id']; ?>"><?php echo htmlspecialchars($m['name'] ?? ''); ?></option>
-                                                                            <?php endforeach; ?>
-                                                                        </select>
+                                                                        
+                                                                        <label class="block text-sm font-semibold text-gray-900 mb-1">Mitarbeiter waehlen:</label>
+                                                                        <div class="multi-select" data-placeholder="Mehrere Mitarbeiter wählen">
+                                                                            <button type="button" class="multi-select-trigger">Mehrere Mitarbeiter wählen</button>
+                                                                            <div class="multi-select-panel hidden">
+                                                                                <?php foreach ($mitarbeiter as $m): ?>
+                                                                                    <label class="multi-select-option">
+                                                                                        <input type="checkbox" name="mitarbeiter_ids[]" value="<?php echo $m['id']; ?>">
+                                                                                        <span><?php echo htmlspecialchars($m['name'] ?? ''); ?></span>
+                                                                                    </label>
+                                                                                <?php endforeach; ?>
+                                                                            </div>
+                                                                        </div>
                                                                     </div>
                                                                     <div class="flex items-center gap-2 mt-2">
                                                                         <button onclick="saveEdit(<?php echo $aufguss['id']; ?>, 'mitarbeiter')" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">✓ Speichern</button>
@@ -1204,11 +1275,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     <div class="border-t border-gray-200 pt-4 mt-4">
                                                         <label class="block text-sm font-medium text-gray-900 mb-2 text-center">Mehrere Aufgiesser</label>
                                                         <label for="mitarbeiter-multi-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-1 text-center">Mitarbeiter auswählen (Mehrfachauswahl)</label>
-                                                        <select id="mitarbeiter-multi-<?php echo $plan['id']; ?>" name="mitarbeiter_ids[]" multiple class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)">
-                                                            <?php foreach ($mitarbeiter as $m): ?>
-                                                                <option class="text-center" value="<?php echo $m['id']; ?>"><?php echo htmlspecialchars($m['name'] ?? ''); ?></option>
-                                                            <?php endforeach; ?>
-                                                        </select>
+                                                        <div class="multi-select" data-placeholder="Mehrere Mitarbeiter wählen">
+                                                            <button type="button" class="multi-select-trigger">Mehrere Mitarbeiter wählen</button>
+                                                            <div class="multi-select-panel hidden">
+                                                                <?php foreach ($mitarbeiter as $m): ?>
+                                                                    <label class="multi-select-option">
+                                                                        <input type="checkbox" name="mitarbeiter_ids[]" value="<?php echo $m['id']; ?>">
+                                                                        <span><?php echo htmlspecialchars($m['name'] ?? ''); ?></span>
+                                                                    </label>
+                                                                <?php endforeach; ?>
+                                                            </div>
+                                                        </div>
                                                         <p class="text-xs text-gray-500 mt-2 text-center">Mehrere Namen mit Strg/Cmd auswählen.</p>
 
                                                     </div>
@@ -2457,6 +2534,121 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
+        function setupMultiSelects() {
+            const openPanels = new Set();
+
+            const closePanel = (panel) => {
+                if (!panel) {
+                    return;
+                }
+                panel.classList.add('hidden');
+                if (panel._reposition) {
+                    window.removeEventListener('resize', panel._reposition);
+                    window.removeEventListener('scroll', panel._reposition, true);
+                }
+                if (panel._scrollParent && panel._reposition) {
+                    panel._scrollParent.removeEventListener('scroll', panel._reposition);
+                }
+                if (panel._originalParent) {
+                    panel._originalParent.appendChild(panel);
+                }
+                panel.style.position = '';
+                panel.style.left = '';
+                panel.style.top = '';
+                panel.style.width = '';
+                panel.style.zIndex = '';
+                openPanels.delete(panel);
+            };
+
+            const closeAllPanels = () => {
+                Array.from(openPanels).forEach(closePanel);
+            };
+
+            window.closeAllMultiSelectPanels = closeAllPanels;
+
+            document.querySelectorAll('.multi-select').forEach(select => {
+                const trigger = select.querySelector('.multi-select-trigger');
+                const panel = select.querySelector('.multi-select-panel');
+                const checkboxes = Array.from(select.querySelectorAll('input[type="checkbox"]'));
+                const placeholder = select.dataset.placeholder || 'Auswahl';
+
+                if (!trigger || !panel) {
+                    return;
+                }
+
+                const updateLabel = () => {
+                    const selected = checkboxes
+                        .filter(box => box.checked)
+                        .map(box => {
+                            const label = box.closest('label');
+                            const text = label ? label.textContent : '';
+                            return text.trim();
+                        })
+                        .filter(Boolean);
+                    trigger.textContent = selected.length ? selected.join(', ') : placeholder;
+                    checkboxes.forEach(box => {
+                        const label = box.closest('label');
+                        if (!label) {
+                            return;
+                        }
+                        label.classList.toggle('is-selected', box.checked);
+                    });
+                };
+
+                const positionPanel = () => {
+                    const rect = trigger.getBoundingClientRect();
+                    panel.style.position = 'fixed';
+                    panel.style.left = `${rect.left}px`;
+                    panel.style.top = `${rect.bottom}px`;
+                    panel.style.width = `${rect.width}px`;
+                    panel.style.zIndex = '9999';
+                };
+
+                const openPanel = () => {
+                    closeAllPanels();
+                    if (!panel._originalParent) {
+                        panel._originalParent = panel.parentElement;
+                    }
+                    panel._scrollParent = select.closest('.plan-table-scroll');
+                    panel._reposition = positionPanel;
+                    document.body.appendChild(panel);
+                    panel.classList.remove('hidden');
+                    positionPanel();
+                    window.addEventListener('resize', positionPanel);
+                    window.addEventListener('scroll', positionPanel, true);
+                    if (panel._scrollParent) {
+                        panel._scrollParent.addEventListener('scroll', positionPanel);
+                    }
+                    openPanels.add(panel);
+                };
+
+                trigger.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    if (panel.classList.contains('hidden')) {
+                        openPanel();
+                    } else {
+                        closePanel(panel);
+                    }
+                });
+
+                panel.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                });
+
+                checkboxes.forEach(box => {
+                    box.addEventListener('change', updateLabel);
+                });
+
+                updateLabel();
+            });
+
+            document.addEventListener('click', () => {
+                closeAllPanels();
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', setupMultiSelects);
+
         // Datei entfernen
         function removeFile(type, planId) {
             const input = document.getElementById(`${type}-bild-${planId}`);
@@ -2578,6 +2770,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const displayMode = row.querySelector(`.sauna-${key}-cell .display-mode`);
             const editMode = row.querySelector(`.sauna-${key}-cell .edit-mode`);
 
+            if (window.closeAllEditModes) {
+                window.closeAllEditModes(editMode);
+            }
             displayMode.classList.add('hidden');
             editMode.classList.remove('hidden');
         }
@@ -2651,6 +2846,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const displayMode = row.querySelector(`.mitarbeiter-name-cell .display-mode`);
             const editMode = row.querySelector(`.mitarbeiter-name-cell .edit-mode`);
 
+            if (window.closeAllEditModes) {
+                window.closeAllEditModes(editMode);
+            }
             displayMode.classList.add('hidden');
             editMode.classList.remove('hidden');
         }
@@ -2706,6 +2904,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const displayMode = row.querySelector(`.aufguss-${field === 'beschreibung' ? 'desc' : 'name'}-cell .display-mode`);
             const editMode = row.querySelector(`.aufguss-${field === 'beschreibung' ? 'desc' : 'name'}-cell .edit-mode`);
 
+            if (window.closeAllEditModes) {
+                window.closeAllEditModes(editMode);
+            }
             displayMode.classList.add('hidden');
             editMode.classList.remove('hidden');
         }
@@ -2760,6 +2961,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const displayMode = row.querySelector(`.duftmittel-${field === 'beschreibung' ? 'desc' : 'name'}-cell .display-mode`);
             const editMode = row.querySelector(`.duftmittel-${field === 'beschreibung' ? 'desc' : 'name'}-cell .edit-mode`);
 
+            if (window.closeAllEditModes) {
+                window.closeAllEditModes(editMode);
+            }
             displayMode.classList.add('hidden');
             editMode.classList.remove('hidden');
         }
@@ -4369,5 +4573,6 @@ function savePlanSettings(planId, options = {}) {
 </body>
 
 </html>
+
 
 

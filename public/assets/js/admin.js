@@ -176,6 +176,27 @@ function toggleFormMain(formId) {
 }
 
 // Inline-Editing Funktionen für Aufgüsse
+function closeAllEditModes(exceptEditMode) {
+    document.querySelectorAll('.edit-mode:not(.hidden)').forEach(panel => {
+        if (exceptEditMode && panel === exceptEditMode) {
+            return;
+        }
+        panel.classList.add('hidden');
+        const container = panel.closest('td') || panel.closest('div');
+        if (!container) {
+            return;
+        }
+        const displayMode = container.querySelector('.display-mode');
+        if (displayMode) {
+            displayMode.classList.remove('hidden');
+        }
+    });
+
+    if (typeof window.closeAllMultiSelectPanels === 'function') {
+        window.closeAllMultiSelectPanels();
+    }
+}
+
 function toggleEdit(aufgussId, field) {
     // Debug-Logging entfernt (lokaler Debug-Server nicht aktiv)
 
@@ -186,6 +207,7 @@ function toggleEdit(aufgussId, field) {
     const editMode = cell.querySelector('.edit-mode');
 
     if (displayMode && editMode) {
+        closeAllEditModes(editMode);
         displayMode.classList.add('hidden');
         editMode.classList.remove('hidden');
 
@@ -561,6 +583,7 @@ document.addEventListener('DOMContentLoaded', function() {
 window.toggleForm = toggleForm;
 window.toggleFormMain = toggleFormMain;
 window.toggleEdit = toggleEdit;
+window.closeAllEditModes = closeAllEditModes;
 window.cancelEdit = cancelEdit;
 window.handleFieldInput = handleFieldInput;
 window.handleFieldSelect = handleFieldSelect;
