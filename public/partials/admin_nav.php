@@ -74,8 +74,8 @@ if (!empty($saveError)) {
 }
 ?>
 <nav<?php echo $navIdAttr; ?> class="<?php echo $navClassAttr; ?>">
-    <div class="container mx-auto flex items-center justify-center">
-        <div class="flex flex-wrap items-center justify-center gap-4">
+    <div class="container mx-auto flex items-center">
+        <div class="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-evenly gap-4">
             <button type="button" class="mr-4 hover:underline" aria-label="Zur&uuml;ck" onclick="history.back()">
                 &larr; Zur&uuml;ck
             </button>
