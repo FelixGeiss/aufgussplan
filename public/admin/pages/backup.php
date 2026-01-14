@@ -37,6 +37,7 @@ $aufguss_optionen = [];
 $saunen = [];
 $duftmittel = [];
 $mitarbeiter = [];
+$umfrage_bewertungen = [];
 $werbungTabFiles = [];
 $hintergrundTabFiles = [];
 
@@ -66,6 +67,21 @@ try {
     $saunen = $db->query("SELECT id, name, bild, beschreibung, temperatur FROM saunen ORDER BY name")->fetchAll();
     $duftmittel = $db->query("SELECT id, name, beschreibung FROM duftmittel ORDER BY name")->fetchAll();
     $mitarbeiter = $db->query("SELECT id, name, bild FROM mitarbeiter ORDER BY name")->fetchAll();
+    $umfrage_bewertungen = $db->query(
+        "SELECT r.id,
+                r.aufguss_id,
+                r.plan_id,
+                r.aufguss_name_id,
+                r.kriterium,
+                r.rating,
+                r.datum,
+                p.name AS plan_name,
+                n.name AS aufguss_name
+         FROM umfrage_bewertungen r
+         LEFT JOIN plaene p ON p.id = r.plan_id
+         LEFT JOIN aufguss_namen n ON n.id = r.aufguss_name_id
+         ORDER BY r.datum DESC, r.id DESC"
+    )->fetchAll();
 } catch (Throwable $e) {
     $errors[] = 'Konnte Datenbank-Uebersicht nicht laden: ' . $e->getMessage();
 }

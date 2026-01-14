@@ -19,6 +19,26 @@ function showTab(tabName) {
     document.getElementById('tab-' + tabName).classList.add('border-indigo-500', 'text-indigo-600');
 }
 
+// Umfragen-Tabelle filtern
+function initUmfragenSearch() {
+    const input = document.getElementById('umfragen-search');
+    const table = document.querySelector('#content-umfragen table');
+    if (!input || !table) return;
+    const rows = Array.from(table.querySelectorAll('tbody tr'));
+
+    const filterRows = () => {
+        const query = input.value.trim().toLowerCase();
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.classList.toggle('hidden', query !== '' && !text.includes(query));
+        });
+    };
+
+    input.addEventListener('input', filterRows);
+}
+
+document.addEventListener('DOMContentLoaded', initUmfragenSearch);
+
 // Loeschfunktion fuer Datenbank-Eintraege
 function deleteDatenbankEintrag(type, id, name) {
     if (confirm('Moechten Sie wirklich "' + name + '" loeschen? Diese Aktion kann nicht rueckgaengig gemacht werden.')) {

@@ -119,6 +119,13 @@ try {
             $_SESSION['delete_message'] = 'Mitarbeiter erfolgreich geloescht.';
             break;
 
+        case 'umfragen':
+            // Umfrage-Ergebnis loeschen
+            $stmt = $db->prepare("DELETE FROM umfrage_bewertungen WHERE id = ?");
+            $stmt->execute([$id]);
+            $_SESSION['delete_message'] = 'Umfrage-Ergebnis erfolgreich geloescht.';
+            break;
+
         default:
             $_SESSION['delete_error'] = 'Unbekannter Eintragstyp.';
             header('Location: ../pages/aufguesse.php');

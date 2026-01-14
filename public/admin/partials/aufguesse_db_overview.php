@@ -18,6 +18,9 @@
                             <button onclick="showTab('mitarbeiter')" id="tab-mitarbeiter" class="tab-button whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
                                 Mitarbeiter (<?php echo count($mitarbeiter); ?>)
                             </button>
+                            <button onclick="showTab('umfragen')" id="tab-umfragen" class="tab-button whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                                Umfragen (<?php echo count($umfrage_bewertungen); ?>)
+                            </button>
                             <button onclick="showTab('werbung')" id="tab-werbung" class="tab-button whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
                                 Werbung (<?php echo count($werbungTabFiles); ?>)
                             </button>
@@ -560,6 +563,85 @@
                                                     onclick="deleteUploadFile('werbung', <?php echo htmlspecialchars(json_encode($fileRelPath), ENT_QUOTES, 'UTF-8'); ?>)"
                                                     class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition-colors duration-150"
                                                     title="Datei Löschen">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Umfragen Tab -->
+                <div id="content-umfragen" class="tab-content hidden">
+                    <div class="mb-4">
+                        <label for="umfragen-search" class="block text-sm font-medium text-gray-700 mb-1">Umfragen suchen</label>
+                        <input id="umfragen-search" type="text" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900" placeholder="Nach Plan, Aufguss, Kriterium oder Datum suchen">
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-transparent border border-gray-200 rounded-lg db-overview-table">
+                            <thead class="bg-white/5">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
+                                        ID
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
+                                        Datum
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
+                                        Kriterium
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
+                                        Bewertung
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
+                                        Plan
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
+                                        Aufguss
+                                    </th>
+                                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+                                        Aktionen
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-transparent divide-y divide-gray-200">
+                                <?php if (empty($umfrage_bewertungen)): ?>
+                                    <tr>
+                                        <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                                            Keine Umfrage-Ergebnisse in der Datenbank gefunden.
+                                        </td>
+                                    </tr>
+                                <?php else: ?>
+                                    <?php foreach ($umfrage_bewertungen as $umfrage): ?>
+                                        <tr class="bg-white/5">
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                <?php echo htmlspecialchars($umfrage['id']); ?>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <?php echo !empty($umfrage['datum']) ? htmlspecialchars(date('d.m.Y', strtotime($umfrage['datum']))) : '-'; ?>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <?php echo htmlspecialchars($umfrage['kriterium'] ?? ''); ?>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <?php echo htmlspecialchars($umfrage['rating'] ?? ''); ?>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <?php echo htmlspecialchars($umfrage['plan_name'] ?? ''); ?>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <?php echo htmlspecialchars($umfrage['aufguss_name'] ?? ''); ?>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                                <button type="button"
+                                                    onclick="deleteDatenbankEintrag('umfragen', <?php echo htmlspecialchars($umfrage['id']); ?>, '<?php echo htmlspecialchars($umfrage['kriterium'] ?? 'Umfrage'); ?>')"
+                                                    class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition-colors duration-150"
+                                                    title="Ergebnis l&ouml;schen">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                     </svg>
