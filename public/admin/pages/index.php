@@ -72,12 +72,9 @@ if (is_file($screenConfigFile)) {
             return $id > 0;
         }));
 
-        if ($enabled && !empty($order)) {
+        $screenAdStatus['screens'] = $order;
+        if ($enabled) {
             $screenAdStatus['label'] = 'Werbung aktiv';
-            $screenAdStatus['screens'] = $order;
-        } elseif ($enabled) {
-            $screenAdStatus['label'] = 'Werbung aktiv';
-            $screenAdStatus['screens'] = [];
         } else {
             $screenAdStatus['label'] = 'Werbung deaktiviert';
         }
@@ -216,6 +213,16 @@ if (is_file($screenConfigFile)) {
             }
 
             const storageKey = 'aufgussplanSelectedPlan';
+
+            const notifyPublicPlanChange = (planId) => {
+                localStorage.setItem('aufgussplanPlanChanged', String(Date.now()));
+                if (!planId) return;
+                fetch('../../api/selected_plan.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ plan_id: String(planId) })
+                }).catch(() => {});
+            };
             const setActive = (planId) => {
                 planButtons.forEach(button => {
                     const isActive = button.getAttribute('data-plan-select') === String(planId);
@@ -240,6 +247,7 @@ if (is_file($screenConfigFile)) {
                     if (!planId) return;
                     setActive(planId);
                     localStorage.setItem(storageKey, String(planId));
+                    notifyPublicPlanChange(planId);
                 });
             });
         })();

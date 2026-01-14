@@ -1168,8 +1168,10 @@ function savePlanSettings(planId, options = {}) {
                     themeColor,
                     textColor
                 );
-                notifyPublicPlanChange(planId);
-                notifyPublicReload();
+                if (isSelectedPlan(planId)) {
+                    notifyPublicPlanChange(planId);
+                    notifyPublicReload();
+                }
             }
 
             if (!enabled) {
@@ -1250,7 +1252,9 @@ function savePlanSettings(planId, options = {}) {
                     payload.theme_color,
                     payload.text_color
                 );
-                notifyPublicPlanChange(planId);
+                if (isSelectedPlan(planId)) {
+                    notifyPublicPlanChange(planId);
+                }
             } catch (error) {
                 // keep local changes; server sync can be retried on save
             }
@@ -1303,7 +1307,9 @@ function savePlanSettings(planId, options = {}) {
                     payload.theme_color,
                     payload.text_color
                 );
-                notifyPublicPlanChange(planId);
+                if (isSelectedPlan(planId)) {
+                    notifyPublicPlanChange(planId);
+                }
             } catch (error) {
                 // keep local changes; server sync can be retried on save
             }
@@ -1515,7 +1521,7 @@ function savePlanSettings(planId, options = {}) {
                     removeAdFile(planId);
                 }
                 schedulePlanAd(planId);
-                if (options.notify !== false) {
+                if (options.notify !== false && isSelectedPlan(planId)) {
                     notifyPublicPlanChange(planId);
                 }
             } catch (error) {
@@ -1628,7 +1634,9 @@ function savePlanSettings(planId, options = {}) {
                 getPlanAdSettings(planId);
                 updatePlanAdControls(planId);
                 schedulePlanAd(planId);
-            notifyPublicPlanChange(planId);
+                if (isSelectedPlan(planId)) {
+                    notifyPublicPlanChange(planId);
+                }
             } catch (error) {
                 alert('Netzwerkfehler beim Löschen der Werbung.');
             }
@@ -2088,7 +2096,9 @@ function savePlanSettings(planId, options = {}) {
                 bannerWidth,
                 updatedSettings.themeColor
             );
-            notifyPublicPlanChange(planId);
+            if (isSelectedPlan(planId)) {
+                notifyPublicPlanChange(planId);
+            }
             closePlanBannerModal();
         }
 
@@ -2154,6 +2164,13 @@ function savePlanSettings(planId, options = {}) {
             } catch (error) {
                 alert(error && error.message ? error.message : 'Upload fehlgeschlagen');
             }
+        }
+
+        // Funktion: isSelectedPlan
+        function isSelectedPlan(planId) {
+            const selected = localStorage.getItem('aufgussplanSelectedPlan');
+            if (!selected) return false;
+            return String(selected) === String(planId);
         }
 
         // Funktion: notifyPublicPlanChange

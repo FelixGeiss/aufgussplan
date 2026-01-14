@@ -540,13 +540,21 @@ function handleGlobalAdSave() {
         body: JSON.stringify(payload)
     })
         .then(result => {
-            if (result && result.success && result.data && result.data.global_ad) {
-                globalAd = {
-                    path: result.data.global_ad.path || '',
-                    type: result.data.global_ad.type || ''
-                };
-                renderGlobalAd();
-                notify('Globale Werbung gespeichert.', 'success');
+        if (result && result.success && result.data && result.data.global_ad) {
+            const serverAd = result.data.global_ad || {};
+            const order = Array.isArray(serverAd.order) && serverAd.order.length
+                ? serverAd.order
+                : (Array.isArray(globalAd.order) ? globalAd.order : []);
+            globalAd = {
+                path: serverAd.path || globalAd.path || '',
+                type: serverAd.type || globalAd.type || '',
+                enabled: typeof serverAd.enabled === 'boolean' ? serverAd.enabled : !!globalAd.enabled,
+                order,
+                displaySeconds: Number(serverAd.display_seconds ?? globalAd.displaySeconds) || 10,
+                pauseSeconds: Number(serverAd.pause_seconds ?? globalAd.pauseSeconds) || 10
+            };
+            renderGlobalAd();
+            notify('Globale Werbung gespeichert.', 'success');
             } else {
                 notify(result && result.message ? result.message : 'Speichern fehlgeschlagen.', 'error');
             }
