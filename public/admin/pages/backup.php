@@ -33,6 +33,12 @@ $dbOverview = [
 ];
 $backupMetaPath = ROOT_PATH . 'storage' . DIRECTORY_SEPARATOR . 'backup_meta.json';
 $lastBackupLabel = 'Noch kein Backup erstellt.';
+$aufguss_optionen = [];
+$saunen = [];
+$duftmittel = [];
+$mitarbeiter = [];
+$werbungTabFiles = [];
+$hintergrundTabFiles = [];
 
 if (is_file($backupMetaPath)) {
     $metaRaw = file_get_contents($backupMetaPath);
@@ -56,6 +62,10 @@ try {
     $dbOverview['duftmittel'] = (int)$db->query("SELECT COUNT(*) FROM duftmittel")->fetchColumn();
     $dbOverview['mitarbeiter'] = (int)$db->query("SELECT COUNT(*) FROM mitarbeiter")->fetchColumn();
     $dbOverview['umfragen'] = (int)$db->query("SELECT COUNT(*) FROM umfrage_bewertungen")->fetchColumn();
+    $aufguss_optionen = $db->query("SELECT id, name, beschreibung FROM aufguss_namen ORDER BY name")->fetchAll();
+    $saunen = $db->query("SELECT id, name, bild, beschreibung, temperatur FROM saunen ORDER BY name")->fetchAll();
+    $duftmittel = $db->query("SELECT id, name, beschreibung FROM duftmittel ORDER BY name")->fetchAll();
+    $mitarbeiter = $db->query("SELECT id, name, bild FROM mitarbeiter ORDER BY name")->fetchAll();
 } catch (Throwable $e) {
     $errors[] = 'Konnte Datenbank-Uebersicht nicht laden: ' . $e->getMessage();
 }
@@ -82,6 +92,16 @@ if (is_dir($werbungUploadDir)) {
         $fullPath = $werbungUploadDir . $entry;
         if (is_file($fullPath)) {
             $dbOverview['werbung_medien']++;
+            $path = 'werbung/' . $entry;
+            $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+            $typ = in_array($ext, ['mp4', 'webm', 'ogg'], true) ? 'Werbung (Video)' : 'Werbung (Bild)';
+            $werbungTabFiles[] = [
+                'bereich' => 'Plan',
+                'name' => 'Datei',
+                'datei' => $path,
+                'typ' => $typ,
+                'plan_id' => null
+            ];
         }
     }
 }
@@ -93,6 +113,14 @@ if (is_dir($planUploadDir)) {
         $fullPath = $planUploadDir . $entry;
         if (is_file($fullPath)) {
             $dbOverview['hintergrund_bilder']++;
+            $path = 'plan/' . $entry;
+            $hintergrundTabFiles[] = [
+                'bereich' => 'Plan',
+                'name' => 'Datei',
+                'datei' => $path,
+                'typ' => 'Hintergrundbild',
+                'plan_id' => null
+            ];
         }
     }
 }
@@ -543,65 +571,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md p-6 mt-6">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold">Datenbank-Übersicht</h3>
-                <a href="<?php echo BASE_URL; ?>admin/pages/aufguesse.php" class="text-sm text-indigo-600 hover:text-indigo-800">Zur Detailansicht</a>
+        <div class="grid gap-6 lg:grid-cols-2 mt-6">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="text-sm text-gray-500">Uploads</div>
+                <div class="text-lg font-semibold text-gray-900">
+                    <?php echo (int)$dbOverview['uploads_count']; ?> Dateien - <?php echo htmlspecialchars(format_bytes($dbOverview['uploads_size']), ENT_QUOTES, 'UTF-8'); ?>
+                </div>
             </div>
-            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                <div class="rounded border border-gray-200 p-4">
-                    <div class="text-sm text-gray-500">Pläne</div>
-                    <div class="text-2xl font-semibold text-gray-900"><?php echo (int)$dbOverview['plaene']; ?></div>
-                </div>
-                <div class="rounded border border-gray-200 p-4">
-                    <div class="text-sm text-gray-500">Aufgüsse</div>
-                    <div class="text-2xl font-semibold text-gray-900"><?php echo (int)$dbOverview['aufguesse']; ?></div>
-                </div>
-                <div class="rounded border border-gray-200 p-4">
-                    <div class="text-sm text-gray-500">Aufgussnamen</div>
-                    <div class="text-2xl font-semibold text-gray-900"><?php echo (int)$dbOverview['aufguss_namen']; ?></div>
-                </div>
-                <div class="rounded border border-gray-200 p-4">
-                    <div class="text-sm text-gray-500">Saunen</div>
-                    <div class="text-2xl font-semibold text-gray-900"><?php echo (int)$dbOverview['saunen']; ?></div>
-                </div>
-                <div class="rounded border border-gray-200 p-4">
-                    <div class="text-sm text-gray-500">Duftmittel</div>
-                    <div class="text-2xl font-semibold text-gray-900"><?php echo (int)$dbOverview['duftmittel']; ?></div>
-                </div>
-                <div class="rounded border border-gray-200 p-4">
-                    <div class="text-sm text-gray-500">Mitarbeiter</div>
-                    <div class="text-2xl font-semibold text-gray-900"><?php echo (int)$dbOverview['mitarbeiter']; ?></div>
-                </div>
-                <div class="rounded border border-gray-200 p-4">
-                    <div class="text-sm text-gray-500">Umfragen</div>
-                    <div class="text-2xl font-semibold text-gray-900"><?php echo (int)$dbOverview['umfragen']; ?></div>
-                </div>
-                <div class="rounded border border-gray-200 p-4">
-                    <div class="text-sm text-gray-500">Werbung (Bild/Video)</div>
-                    <div class="text-2xl font-semibold text-gray-900"><?php echo (int)$dbOverview['werbung_medien']; ?></div>
-                </div>
-                <div class="rounded border border-gray-200 p-4">
-                    <div class="text-sm text-gray-500">Hintergrund (Bild)</div>
-                    <div class="text-2xl font-semibold text-gray-900"><?php echo (int)$dbOverview['hintergrund_bilder']; ?></div>
-                </div>
-                <div class="rounded border border-gray-200 p-4 sm:col-span-2 lg:col-span-3">
-                    <div class="text-sm text-gray-500">Uploads</div>
-                    <div class="text-lg font-semibold text-gray-900">
-                        <?php echo (int)$dbOverview['uploads_count']; ?> Dateien - <?php echo htmlspecialchars(format_bytes($dbOverview['uploads_size']), ENT_QUOTES, 'UTF-8'); ?>
-                    </div>
-                </div>
-                <div class="rounded border border-gray-200 p-4 sm:col-span-2 lg:col-span-3">
-                    <div class="text-sm text-gray-500">Letztes Backup</div>
-                    <div class="text-lg font-semibold text-gray-900">
-                        <?php echo htmlspecialchars($lastBackupLabel, ENT_QUOTES, 'UTF-8'); ?>
-                    </div>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="text-sm text-gray-500">Letztes Backup</div>
+                <div class="text-lg font-semibold text-gray-900">
+                    <?php echo htmlspecialchars($lastBackupLabel, ENT_QUOTES, 'UTF-8'); ?>
                 </div>
             </div>
         </div>
+
+        <!-- Datenbank-Uebersicht eingebunden -->
+        <?php include __DIR__ . '/../partials/aufguesse_db_overview.php'; ?>
     </div>
 </body>
 </html>
+<script src="../../assets/js/admin.js?v=<?php echo filemtime(__DIR__ . '/../../assets/js/admin.js'); ?>"></script>
+<script src="../../assets/js/admin-db-overview.js?v=<?php echo filemtime(__DIR__ . '/../../assets/js/admin-db-overview.js'); ?>"></script>
 <script>
     (function() {
         const form = document.getElementById('backup-download-form');
