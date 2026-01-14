@@ -499,7 +499,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Backup & Restore - Aufgussplan</title>
     <link rel="stylesheet" href="../../dist/style.css">
-    <link rel="stylesheet" href="../../assets/css/admin.css">
+    <link rel="stylesheet" href="../../assets/css/admin.css?v=<?php echo filemtime(__DIR__ . '/../../assets/css/admin.css'); ?>">
 </head>
 <body class="bg-gray-100">
     <?php include __DIR__ . '/../partials/navbar.php'; ?>
@@ -507,21 +507,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="container mx-auto px-4 py-8">
         <h2 class="text-2xl font-bold mb-6">Backup & Restore</h2>
 
-        <?php if (!empty($errors)): ?>
-            <div class="mb-4 rounded border border-red-200 bg-red-50 p-4 text-red-800">
-                <?php foreach ($errors as $error): ?>
-                    <div><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></div>
-                <?php endforeach; ?>
-            </div>
-        <?php endif; ?>
-
-        <?php if (!empty($messages)): ?>
-            <div class="mb-4 rounded border border-green-200 bg-green-50 p-4 text-green-800">
-                <?php foreach ($messages as $message): ?>
-                    <div><?php echo htmlspecialchars($message, ENT_QUOTES, 'UTF-8'); ?></div>
-                <?php endforeach; ?>
-            </div>
-        <?php endif; ?>
+        
 
         <div class="grid gap-6 lg:grid-cols-2">
             <div class="bg-white rounded-lg shadow-md p-6">
@@ -708,3 +694,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     })();
 </script>
+

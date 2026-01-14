@@ -365,7 +365,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Aufgüsse verwalten - Aufgussplan</title>
     <!-- Lokale Tailwind CSS -->
     <link rel="stylesheet" href="../../dist/style.css">
-    <link rel="stylesheet" href="../../assets/css/admin.css">
+    <link rel="stylesheet" href="../../assets/css/admin.css?v=<?php echo filemtime(__DIR__ . '/../../assets/css/admin.css'); ?>">
     <style>
         .next-aufguss-row {
             background-color: rgba(255, 255, 255, 0.5);
@@ -613,53 +613,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             left: 80%;
         }
 
-        .toast-stack {
-            position: fixed;
-            top: 1rem;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10000;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            width: min(92vw, 560px);
-            pointer-events: none;
-        }
-
-        .toast {
-            pointer-events: auto;
-            background-color: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-left-width: 6px;
-            border-radius: 0.5rem;
-            padding: 0.75rem 1rem;
-            box-shadow: 0 10px 22px rgba(15, 23, 42, 0.14);
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 0.75rem;
-            opacity: 0;
-            transform: translateY(-12px);
-            transition: opacity 200ms ease, transform 200ms ease;
-        }
-
-        .toast.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .toast-success {
-            border-color: #22c55e;
-            color: #166534;
-            background-color: #f0fdf4;
-        }
-
-        .toast-error {
-            border-color: #ef4444;
-            color: #991b1b;
-            background-color: #fef2f2;
-        }
-
     </style>
 </head>
 
@@ -669,29 +622,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div class="container mx-auto px-4 py-8 space-y-8">
 
-        <div id="toast-stack" class="toast-stack">
-            <?php if ($toastMessage): ?>
-                <div class="toast toast-<?php echo htmlspecialchars($toastType); ?>" data-toast>
-                    <div><?php echo htmlspecialchars($toastMessage); ?></div>
-                    <button type="button" class="font-bold leading-none" aria-label="Meldung schliessen" data-toast-close>
-                        &times;
-                    </button>
-                </div>
-            <?php endif; ?>
-
-            <?php if (!empty($errors)): ?>
-                <div class="toast toast-error" data-toast>
-                    <ul>
-                        <?php foreach ($errors as $error): ?>
-                            <li><?php echo htmlspecialchars($error); ?></li>
-                        <?php endforeach; ?>
-                    </ul>
-                    <button type="button" class="font-bold leading-none" aria-label="Meldung schliessen" data-toast-close>
-                        &times;
-                    </button>
-                </div>
-            <?php endif; ?>
-        </div>
+        
 
 
         <div class="bg-white rounded-lg shadow-md">
@@ -2716,65 +2647,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         document.addEventListener('DOMContentLoaded', setupMultiSelects);
 
-        function setupToasts() {
-            const toasts = document.querySelectorAll('[data-toast]');
-            if (!toasts.length) {
-                return;
-            }
-
-            toasts.forEach(toast => {
-                requestAnimationFrame(() => {
-                    toast.classList.add('show');
-                });
-
-                const closeButton = toast.querySelector('[data-toast-close]');
-                const removeToast = () => {
-                    toast.classList.remove('show');
-                    setTimeout(() => toast.remove(), 220);
-                };
-
-                if (closeButton) {
-                    closeButton.addEventListener('click', removeToast);
-                }
-
-                setTimeout(removeToast, 4500);
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', setupToasts);
-
-        function showToast(message, type = 'success') {
-            const stack = document.getElementById('toast-stack');
-            if (!stack) {
-                return;
-            }
-            const toast = document.createElement('div');
-            toast.className = `toast toast-${type}`;
-            toast.setAttribute('data-toast', '');
-            toast.innerHTML = `
-                <div>${message}</div>
-                <button type="button" class="font-bold leading-none" aria-label="Meldung schliessen" data-toast-close>
-                    &times;
-                </button>
-            `;
-            stack.appendChild(toast);
-            requestAnimationFrame(() => {
-                toast.classList.add('show');
-            });
-
-            const removeToast = () => {
-                toast.classList.remove('show');
-                setTimeout(() => toast.remove(), 220);
-            };
-            const closeButton = toast.querySelector('[data-toast-close]');
-            if (closeButton) {
-                closeButton.addEventListener('click', removeToast);
-            }
-            setTimeout(removeToast, 4500);
-        }
-
-        window.showToast = showToast;
-
         // Datei entfernen
         function removeFile(type, planId) {
             const input = document.getElementById(`${type}-bild-${planId}`);
@@ -4718,6 +4590,7 @@ function savePlanSettings(planId, options = {}) {
 </body>
 
 </html>
+
 
 
 

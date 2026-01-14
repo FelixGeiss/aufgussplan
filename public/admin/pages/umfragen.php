@@ -112,6 +112,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $planId > 0) {
     } catch (Exception $e) {
         $saveError = 'Speichern fehlgeschlagen. Bitte erneut versuchen.';
     }
+
+    $redirectUrl = BASE_URL . 'admin/pages/umfragen.php?plan_id=' . $planId;
+    if ($saveMessage !== '') {
+        $_SESSION['toast_message'] = $saveMessage;
+        $_SESSION['toast_type'] = 'success';
+        header('Location: ' . $redirectUrl);
+        exit;
+    }
+    if ($saveError !== '') {
+        $_SESSION['toast_message'] = $saveError;
+        $_SESSION['toast_type'] = 'error';
+        header('Location: ' . $redirectUrl);
+        exit;
+    }
 }
 ?>
 
@@ -123,7 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $planId > 0) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Umfrage - Aufgussplan</title>
     <link rel="stylesheet" href="../../dist/style.css">
-    <link rel="stylesheet" href="../../assets/css/admin.css">
+    <link rel="stylesheet" href="../../assets/css/admin.css?v=<?php echo filemtime(__DIR__ . '/../../assets/css/admin.css'); ?>">
 </head>
 
 <body class="bg-gray-100" data-selected-plan="<?php echo $planId > 0 ? (int)$planId : ''; ?>">
@@ -141,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $planId > 0) {
             <?php else: ?>
                 <div class="flex flex-wrap gap-3">
                     <?php foreach ($Pläene as $plan): ?>
-                        <button type="button" class="plan-select-btn" data-plan-id="<?php echo (int)$plan['id']; ?>">
+                        <button type="button" class="plan-select-btn" data-plan-id="<?php echo (int)$plan['id']; ?>" data-plan-name="<?php echo htmlspecialchars($plan['name'] ?? 'Plan', ENT_QUOTES, 'UTF-8'); ?>">
                             <?php echo htmlspecialchars($plan['name'] ?? 'Plan'); ?>
                         </button>
                     <?php endforeach; ?>
@@ -172,15 +186,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $planId > 0) {
                     <input type="hidden" name="plan_id" value="<?php echo (int)$planId; ?>">
                     <input type="hidden" name="clear" value="0" id="survey-clear-flag">
 
-                    <?php if ($saveMessage): ?>
-                        <div class="rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
-                            <?php echo htmlspecialchars($saveMessage); ?>
-                        </div>
-                    <?php elseif ($saveError): ?>
-                        <div class="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                            <?php echo htmlspecialchars($saveError); ?>
-                        </div>
-                    <?php endif; ?>
+                    
 
                     <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-4">
                         <h4 class="text-sm font-semibold text-gray-900 mb-3">Kriterien für alle Aufgüsse</h4>
@@ -260,6 +266,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $planId > 0) {
                     const url = new URL(window.location.href);
                     url.searchParams.set('plan_id', planId);
                     window.location.href = url.toString();
+                    if (window.showToast) {
+                        const planName = button.getAttribute('data-plan-name') || `Plan ${planId}`;
+                        window.showToast(`Ausgewählt: ${planName}`, 'success');
+                    }
                 });
             });
         })();
@@ -282,6 +292,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $planId > 0) {
             });
         })();
     </script>
+    <script src="../../assets/js/admin.js?v=<?php echo filemtime(__DIR__ . '/../../assets/js/admin.js'); ?>"></script>
 </body>
 
 </html>
+
+

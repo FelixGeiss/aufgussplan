@@ -50,7 +50,7 @@ $werbungFiles = listUploadFiles('werbung');
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bildschirme verwalten - Aufgussplan</title>
     <link rel="stylesheet" href="../../dist/style.css">
-    <link rel="stylesheet" href="../../assets/css/admin.css">
+    <link rel="stylesheet" href="../../assets/css/admin.css?v=<?php echo filemtime(__DIR__ . '/../../assets/css/admin.css'); ?>">
 </head>
 <body class="bg-gray-100">
     <?php include __DIR__ . '/../partials/navbar.php'; ?>
@@ -81,3 +81,4 @@ $werbungFiles = listUploadFiles('werbung');
     <script src="../../assets/js/bildschirme.js"></script>
 </body>
 </html>
+

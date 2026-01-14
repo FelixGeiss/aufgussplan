@@ -64,6 +64,27 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    const existingToasts = document.querySelectorAll('#toast-stack [data-toast]');
+    if (existingToasts.length) {
+        existingToasts.forEach(toast => {
+            requestAnimationFrame(() => {
+                toast.classList.add('show');
+            });
+
+            const closeButton = toast.querySelector('[data-toast-close]');
+            const removeToast = () => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 220);
+            };
+
+            if (closeButton) {
+                closeButton.addEventListener('click', removeToast);
+            }
+
+            setTimeout(removeToast, 4500);
+        });
+    }
 });
 
 /**

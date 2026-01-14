@@ -21,6 +21,57 @@ $navIdAttr = $navId !== ''
     ? ' id="' . htmlspecialchars($navId, ENT_QUOTES, 'UTF-8') . '"'
     : '';
 $navClassAttr = htmlspecialchars($navClass, ENT_QUOTES, 'UTF-8');
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+$adminToasts = [];
+$addToast = function ($text, $type = 'success') use (&$adminToasts) {
+    $text = trim((string)$text);
+    if ($text === '') {
+        return;
+    }
+    $adminToasts[] = [
+        'text' => $text,
+        'type' => $type
+    ];
+};
+
+if (isset($_SESSION['toast_message'])) {
+    $addToast($_SESSION['toast_message'], $_SESSION['toast_type'] ?? 'success');
+    unset($_SESSION['toast_message'], $_SESSION['toast_type']);
+}
+
+if (!empty($toastMessage)) {
+    $addToast($toastMessage, $toastType ?? 'success');
+} elseif (!empty($message)) {
+    $addToast($message, 'success');
+}
+
+if (!empty($messages) && is_array($messages)) {
+    foreach ($messages as $msg) {
+        $addToast($msg, 'success');
+    }
+}
+
+if (!empty($saveMessage)) {
+    $addToast($saveMessage, 'success');
+}
+
+if (!empty($errors)) {
+    if (is_array($errors)) {
+        foreach ($errors as $err) {
+            $addToast($err, 'error');
+        }
+    } else {
+        $addToast($errors, 'error');
+    }
+}
+
+if (!empty($saveError)) {
+    $addToast($saveError, 'error');
+}
 ?>
 <nav<?php echo $navIdAttr; ?> class="<?php echo $navClassAttr; ?>">
     <div class="container mx-auto flex items-center justify-center">
@@ -65,3 +116,13 @@ $navClassAttr = htmlspecialchars($navClass, ENT_QUOTES, 'UTF-8');
         </div>
     </div>
 </nav>
+<div id="toast-stack" class="toast-stack">
+    <?php foreach ($adminToasts as $toast): ?>
+        <div class="toast toast-<?php echo htmlspecialchars($toast['type'], ENT_QUOTES, 'UTF-8'); ?>" data-toast>
+            <div><?php echo htmlspecialchars($toast['text'], ENT_QUOTES, 'UTF-8'); ?></div>
+            <button type="button" class="font-bold leading-none" aria-label="Meldung schliessen" data-toast-close>
+                &times;
+            </button>
+        </div>
+    <?php endforeach; ?>
+</div>

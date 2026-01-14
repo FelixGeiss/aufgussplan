@@ -95,7 +95,7 @@ if (is_file($screenConfigFile)) {
     <!-- Lokale Tailwind CSS -->
     <link rel="stylesheet" href="../../dist/style.css">
     <!-- Admin-spezifische Styles -->
-    <link rel="stylesheet" href="../../assets/css/admin.css">
+    <link rel="stylesheet" href="../../assets/css/admin.css?v=<?php echo filemtime(__DIR__ . '/../../assets/css/admin.css'); ?>">
 </head>
 
 <body class="bg-gray-100 admin-scale-borders">
@@ -247,3 +247,4 @@ if (is_file($screenConfigFile)) {
 </body>
 
 </html>
+

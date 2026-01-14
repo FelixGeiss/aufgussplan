@@ -26,7 +26,7 @@ require_permission('mitarbeiter');
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mitarbeiter verwalten - Aufgussplan</title>
     <link rel="stylesheet" href="../../dist/style.css">
-    <link rel="stylesheet" href="../../assets/css/admin.css">
+    <link rel="stylesheet" href="../../assets/css/admin.css?v=<?php echo filemtime(__DIR__ . '/../../assets/css/admin.css'); ?>">
 </head>
 <body class="bg-gray-100">
     <?php include __DIR__ . '/../partials/navbar.php'; ?>
@@ -239,3 +239,4 @@ require_permission('mitarbeiter');
     <script src="../../assets/js/mitarbeiter.js"></script>
 </body>
 </html>
+

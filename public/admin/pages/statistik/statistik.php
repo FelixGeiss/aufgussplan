@@ -711,7 +711,7 @@ if (defined('STATISTIK_JSON')) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Statistiken - Aufgussplan</title>
     <link rel="stylesheet" href="../../../dist/style.css">
-    <link rel="stylesheet" href="../../../assets/css/admin.css">
+    <link rel="stylesheet" href="../../../assets/css/admin.css?v=<?php echo filemtime(__DIR__ . '/../../../assets/css/admin.css'); ?>">
 </head>
 <body class="bg-gray-100">
     <?php
@@ -1518,7 +1518,10 @@ if (defined('STATISTIK_JSON')) {
                         alert(message);
                         return;
                     }
-                    window.location.reload();
+                    if (window.showToast) {
+                        window.showToast('Gelöscht', 'success');
+                    }
+                    setTimeout(() => window.location.reload(), 700);
                 } catch (error) {
                     console.error('Fehler beim Löschen der Umfrage', error);
                     alert('Löschen fehlgeschlagen.');
@@ -1534,5 +1537,7 @@ if (defined('STATISTIK_JSON')) {
             });
         })();
     </script>
+    <script src="../../../assets/js/admin.js?v=<?php echo filemtime(__DIR__ . '/../../../assets/js/admin.js'); ?>"></script>
 </body>
 </html>
+
