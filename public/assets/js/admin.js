@@ -180,7 +180,7 @@ function toggleForm(formId) {
             <svg class="-ml-1 mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z" clip-rule="evenodd" />
             </svg>
-            Formular schließen
+            Planbearbeitung schliessen
         `;
     } else {
         form.classList.add('hidden');
@@ -188,7 +188,7 @@ function toggleForm(formId) {
             <svg class="-ml-1 mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
             </svg>
-            Neuen Aufguss zu "${button.querySelector('span') ? button.querySelector('span').textContent : 'Plan'}" hinzufügen
+            Planbearbeitung
         `;
     }
 }
@@ -204,7 +204,7 @@ function toggleFormMain(formId) {
             <svg class="-ml-1 mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z" clip-rule="evenodd" />
             </svg>
-            Formular schließen
+            Formular schliessen
         `;
     } else {
         form.classList.add('hidden');
