@@ -60,8 +60,7 @@ $werbungFiles = listUploadFiles('werbung');
         <div class="bg-white rounded-lg shadow-md p-6">
             <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between mb-6">
                 <p class="text-gray-600">
-                    Waehle pro Bildschirm, ob ein Plan oder ein Bild angezeigt werden soll.
-                    Optional kannst du einen Hintergrund definieren.
+                    Stelle die Werbung f&uuml;r die Bildschirme ein.
                 </p>
                 <a href="../../index.php" class="inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Zur Anzeige</a>
             </div>
