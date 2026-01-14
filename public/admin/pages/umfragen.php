@@ -266,10 +266,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $planId > 0) {
                     const url = new URL(window.location.href);
                     url.searchParams.set('plan_id', planId);
                     window.location.href = url.toString();
-                    if (window.showToast) {
-                        const planName = button.getAttribute('data-plan-name') || `Plan ${planId}`;
-                        window.showToast(`Ausgewählt: ${planName}`, 'success');
-                    }
                 });
             });
         })();
