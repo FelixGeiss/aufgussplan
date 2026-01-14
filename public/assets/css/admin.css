@@ -250,6 +250,14 @@ input[type="radio"] {
     background-color: var(--admin-color-danger-50);
 }
 
+.admin-btn-save {
+    background-color: var(--admin-color-success-500);
+}
+
+.admin-btn-save:hover {
+    background-color: var(--admin-color-success-600);
+}
+
 
 .apex-chart-line {
     min-height: 420px;
@@ -267,6 +275,12 @@ input[type="radio"] {
 
 table tbody tr:hover {
     background-color: var(--admin-color-table-hover);
+}
+
+.db-overview-table th,
+.db-overview-table td {
+    text-align: center;
+    vertical-align: middle;
 }
 
 /* ============================================================================

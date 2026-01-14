@@ -113,7 +113,7 @@ if (is_file($screenConfigFile)) {
                 <div class="bg-white rounded-lg  p-6">
                     <h3 class="text-lg font-semibold mb-2">Mitarbeiter</h3>
                     <p class="text-gray-600">Verwalten Sie Ihre Mitarbeiter</p>
-                    <a href="mitarbeiter.php" class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Verwalten</a>
+                    <a href="mitarbeiter.php" class="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Verwalten</a>
                 </div>
             <?php endif; ?>
 
@@ -121,7 +121,7 @@ if (is_file($screenConfigFile)) {
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-lg font-semibold mb-2">Backup</h3>
                     <p class="text-gray-600">Datenbank und Uploads sichern</p>
-                    <a href="backup.php" class="mt-4 inline-block bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600">Verwalten</a>
+                    <a href="backup.php" class="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Verwalten</a>
                 </div>
             <?php endif; ?>
 
@@ -129,7 +129,7 @@ if (is_file($screenConfigFile)) {
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-lg font-semibold mb-2">Statistiken</h3>
                     <p class="text-gray-600">Uebersicht ueber Aktivitaeten</p>
-                    <a href="statistik/statistik.php" class="mt-4 inline-block bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Verwalten</a>
+                    <a href="statistik/statistik.php" class="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Verwalten</a>
                 </div>
             <?php endif; ?>
 
@@ -137,7 +137,7 @@ if (is_file($screenConfigFile)) {
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-lg font-semibold mb-2">Umfrage</h3>
                     <p class="text-gray-600">Umfrage Erstellen</p>
-                    <a href="umfragen.php" class="mt-4 inline-block bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Verwalten</a>
+                    <a href="umfragen.php" class="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Verwalten</a>
                 </div>
             <?php endif; ?>
         </div>
@@ -148,7 +148,7 @@ if (is_file($screenConfigFile)) {
                 <h3 class="text-lg font-semibold mb-2">Aufgüsse</h3>
                 <p class="text-gray-600">Planen Sie Ihre Aufgüsse</p>
                 <?php if ($canAufguesse): ?>
-                    <a href="aufguesse.php" class="mt-4 inline-block bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Verwalten</a>
+                    <a href="aufguesse.php" class="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Verwalten</a>
                 <?php endif; ?>
 
                 <div class="mt-6 border-t border-gray-200 pt-6">
@@ -185,7 +185,7 @@ if (is_file($screenConfigFile)) {
                 <div class="bg-white rounded-lg p-6">
                     <h3 class="text-lg font-semibold mb-2">Bildschirme</h3>
                     <p class="text-gray-600">Verwalten Sie die TV-Bildschirme</p>
-                    <a href="bildschirme.php" class="mt-4 inline-block bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600">Verwalten</a>
+                    <a href="bildschirme.php" class="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Verwalten</a>
                     <div class="mt-4 border-t border-gray-200 pt-4">
                         <div class="text-xs text-gray-500 mb-2">
                             <?php echo htmlspecialchars($screenAdStatus['label']); ?>

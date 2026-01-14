@@ -613,6 +613,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             left: 80%;
         }
 
+        .image-edit-hover {
+            border-radius: 0.5rem;
+            padding: 0.25rem;
+            transition: box-shadow 150ms ease, background-color 150ms ease;
+        }
+
+        .image-edit-hover:hover {
+            background-color: rgba(255, 255, 255, 0.35);
+            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+        }
+
     </style>
 </head>
 
@@ -639,8 +650,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <textarea id="plan-beschreibung" name="plan_beschreibung" rows="3" class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)" placeholder="Kurze Beschreibung für den Plan"></textarea>
                     </div>
                     <div class="flex justify-center">
-                        <button type="submit" class="rounded-md bg-indigo-600 px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                            Plan erstellen
+                        <button type="submit" class="admin-btn-save text-white px-4 py-2 rounded text-sm font-semibold inline-flex items-center gap-1">
+                            Plan erstellen <span aria-hidden="true">+</span>
                         </button>
                     </div>
                 </form>
@@ -701,7 +712,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         Plan auswählen
                                     </button>
                                     <button type="button"
-                                        class="rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
+                                        class="rounded-md admin-btn-save px-3 py-1.5 text-sm font-semibold text-white shadow-sm"
                                         onclick="saveAllPlanSettings(<?php echo (int)$plan['id']; ?>)">
                                         Speichern
                                     </button>
@@ -814,7 +825,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                             class="rounded px-2 py-1 text-sm border border-gray-300">
                                                                     </div>
                                                                     <div class="flex items-center gap-2 mt-2">
-                                                                        <button onclick="saveEdit(<?php echo $aufguss['id']; ?>, 'zeit')" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">✓ Speichern</button>
+                                                                        <button onclick="saveEdit(<?php echo $aufguss['id']; ?>, 'zeit')" class="admin-btn-save text-white px-3 py-1 rounded text-sm">✓ Speichern</button>
                                                                         <button onclick="cancelEdit(<?php echo $aufguss['id']; ?>, 'zeit')" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">✕ Abbrechen</button>
                                                                     </div>
                                                                 </div>
@@ -852,7 +863,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                         </select>
                                                                     </div>
                                                                     <div class="flex items-center gap-2 mt-2">
-                                                                        <button onclick="saveEdit(<?php echo $aufguss['id']; ?>, 'aufguss')" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">✓ Speichern</button>
+                                                                        <button onclick="saveEdit(<?php echo $aufguss['id']; ?>, 'aufguss')" class="admin-btn-save text-white px-3 py-1 rounded text-sm">✓ Speichern</button>
                                                                         <button onclick="cancelEdit(<?php echo $aufguss['id']; ?>, 'aufguss')" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">✕ Abbrechen</button>
                                                                     </div>
                                                                 </div>
@@ -924,7 +935,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                         <option value="6" <?php echo ($stärke == 6) ? 'selected' : ''; ?>>6 Extrem stark</option>
                                                                     </select>
                                                                     <div class="flex items-center gap-2 mt-2">
-                                                                        <button onclick="saveEdit(<?php echo $aufguss['id']; ?>, 'stärke')" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">✓ Speichern</button>
+                                                                        <button onclick="saveEdit(<?php echo $aufguss['id']; ?>, 'stärke')" class="admin-btn-save text-white px-3 py-1 rounded text-sm">✓ Speichern</button>
                                                                         <button onclick="cancelEdit(<?php echo $aufguss['id']; ?>, 'stärke')" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">✕ Abbrechen</button>
                                                                     </div>
                                                                 </div>
@@ -1004,7 +1015,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                         </div>
                                                                     </div>
                                                                     <div class="flex items-center gap-2 mt-2">
-                                                                        <button onclick="saveEdit(<?php echo $aufguss['id']; ?>, 'mitarbeiter')" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">✓ Speichern</button>
+                                                                        <button onclick="saveEdit(<?php echo $aufguss['id']; ?>, 'mitarbeiter')" class="admin-btn-save text-white px-3 py-1 rounded text-sm">✓ Speichern</button>
                                                                         <button onclick="cancelEdit(<?php echo $aufguss['id']; ?>, 'mitarbeiter')" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">✕ Abbrechen</button>
                                                                     </div>
                                                                 </div>
@@ -1062,7 +1073,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                         </select>
                                                                     </div>
                                                                     <div class="flex items-center gap-2 mt-2">
-                                                                        <button onclick="saveEdit(<?php echo $aufguss['id']; ?>, 'sauna')" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">✓ Speichern</button>
+                                                                        <button onclick="saveEdit(<?php echo $aufguss['id']; ?>, 'sauna')" class="admin-btn-save text-white px-3 py-1 rounded text-sm">✓ Speichern</button>
                                                                         <button onclick="cancelEdit(<?php echo $aufguss['id']; ?>, 'sauna')" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">✕ Abbrechen</button>
                                                                     </div>
                                                                 </div>
@@ -1071,7 +1082,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                             <!-- Duftmittel -->
                                                             <td class="px-6 py-4 whitespace-nowrap duftmittel-cell text-center">
                                                                 <!-- Anzeige-Modus -->
-                                                                <div class="display-mode flex flex-col items-center cursor-pointer hover:bg-purple-50 transition-colors duration-150 rounded px-2 py-2 group" onclick="toggleEdit(<?php echo $aufguss['id']; ?>, 'duftmittel')">
+                                                                <div class="display-mode flex flex-col items-center cursor-pointer hover:bg-purple-50 hover:text-blue-700 transition-colors duration-150 rounded px-2 py-2 group" onclick="toggleEdit(<?php echo $aufguss['id']; ?>, 'duftmittel')">
                                                                     <div class="flex-shrink-0 h-10 w-10">
                                                                         <div class="h-10 w-10 bg-purple-100 rounded-full flex items-center justify-center">
                                                                             <span class="text-purple-600 text-sm">🌸</span>
@@ -1107,7 +1118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                         </select>
                                                                     </div>
                                                                     <div class="flex items-center gap-2 mt-2">
-                                                                        <button onclick="saveEdit(<?php echo $aufguss['id']; ?>, 'duftmittel')" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">✓ Speichern</button>
+                                                                        <button onclick="saveEdit(<?php echo $aufguss['id']; ?>, 'duftmittel')" class="admin-btn-save text-white px-3 py-1 rounded text-sm">✓ Speichern</button>
                                                                         <button onclick="cancelEdit(<?php echo $aufguss['id']; ?>, 'duftmittel')" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">✕ Abbrechen</button>
                                                                     </div>
                                                                 </div>
@@ -1374,7 +1385,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <!-- Buttons -->
                                                 <div class="flex items-center justify-end gap-x-6 pt-4">
                                                     <button type="button" onclick="toggleForm(<?php echo $plan['id']; ?>)" class="text-sm font-semibold text-gray-900 hover:text-gray-700">Abbrechen</button>
-                                                    <button type="submit" id="submit-btn-<?php echo $plan['id']; ?>" class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Speichern</button>
+                                                    <button type="submit" id="submit-btn-<?php echo $plan['id']; ?>" class="rounded-md admin-btn-save px-4 py-2 text-sm font-semibold text-white shadow-sm">Speichern</button>
                                                 </div>
                                             </form>
                                             <div class="mt-6 border-t border-gray-200 pt-4">
@@ -1449,7 +1460,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             </div>
                                         </label>
 
-                                        <button type="button" id="plan-upload-btn-<?php echo $plan['id']; ?>" onclick="uploadPlanBackgroundImage(<?php echo $plan['id']; ?>)" class="w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                                        <button type="button" id="plan-upload-btn-<?php echo $plan['id']; ?>" onclick="uploadPlanBackgroundImage(<?php echo $plan['id']; ?>)" class="w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">
                                             Hochladen
                                         </button>
 
@@ -1480,7 +1491,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <label for="next-aufguss-lead-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-1">Sekunden vorher anzeigen</label>
                                                 <input id="next-aufguss-lead-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="number" min="1" max="3600" step="1" class="block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50" value="5">
                                             </div>
-                                            <button id="next-aufguss-preview-btn-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="button" onclick="previewNextAufgussPopup(<?php echo $plan['id']; ?>)" class="w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed">
+                                            <button id="next-aufguss-preview-btn-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="button" onclick="previewNextAufgussPopup(<?php echo $plan['id']; ?>)" class="w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
                                                 Vorschau anzeigen
                                             </button>
                                         </div>
@@ -1588,7 +1599,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                         </div>
                                                     <?php endif; ?>
 
-                                                    <button type="button" id="plan-ad-upload-btn-<?php echo $plan['id']; ?>" onclick="uploadPlanAdMedia(<?php echo $plan['id']; ?>)" class="w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                                                    <button type="button" id="plan-ad-upload-btn-<?php echo $plan['id']; ?>" onclick="uploadPlanAdMedia(<?php echo $plan['id']; ?>)" class="w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">
                                                         Hochladen
                                                     </button>
 
@@ -1612,7 +1623,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                         <label for="plan-ad-duration-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-1">Anzeigedauer (Sekunden)</label>
                                                         <input id="plan-ad-duration-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="number" min="1" max="3600" step="1" class="block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50" value="<?php echo htmlspecialchars($plan['werbung_dauer_sekunden'] ?? 10); ?>">
                                                     </div>
-                                                    <button id="plan-ad-preview-btn-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="button" onclick="previewPlanAd(<?php echo $plan['id']; ?>)" class="w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed">
+                                                    <button id="plan-ad-preview-btn-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="button" onclick="previewPlanAd(<?php echo $plan['id']; ?>)" class="w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
                                                         Vorschau anzeigen
                                                     </button>
                                                 </div>
@@ -1679,12 +1690,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <input type="text" name="aufguss_beschreibung" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900" placeholder="optional">
                             </div>
                             <div class="md:col-span-2 flex justify-end">
-                                <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded text-sm font-semibold hover:bg-indigo-500">Aufguss speichern</button>
+                                <button type="submit" class="admin-btn-save text-white px-4 py-2 rounded text-sm font-semibold inline-flex items-center gap-1">
+                                    Aufguss speichern <span aria-hidden="true">+</span>
+                                </button>
                             </div>
                         </form>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="min-w-full bg-transparent border border-gray-200 rounded-lg">
+                        <table class="min-w-full bg-transparent border border-gray-200 rounded-lg db-overview-table">
                             <thead class="bg-white/5">
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
@@ -1725,13 +1738,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     <input type="text" name="aufguss_name" value="<?php echo htmlspecialchars($aufguss['name'] ?? ''); ?>"
                                                         class="rounded px-2 py-1 text-sm border border-gray-300">
                                                     <div class="flex items-center gap-2 mt-2">
-                                                        <button onclick="saveAufgussNameEdit(<?php echo $aufguss['id']; ?>, 'name')" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">✓ Speichern</button>
+                                                        <button onclick="saveAufgussNameEdit(<?php echo $aufguss['id']; ?>, 'name')" class="admin-btn-save text-white px-3 py-1 rounded text-sm">✓ Speichern</button>
                                                         <button onclick="cancelAufgussNameEdit(<?php echo $aufguss['id']; ?>, 'name')" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">✕ Abbrechen</button>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap aufguss-desc-cell">
-                                                <div class="display-mode text-lg text-gray-600 cursor-pointer hover:bg-purple-50 transition-colors duration-150 rounded px-2 py-1 group" onclick="toggleAufgussNameEdit(<?php echo $aufguss['id']; ?>, 'beschreibung')">
+                                                <div class="display-mode text-lg text-gray-600 cursor-pointer hover:bg-purple-50 hover:text-blue-700 transition-colors duration-150 rounded px-2 py-1 group" onclick="toggleAufgussNameEdit(<?php echo $aufguss['id']; ?>, 'beschreibung')">
                                                     <span><?php echo htmlspecialchars($aufguss['beschreibung'] ?? 'Keine Beschreibung'); ?></span>
                                                     <svg class="inline-block w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150" fill="currentColor" viewBox="0 0 20 20">
                                                         <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
@@ -1741,7 +1754,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     <textarea name="aufguss_beschreibung" rows="2"
                                                         class="rounded px-2 py-1 text-sm border border-gray-300"><?php echo htmlspecialchars($aufguss['beschreibung'] ?? ''); ?></textarea>
                                                     <div class="flex items-center gap-2 mt-2">
-                                                        <button onclick="saveAufgussNameEdit(<?php echo $aufguss['id']; ?>, 'beschreibung')" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">✓ Speichern</button>
+                                                        <button onclick="saveAufgussNameEdit(<?php echo $aufguss['id']; ?>, 'beschreibung')" class="admin-btn-save text-white px-3 py-1 rounded text-sm">✓ Speichern</button>
                                                         <button onclick="cancelAufgussNameEdit(<?php echo $aufguss['id']; ?>, 'beschreibung')" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">✕ Abbrechen</button>
                                                     </div>
                                                 </div>
@@ -1782,12 +1795,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <input type="number" name="sauna_temperatur" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900" placeholder="z.B. 90" min="0" step="1">
                             </div>
                             <div class="md:col-span-3 flex justify-end">
-                                <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded text-sm font-semibold hover:bg-indigo-500">Sauna speichern</button>
+                                <button type="submit" class="admin-btn-save text-white px-4 py-2 rounded text-sm font-semibold inline-flex items-center gap-1">
+                                    Sauna speichern <span aria-hidden="true">+</span>
+                                </button>
                             </div>
                         </form>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="min-w-full bg-transparent border border-gray-200 rounded-lg">
+                        <table class="min-w-full bg-transparent border border-gray-200 rounded-lg db-overview-table">
                             <thead class="bg-white/5">
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
@@ -1826,19 +1841,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             </td>
 
                                             <!-- Bild -->
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="flex-shrink-0 h-8 w-8">
-                                                    <?php if (!empty($sauna['bild'])): ?>
-                                                        <img src="../../uploads/<?php echo htmlspecialchars($sauna['bild']); ?>"
-                                                            alt="Sauna-Bild"
-                                                            class="h-8 w-8 rounded-full object-cover border border-gray-200 cursor-pointer hover:border-indigo-400 transition-colors"
-                                                            onclick="openImageModal('sauna', <?php echo $sauna['id']; ?>, '<?php echo htmlspecialchars($sauna['name']); ?>')">
-                                                    <?php else: ?>
-                                                        <div class="h-8 w-8 bg-green-100 rounded-full flex items-center justify-center cursor-pointer hover:bg-green-200 transition-colors"
-                                                            onclick="openImageModal('sauna', <?php echo $sauna['id']; ?>, '<?php echo htmlspecialchars($sauna['name']); ?>')">
-                                                            <span class="text-green-600 text-sm">🏠</span>
-                                                        </div>
-                                                    <?php endif; ?>
+                                                                                        <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="relative inline-flex flex-col items-center group cursor-pointer image-edit-hover"
+                                                    onclick="openImageModal('sauna', <?php echo $sauna['id']; ?>, '<?php echo htmlspecialchars($sauna['name']); ?>')">
+                                                    <div class="flex-shrink-0 h-8 w-8">
+                                                        <?php if (!empty($sauna['bild'])): ?>
+                                                            <img src="../../uploads/<?php echo htmlspecialchars($sauna['bild']); ?>"
+                                                                alt="Sauna-Bild"
+                                                                class="h-8 w-8 rounded-full object-cover border border-gray-200 hover:border-indigo-400 transition-colors">
+                                                        <?php else: ?>
+                                                            <div class="h-8 w-8 bg-green-100 rounded-full flex items-center justify-center hover:bg-green-200 transition-colors">
+    <span class="text-green-600 text-sm">&#127968;</span>
+</div>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                    <svg class="mt-1 w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity duration-150" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                                                    </svg>
                                                 </div>
                                             </td>
 
@@ -1854,7 +1873,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     <input type="text" name="sauna_name" value="<?php echo htmlspecialchars($sauna['name'] ?? ''); ?>"
                                                         class="rounded px-2 py-1 text-sm border border-gray-300">
                                                     <div class="flex items-center gap-2 mt-2">
-                                                        <button onclick="saveSaunaEdit(<?php echo $sauna['id']; ?>, 'name')" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">✓ Speichern</button>
+                                                        <button onclick="saveSaunaEdit(<?php echo $sauna['id']; ?>, 'name')" class="admin-btn-save text-white px-3 py-1 rounded text-sm">✓ Speichern</button>
                                                         <button onclick="cancelSaunaEdit(<?php echo $sauna['id']; ?>, 'name')" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">✕ Abbrechen</button>
                                                     </div>
                                                 </div>
@@ -1862,7 +1881,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                             <!-- Beschreibung (editierbar) -->
                                             <td class="px-6 py-4 whitespace-nowrap sauna-desc-cell">
-                                                <div class="display-mode text-lg text-gray-600 cursor-pointer hover:bg-purple-50 transition-colors duration-150 rounded px-2 py-1 group" onclick="toggleSaunaEdit(<?php echo $sauna['id']; ?>, 'beschreibung')">
+                                                <div class="display-mode text-lg text-gray-600 cursor-pointer hover:bg-purple-50 hover:text-blue-700 transition-colors duration-150 rounded px-2 py-1 group" onclick="toggleSaunaEdit(<?php echo $sauna['id']; ?>, 'beschreibung')">
                                                     <span><?php echo htmlspecialchars($sauna['beschreibung'] ?? 'Keine Beschreibung'); ?></span>
                                                     <svg class="inline-block w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150" fill="currentColor" viewBox="0 0 20 20">
                                                         <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
@@ -1872,7 +1891,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     <textarea name="sauna_beschreibung" rows="2"
                                                         class="rounded px-2 py-1 text-sm border border-gray-300"><?php echo htmlspecialchars($sauna['beschreibung'] ?? ''); ?></textarea>
                                                     <div class="flex items-center gap-2 mt-2">
-                                                        <button onclick="saveSaunaEdit(<?php echo $sauna['id']; ?>, 'beschreibung')" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">✓ Speichern</button>
+                                                        <button onclick="saveSaunaEdit(<?php echo $sauna['id']; ?>, 'beschreibung')" class="admin-btn-save text-white px-3 py-1 rounded text-sm">✓ Speichern</button>
                                                         <button onclick="cancelSaunaEdit(<?php echo $sauna['id']; ?>, 'beschreibung')" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">✕ Abbrechen</button>
                                                     </div>
                                                 </div>
@@ -1896,7 +1915,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     <input type="number" name="sauna_temperatur" value="<?php echo htmlspecialchars($sauna['temperatur'] ?? ''); ?>"
                                                         class="rounded px-2 py-1 text-sm border border-gray-300" min="0" step="1" placeholder="z.B. 90">
                                                     <div class="flex items-center gap-2 mt-2">
-                                                        <button onclick="saveSaunaEdit(<?php echo $sauna['id']; ?>, 'temperatur')" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">✓ Speichern</button>
+                                                        <button onclick="saveSaunaEdit(<?php echo $sauna['id']; ?>, 'temperatur')" class="admin-btn-save text-white px-3 py-1 rounded text-sm">✓ Speichern</button>
                                                         <button type="button" onclick="clearSaunaTemperatur(<?php echo $sauna['id']; ?>)" class="bg-gray-200 text-gray-800 px-3 py-1 rounded text-sm hover:bg-gray-300">Leeren</button>
                                                         <button onclick="cancelSaunaEdit(<?php echo $sauna['id']; ?>, 'temperatur')" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">✕ Abbrechen</button>
                                                     </div>
@@ -1936,12 +1955,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <input type="text" name="duftmittel_beschreibung" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900" placeholder="optional">
                             </div>
                             <div class="md:col-span-2 flex justify-end">
-                                <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded text-sm font-semibold hover:bg-indigo-500">Duftmittel speichern</button>
+                                <button type="submit" class="admin-btn-save text-white px-4 py-2 rounded text-sm font-semibold inline-flex items-center gap-1">
+                                    Duftmittel speichern <span aria-hidden="true">+</span>
+                                </button>
                             </div>
                         </form>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="min-w-full bg-transparent border border-gray-200 rounded-lg">
+                        <table class="min-w-full bg-transparent border border-gray-200 rounded-lg db-overview-table">
                             <thead class="bg-white/5">
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
@@ -1985,7 +2006,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     <input type="text" name="duftmittel_name" value="<?php echo htmlspecialchars($dm['name'] ?? ''); ?>"
                                                         class="rounded px-2 py-1 text-sm border border-gray-300">
                                                     <div class="flex items-center gap-2 mt-2">
-                                                        <button onclick="saveDuftmittelEdit(<?php echo $dm['id']; ?>, 'name')" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">✓ Speichern</button>
+                                                        <button onclick="saveDuftmittelEdit(<?php echo $dm['id']; ?>, 'name')" class="admin-btn-save text-white px-3 py-1 rounded text-sm">✓ Speichern</button>
                                                         <button onclick="cancelDuftmittelEdit(<?php echo $dm['id']; ?>, 'name')" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">✕ Abbrechen</button>
                                                     </div>
                                                 </div>
@@ -1993,7 +2014,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                             <!-- Beschreibung (editierbar) -->
                                             <td class="px-6 py-4 whitespace-nowrap duftmittel-desc-cell">
-                                                <div class="display-mode text-lg text-gray-600 cursor-pointer hover:bg-purple-50 transition-colors duration-150 rounded px-2 py-1 group" onclick="toggleDuftmittelEdit(<?php echo $dm['id']; ?>, 'beschreibung')">
+                                                <div class="display-mode text-lg text-gray-600 cursor-pointer hover:bg-purple-50 hover:text-blue-700 transition-colors duration-150 rounded px-2 py-1 group" onclick="toggleDuftmittelEdit(<?php echo $dm['id']; ?>, 'beschreibung')">
                                                     <span><?php echo htmlspecialchars($dm['beschreibung'] ?? 'Keine Beschreibung'); ?></span>
                                                     <svg class="inline-block w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150" fill="currentColor" viewBox="0 0 20 20">
                                                         <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
@@ -2003,7 +2024,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     <textarea name="duftmittel_beschreibung" rows="2"
                                                         class="rounded px-2 py-1 text-sm border border-gray-300"><?php echo htmlspecialchars($dm['beschreibung'] ?? ''); ?></textarea>
                                                     <div class="flex items-center gap-2 mt-2">
-                                                        <button onclick="saveDuftmittelEdit(<?php echo $dm['id']; ?>, 'beschreibung')" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">✓ Speichern</button>
+                                                        <button onclick="saveDuftmittelEdit(<?php echo $dm['id']; ?>, 'beschreibung')" class="admin-btn-save text-white px-3 py-1 rounded text-sm">✓ Speichern</button>
                                                         <button onclick="cancelDuftmittelEdit(<?php echo $dm['id']; ?>, 'beschreibung')" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">✕ Abbrechen</button>
                                                     </div>
                                                 </div>
@@ -2030,7 +2051,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <!-- Mitarbeiter Tab -->
                 <div id="content-mitarbeiter" class="tab-content hidden">
                     <div class="overflow-x-auto">
-                        <table class="min-w-full bg-transparent border border-gray-200 rounded-lg">
+                        <table class="min-w-full bg-transparent border border-gray-200 rounded-lg db-overview-table">
                             <thead class="bg-white/5">
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
@@ -2064,20 +2085,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                             <!-- Bild -->
                                             <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="flex-shrink-0 h-8 w-8">
-                                                    <?php if (!empty($mitarbeiter_item['bild'])): ?>
-                                                        <img src="../../uploads/<?php echo htmlspecialchars($mitarbeiter_item['bild']); ?>"
-                                                            alt="Mitarbeiter-Bild"
-                                                            class="h-8 w-8 rounded-full object-cover border border-gray-200 cursor-pointer hover:border-indigo-400 transition-colors"
-                                                            onclick="openImageModal('mitarbeiter', <?php echo $mitarbeiter_item['id']; ?>, '<?php echo htmlspecialchars($mitarbeiter_item['name']); ?>')">
-                                                    <?php else: ?>
-                                                        <div class="h-8 w-8 bg-gray-300 rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-400 transition-colors"
-                                                            onclick="openImageModal('mitarbeiter', <?php echo $mitarbeiter_item['id']; ?>, '<?php echo htmlspecialchars($mitarbeiter_item['name']); ?>')">
-                                                            <span class="text-gray-700 font-semibold text-xs">
-                                                                <?php echo strtoupper(substr($mitarbeiter_item['name'] ?? 'U', 0, 1)); ?>
-                                                            </span>
-                                                        </div>
-                                                    <?php endif; ?>
+                                                <div class="relative inline-flex flex-col items-center group cursor-pointer image-edit-hover"
+                                                    onclick="openImageModal('mitarbeiter', <?php echo $mitarbeiter_item['id']; ?>, '<?php echo htmlspecialchars($mitarbeiter_item['name']); ?>')">
+                                                    <div class="flex-shrink-0 h-8 w-8">
+                                                        <?php if (!empty($mitarbeiter_item['bild'])): ?>
+                                                            <img src="../../uploads/<?php echo htmlspecialchars($mitarbeiter_item['bild']); ?>"
+                                                                alt="Mitarbeiter-Bild"
+                                                                class="h-8 w-8 rounded-full object-cover border border-gray-200 hover:border-indigo-400 transition-colors">
+                                                        <?php else: ?>
+                                                            <div class="h-8 w-8 bg-gray-300 rounded-full flex items-center justify-center hover:bg-gray-400 transition-colors">
+                                                                <span class="text-gray-700 font-semibold text-sm">
+                                                                    <?php echo strtoupper(substr($mitarbeiter_item['name'], 0, 1)); ?>
+                                                                </span>
+                                                            </div>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                    <svg class="mt-1 w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity duration-150" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                                                    </svg>
                                                 </div>
                                             </td>
 
@@ -2093,7 +2118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     <input type="text" name="mitarbeiter_name" value="<?php echo htmlspecialchars($mitarbeiter_item['name'] ?? ''); ?>"
                                                         class="rounded px-2 py-1 text-sm border border-gray-300">
                                                     <div class="flex items-center gap-2 mt-2">
-                                                        <button onclick="saveMitarbeiterEdit(<?php echo $mitarbeiter_item['id']; ?>, 'name')" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">✓ Speichern</button>
+                                                        <button onclick="saveMitarbeiterEdit(<?php echo $mitarbeiter_item['id']; ?>, 'name')" class="admin-btn-save text-white px-3 py-1 rounded text-sm">✓ Speichern</button>
                                                         <button onclick="cancelMitarbeiterEdit(<?php echo $mitarbeiter_item['id']; ?>, 'name')" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">✕ Abbrechen</button>
                                                     </div>
                                                 </div>
@@ -2120,7 +2145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <!-- Werbung Tab -->
                 <div id="content-werbung" class="tab-content hidden">
                     <div class="overflow-x-auto">
-                        <table class="min-w-full bg-transparent border border-gray-200 rounded-lg">
+                        <table class="min-w-full bg-transparent border border-gray-200 rounded-lg db-overview-table">
                             <thead class="bg-white/5">
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
@@ -2198,7 +2223,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <!-- Hintergrund Tab -->
                 <div id="content-hintergrund" class="tab-content hidden">
                     <div class="overflow-x-auto">
-                        <table class="min-w-full bg-transparent border border-gray-200 rounded-lg">
+                        <table class="min-w-full bg-transparent border border-gray-200 rounded-lg db-overview-table">
                             <thead class="bg-white/5">
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-black-500 uppercase tracking-wider border-b">
@@ -2359,7 +2384,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <p class="text-xs text-gray-500">Der Banner passt seine Höhe automatisch an den Text an.</p>
                 <div class="flex items-center justify-end gap-2 pt-2">
                     <button type="button" onclick="closePlanBannerModal()" class="rounded-md bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-200">Abbrechen</button>
-                    <button type="button" onclick="savePlanBannerSettings()" class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500">Speichern</button>
+                    <button type="button" onclick="savePlanBannerSettings()" class="rounded-md admin-btn-save px-4 py-2 text-sm font-semibold text-white">Speichern</button>
                 </div>
             </div>
         </div>
@@ -2423,7 +2448,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <!-- Buttons -->
                     <div class="flex items-center justify-end gap-x-6 pt-4">
                         <button type="button" onclick="closeImageModal()" class="text-sm font-semibold text-gray-900 hover:text-gray-700">Abbrechen</button>
-                        <button type="submit" id="modalSubmitBtn" class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50">Speichern</button>
+                        <button type="submit" id="modalSubmitBtn" class="rounded-md admin-btn-save px-4 py-2 text-sm font-semibold text-white shadow-sm disabled:opacity-50">Speichern</button>
                     </div>
                 </form>
             </div>
@@ -4590,6 +4615,23 @@ function savePlanSettings(planId, options = {}) {
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

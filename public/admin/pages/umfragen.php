@@ -215,7 +215,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $planId > 0) {
                     </div>
 
                     <div class="flex flex-wrap gap-3 pt-2">
-                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        <button type="submit" class="admin-btn-save text-white px-4 py-2 rounded">
                             Umfrage speichern
                         </button>
                         <button type="button" id="survey-delete" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
@@ -296,5 +296,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $planId > 0) {
 </body>
 
 </html>
+
 
 
