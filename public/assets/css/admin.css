@@ -669,7 +669,7 @@ textarea.border-green-500 {
 .plan-table-scroll {
     max-height: 520px;
     overflow-y: auto;
-    overflow-x: hidden;
+    overflow-x: auto;
 }
 
 .plan-table-scroll .zeit-cell,
@@ -841,4 +841,45 @@ textarea.border-green-500 {
 .image-edit-hover:hover {
     background-color: rgba(255, 255, 255, 0.35);
     box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+}
+
+@media (min-width: 771px) {
+    .plan-header {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .plan-header__title,
+    .plan-header__meta,
+    .plan-header__banner {
+        order: 0;
+    }
+
+    .plan-header__meta {
+        text-align: right;
+    }
+
+    .plan-header__banner {
+        justify-content: center;
+    }
+
+    .plan-header__buttons {
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-end;
+    }
+
+    .plan-header__buttons > * {
+        width: 100%;
+    }
+}
+
+.plan-header__buttons > * {
+    width: 100%;
+}
+
+.plan-header__banner {
+    justify-content: center;
+    width: 100%;
 }
