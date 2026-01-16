@@ -767,15 +767,4 @@ console.log('Debug:', variable);
 debugger; // Stoppt Ausführung
 ```
 
----
-
-**Viel Erfolg beim Lernen und Entwickeln! 🚀**
-
-Dieses Projekt ist perfekt für Anfänger, um moderne Webentwicklung zu lernen:
-- PHP-Programmierung
-- Datenbank-Design
-- Frontend-Entwicklung
-- Sicherheitskonzepte
-- Projekt-Architektur
-
-Jede geänderte Zeile ist eine Lerngelegenheit! 🎓
+Ich habe viel mit Codex geschrieben.
