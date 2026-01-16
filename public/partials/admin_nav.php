@@ -74,8 +74,15 @@ if (!empty($saveError)) {
 }
 ?>
 <nav<?php echo $navIdAttr; ?> class="<?php echo $navClassAttr; ?>">
-    <div class="container mx-auto flex items-center">
-        <div class="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-evenly gap-4">
+    <div class="container mx-auto">
+        <div class="flex items-center justify-end">
+            <button type="button" class="md:hidden inline-flex items-center gap-2 px-3 py-2 border border-white/30 rounded" data-admin-nav-toggle aria-expanded="false" aria-controls="admin-nav-menu">
+                <span class="text-sm font-semibold">Men&uuml;</span>
+                <span aria-hidden="true">☰</span>
+            </button>
+        </div>
+
+        <div class="mx-auto mt-4 w-full max-w-6xl flex-wrap items-center justify-evenly gap-4 hidden md:flex">
             <button type="button" class="mr-4 hover:underline" aria-label="Zur&uuml;ck" onclick="history.back()">
                 &larr; Zur&uuml;ck
             </button>
@@ -127,8 +134,83 @@ if (!empty($saveError)) {
                 <a href="<?php echo $adminAuthBase; ?>login.php" class="hover:underline">Login</a>
             <?php endif; ?>
         </div>
+
+        <div id="admin-nav-menu" class="mt-4 hidden md:hidden">
+            <?php if ($loggedIn): ?>
+                <div class="grid gap-6 sm:grid-cols-2 text-center max-[500px]:grid-cols-1">
+                    <div class="flex flex-col gap-3">
+                        <?php if ($canBildschirme): ?>
+                            <details class="group">
+                                <summary class="cursor-pointer hover:underline list-none flex items-center justify-center gap-2">
+                                    <span>Bildschirme</span>
+                                    <span class="text-xs opacity-75 transition-transform duration-150 group-open:rotate-180">▾</span>
+                                </summary>
+                                <div class="mt-2 text-sm text-white/90">
+                                    <a href="<?php echo $publicBase; ?>bildschirm_1.php" class="block py-1 hover:underline" target="_blank" rel="noopener">Bildschirm 1</a>
+                                    <a href="<?php echo $publicBase; ?>bildschirm_2.php" class="block py-1 hover:underline" target="_blank" rel="noopener">Bildschirm 2</a>
+                                    <a href="<?php echo $publicBase; ?>bildschirm_3.php" class="block py-1 hover:underline" target="_blank" rel="noopener">Bildschirm 3</a>
+                                    <a href="<?php echo $publicBase; ?>bildschirm_4.php" class="block py-1 hover:underline" target="_blank" rel="noopener">Bildschirm 4</a>
+                                    <a href="<?php echo $publicBase; ?>bildschirm_5.php" class="block py-1 hover:underline" target="_blank" rel="noopener">Bildschirm 5</a>
+                                </div>
+                            </details>
+                        <?php endif; ?>
+                        <?php if ($canAufguesse): ?>
+                            <details class="group">
+                                <summary class="cursor-pointer hover:underline list-none flex items-center justify-center gap-2">
+                                    <span>Plan</span>
+                                    <span class="text-xs opacity-75 transition-transform duration-150 group-open:rotate-180">▾</span>
+                                </summary>
+                                <div class="mt-2 text-sm text-white/90">
+                                    <a href="<?php echo $publicBase; ?>index.php" class="block py-1 hover:underline">Anzeigen</a>
+                                    <a href="<?php echo $adminBase; ?>aufguesse.php" class="block py-1 hover:underline">Bearbeiten</a>
+                                </div>
+                            </details>
+                        <?php endif; ?>
+                        <?php if ($canUmfragen): ?>
+                            <details class="group">
+                                <summary class="cursor-pointer hover:underline list-none flex items-center justify-center gap-2">
+                                    <span>Umfrage</span>
+                                    <span class="text-xs opacity-75 transition-transform duration-150 group-open:rotate-180">▾</span>
+                                </summary>
+                                <div class="mt-2 text-sm text-white/90">
+                                    <a href="<?php echo $publicBase; ?>umfrage.php" class="block py-1 hover:underline">Anzeigen</a>
+                                    <a href="<?php echo $adminBase; ?>umfragen.php" class="block py-1 hover:underline">Bearbeiten</a>
+                                </div>
+                            </details>
+                        <?php endif; ?>
+                    </div>
+                    <div class="flex flex-col gap-3">
+                        <a href="<?php echo $adminBase; ?>index.php" class="hover:underline">Dashboard</a>
+                        <?php if ($canMitarbeiter): ?>
+                            <a href="<?php echo $adminBase; ?>mitarbeiter.php" class="hover:underline">Mitarbeiter</a>
+                        <?php endif; ?>
+                        <?php if ($canStatistik): ?>
+                            <a href="<?php echo $adminBase; ?>statistik/statistik.php" class="hover:underline">Statistiken</a>
+                        <?php endif; ?>
+                        <?php if ($canBackup): ?>
+                            <a href="<?php echo $adminBase; ?>backup.php" class="hover:underline">Backup</a>
+                        <?php endif; ?>
+                        <a href="<?php echo $adminAuthBase; ?>logout.php" class="hover:underline">Logout</a>
+                    </div>
+                </div>
+            <?php else: ?>
+                <a href="<?php echo $adminAuthBase; ?>login.php" class="hover:underline">Login</a>
+            <?php endif; ?>
+        </div>
     </div>
 </nav>
+<script>
+    (function() {
+        const toggle = document.querySelector('[data-admin-nav-toggle]');
+        const menu = document.getElementById('admin-nav-menu');
+        if (!toggle || !menu) return;
+        toggle.addEventListener('click', () => {
+            const isOpen = !menu.classList.contains('hidden');
+            menu.classList.toggle('hidden', isOpen);
+            toggle.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+        });
+    })();
+</script>
 <div id="toast-stack" class="toast-stack">
     <?php foreach ($adminToasts as $toast): ?>
         <div class="toast toast-<?php echo htmlspecialchars($toast['type'], ENT_QUOTES, 'UTF-8'); ?>" data-toast>
