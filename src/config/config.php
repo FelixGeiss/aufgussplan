@@ -43,8 +43,8 @@ define('DB_PASS', '');
  */
 
 // Die Basis-URL der Anwendung (wichtig für Links und Redirects)
-// Beispiel: 'http://localhost/aufgussplan/' oder 'https://meine-sauna.de/'
-define('BASE_URL', 'http://localhost/aufgussplan/');
+// Beispiel: 'http://localhost/AufgussManager/' oder 'https://meine-sauna.de/'
+define('BASE_URL', 'http://localhost/AufgussManager/');
 
 // Der absolute Pfad zum Hauptverzeichnis des Projekts auf dem Server
 // dirname(__DIR__, 2) geht 2 Ebenen nach oben vom aktuellen Verzeichnis

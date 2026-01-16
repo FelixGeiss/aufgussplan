@@ -1,3 +1,4 @@
+@import url("./fonts.css");
 /**
  * ZUSÄTZLICHE STYLES FÜR DIE ÖFFENTLICHE AUFGUSSPLAN-ANZEIGE
  *
@@ -885,5 +886,4 @@
         display: flex;
     }
 }
-
 

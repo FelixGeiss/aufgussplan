@@ -917,7 +917,7 @@
         // Funktion: buildNextAufgussHtml
         function buildNextAufgussHtml(data) {
             const aufgussName = data.name || 'Aufguss';
-            const staerke = data.staerke ? `Starke: ${data.staerke}` : 'Starke: -';
+            const staerke = data.staerke ? `Stärke: ${data.staerke}` : 'Stärke: -';
             const aufgieserRaw = data.aufgieser_name || '-';
             const aufgieserList = aufgieserRaw
                 .split(',')
@@ -950,11 +950,8 @@
                     ? `<img src="../../uploads/${data.mitarbeiter_bild}" alt="Aufgieser" class="w-full h-72 object-contain rounded-lg bg-gray-100">`
                     : `<div class="w-full h-72 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500 font-semibold">Kein Aufgieser-Bild</div>`);
 
-            const saunaBadge = saunaTempText
-                ? `<span class="absolute -top-2 -right-4 bg-white text-sm leading-none px-3 py-1.5 rounded-full border border-gray-200 text-gray-700">${saunaTempText}&deg;C</span>`
-                : '';
             const saunaImg = data.sauna_bild ?
-                `<div class="relative">${saunaBadge}<img src="../../uploads/${data.sauna_bild}" alt="Sauna" class="w-full h-72 object-contain rounded-lg bg-gray-100"></div>` :
+                `<div><img src="../../uploads/${data.sauna_bild}" alt="Sauna" class="w-full h-72 object-contain rounded-lg bg-gray-100"></div>` :
                 `<div class="w-full h-72 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500 font-semibold">Kein Sauna-Bild</div>`;
 
             return `
