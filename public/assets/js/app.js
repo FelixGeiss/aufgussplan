@@ -710,7 +710,7 @@ function renderPlanView(planId, Pläene, aufguesse) {
         const rows = aufguesse.map(aufguss => renderPlanRowDiv(aufguss)).join('');
         tableHtml = `
             <div class="plan-list">
-                <div class="plan-list-head">
+                <div class="plan-list-head font-display">
                     <div class="plan-list-cell">Zeit</div>
                     <div class="plan-list-cell">Aufguss</div>
                     <div class="plan-list-cell">Stärke</div>

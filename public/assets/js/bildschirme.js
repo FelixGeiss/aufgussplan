@@ -260,7 +260,7 @@ function buildScreenCard(screenId, screen, plans) {
     return `
         <div class="border border-gray-200 rounded-lg p-4 bg-gray-50" data-screen-card data-screen-id="${screenId}" data-image-path="${escapeHtml(imagePath)}" data-background-path="${escapeHtml(backgroundPath)}">
             <div class="flex items-center justify-between mb-3">
-                <div class="text-lg font-semibold">Bildschirm ${screenId}</div>
+                <div class="text-lg font-semibold font-display">Bildschirm ${screenId}</div>
                 <a href="../../bildschirm_${screenId}.php" class="text-sm text-blue-600 hover:underline" target="_blank" rel="noopener">Öffnen</a>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

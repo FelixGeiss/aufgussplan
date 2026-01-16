@@ -725,7 +725,7 @@ if (defined('STATISTIK_JSON')) {
         <h2 class="text-2xl font-bold mb-6">Statistiken</h2>
 
         <div class="mb-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-3">Zeitreihen (ein-/ausblenden)</h3>
+            <h3 class="text-lg font-semibold text-gray-900 mb-3">Zeitreihen</h3>
             <div class="bg-white rounded-lg shadow-md p-6">
                 <div class="flex flex-wrap items-center gap-4" style="min-height:46px;">
                     <span class="text-sm font-semibold text-gray-700">Zeitreihen anzeigen:</span>
@@ -925,7 +925,7 @@ if (defined('STATISTIK_JSON')) {
                             <div class="flex items-start justify-between gap-3">
                                 <div>
                                     <div class="text-xs uppercase tracking-wide text-gray-500">Umfragepunkt</div>
-                                    <div class="text-lg font-semibold text-gray-900 mt-1">
+                                    <div class="text-lg font-semibold text-gray-900 mt-1 font-display">
                                         <?php echo htmlspecialchars($item['label']); ?>
                                     </div>
                                     <div class="text-sm text-gray-600 mt-1">

@@ -556,7 +556,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="grid gap-6 lg:grid-cols-2">
             <div class="bg-white rounded-lg shadow-md p-6">
                 <h3 class="text-lg font-semibold mb-2">Backup erstellen</h3>
-                <p class="text-gray-600 mb-4">Erstellt ein ZIP-Backup der Datenbank, Uploads und LocalStorage.</p>
                 <form method="post" id="backup-download-form">
                     <input type="hidden" name="action" value="backup">
                     <input type="hidden" name="localstorage_json" id="localstorage-json">
@@ -567,7 +566,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <div class="bg-white rounded-lg shadow-md p-6">
                 <h3 class="text-lg font-semibold mb-2">Backup wiederherstellen</h3>
-                <p class="text-gray-600 mb-4">Spielt ein ZIP-Backup ein und stellt Datenbank und Uploads wieder her.</p>
                 <form method="post" enctype="multipart/form-data" class="space-y-4">
                     <input type="hidden" name="action" value="restore">
                     <div>
