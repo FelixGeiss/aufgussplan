@@ -5,7 +5,7 @@
                 <!-- Tabs für verschiedene Datenarten -->
                 <div class="mb-6">
                     <div class="border-b border-gray-200">
-                        <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                        <nav class="-mb-px flex flex-wrap gap-x-8 gap-y-2" aria-label="Tabs">
                             <button onclick="showTab('aufguesse')" id="tab-aufguesse" class="tab-button whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm border-indigo-500 text-indigo-600">
                                 Aufgüsse (<?php echo count($aufguss_optionen); ?>)
                             </button>
