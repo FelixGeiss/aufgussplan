@@ -2,8 +2,8 @@
 // Alle Kommentare bewusst auf Deutsch (ASCII) gehalten.
 
 
-const placeholderMitarbeiter = '../../assets/placeholders/Platzhalter_Mitarbeiter.png';
-const placeholderSauna = '../../assets/placeholders/Platzhalter_Sauna.png';
+const placeholderMitarbeiter = '../../assets/placeholders/Platzhalter_Mitarbeiter.svg';
+const placeholderSauna = '../../assets/placeholders/Platzhalter_Sauna.svg';
 
 function buildImageTag(src, fallbackSrc, alt, className) {
     const safeAlt = String(alt || '');

@@ -207,12 +207,12 @@
                                                         <?php
                                                         $saunaBild = !empty($sauna['bild'])
                                                             ? '../../uploads/' . htmlspecialchars($sauna['bild'])
-                                                            : '../../assets/placeholders/Platzhalter_Sauna.png';
+                                                            : '../../assets/placeholders/Platzhalter_Sauna.svg';
                                                         ?>
                                                         <img src="<?php echo $saunaBild; ?>"
                                                             alt="Sauna-Bild"
                                                             class="h-8 w-8 rounded-full object-cover border border-gray-200 hover:border-indigo-400 transition-colors"
-                                                            onerror="this.onerror=null;this.src='../../assets/placeholders/Platzhalter_Sauna.png';">
+                                                            onerror="this.onerror=null;this.src='../../assets/placeholders/Platzhalter_Sauna.svg';">
                                                     </div>
                                                     <svg class="mt-1 w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity duration-150" fill="currentColor" viewBox="0 0 20 20">
                                                         <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
@@ -471,12 +471,12 @@
                                                         <?php
                                                         $mitarbeiterBild = !empty($mitarbeiter_item['bild'])
                                                             ? '../../uploads/' . htmlspecialchars($mitarbeiter_item['bild'])
-                                                            : '../../assets/placeholders/Platzhalter_Mitarbeiter.png';
+                                                            : '../../assets/placeholders/Platzhalter_Mitarbeiter.svg';
                                                         ?>
                                                         <img src="<?php echo $mitarbeiterBild; ?>"
                                                             alt="Mitarbeiter-Bild"
                                                             class="h-8 w-8 rounded-full object-cover border border-gray-200 hover:border-indigo-400 transition-colors"
-                                                            onerror="this.onerror=null;this.src='../../assets/placeholders/Platzhalter_Mitarbeiter.png';">
+                                                            onerror="this.onerror=null;this.src='../../assets/placeholders/Platzhalter_Mitarbeiter.svg';">
                                                     </div>
                                                     <svg class="mt-1 w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity duration-150" fill="currentColor" viewBox="0 0 20 20">
                                                         <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
@@ -558,7 +558,9 @@
                                         <tr class="bg-white/5">
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <?php
-                                                $isVideo = stripos($file['typ'], 'video') !== false;
+                                                $ext = strtolower(pathinfo($file['datei'] ?? '', PATHINFO_EXTENSION));
+                                                $isVideo = stripos($file['typ'], 'video') !== false
+                                                    || in_array($ext, ['mp4', 'webm', 'ogg'], true);
                                                 $fileRelPath = $file['datei'] ?? '';
                                                 $filePath = '../../uploads/' . $fileRelPath;
                                                 ?>
@@ -715,7 +717,9 @@
                                         <tr class="bg-white/5">
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <?php
-                                                $isVideo = stripos($file['typ'], 'video') !== false;
+                                                $ext = strtolower(pathinfo($file['datei'] ?? '', PATHINFO_EXTENSION));
+                                                $isVideo = stripos($file['typ'], 'video') !== false
+                                                    || in_array($ext, ['mp4', 'webm', 'ogg'], true);
                                                 $fileRelPath = $file['datei'] ?? '';
                                                 $filePath = '../../uploads/' . $fileRelPath;
                                                 ?>

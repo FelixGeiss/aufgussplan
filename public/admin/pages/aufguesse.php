@@ -1208,9 +1208,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <h3 class="text-lg font-semibold text-gray-900 mb-4 text-center">Plan-Hintergrundbild</h3>
                                     <div class="mt-2">
                                         <?php if (!empty($plan['hintergrund_bild'])): ?>
-                                            <img src="../../uploads/<?php echo htmlspecialchars($plan['hintergrund_bild']); ?>"
-                                                alt="Plan Hintergrundbild"
-                                                class="w-full h-48 object-cover">
+                                            <?php
+                                            $bgPath = $plan['hintergrund_bild'];
+                                            $bgExt = strtolower(pathinfo((string)$bgPath, PATHINFO_EXTENSION));
+                                            $bgIsVideo = in_array($bgExt, ['mp4', 'webm', 'ogg'], true);
+                                            ?>
+                                            <?php if ($bgIsVideo): ?>
+                                                <video class="w-full h-48 object-cover" autoplay muted loop playsinline>
+                                                    <source src="../../uploads/<?php echo htmlspecialchars($bgPath); ?>" type="video/<?php echo htmlspecialchars($bgExt); ?>">
+                                                </video>
+                                            <?php else: ?>
+                                                <img src="../../uploads/<?php echo htmlspecialchars($bgPath); ?>"
+                                                    alt="Plan Hintergrundbild"
+                                                    class="w-full h-48 object-cover">
+                                            <?php endif; ?>
                                         <?php else: ?>
                                             <div class="flex items-center justify-center h-48 text-sm text-gray-500 bg-gray-100">
                                                 Kein Hintergrundbild vorhanden
