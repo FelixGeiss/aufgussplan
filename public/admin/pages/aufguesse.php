@@ -1192,25 +1192,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     <button type="submit" id="submit-btn-<?php echo $plan['id']; ?>" class="rounded-md admin-btn-save px-4 py-2 text-sm font-semibold text-white shadow-sm">Speichern</button>
                                                 </div>
                                             </form>
-                                            <div class="mt-6 border-t border-gray-200 pt-4">
-                                                <h3 class="text-lg font-semibold text-gray-900 mb-3 text-center">Farben</h3>
-                                                <label for="next-aufguss-theme-color-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-2 text-center">
-                                                    Farbe für Uhr, Header und Row-Hervorhebung
-                                                </label>
-                                                <div class="flex items-center justify-center gap-4">
-                                                    <input id="next-aufguss-theme-color-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="color" class="h-10 w-20 rounded border border-gray-300 bg-white shadow-sm cursor-pointer">
-                                                    <span class="text-xs text-gray-500">Wird im Aufgussplan angezeigt</span>
-                                                </div>
-                                                <div class="mt-4">
-                                                    <label for="plan-text-color-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-2 text-center">
-                                                        Textfarbe für schwarze Texte (ohne Stärke-Badge)
-                                                    </label>
-                                                    <div class="flex items-center justify-center gap-4">
-                                                        <input id="plan-text-color-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="color" class="h-10 w-20 rounded border border-gray-300 bg-white shadow-sm cursor-pointer">
-                                                        <span class="text-xs text-gray-500">Nur in dieser Admin-Ansicht</span>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            
                                     </div>
 
                                 </div>
@@ -1315,7 +1297,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 </button>
                                             </div>
                                         </div>
-                                        <div class="mt-4 border-t border-gray-200 pt-4 space-y-3">
+                                        <div class="mt-6 border-t border-gray-200 pt-4">
+                                                <h3 class="text-lg font-semibold text-gray-900 mb-3 text-center">Farben</h3>
+                                                <label for="next-aufguss-theme-color-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-2 text-center">
+                                                    Farbe für Uhr, Header und Row-Hervorhebung
+                                                </label>
+                                                <div class="flex items-center justify-center gap-4">
+                                                    <input id="next-aufguss-theme-color-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="color" class="h-10 w-20 rounded border border-gray-300 bg-white shadow-sm cursor-pointer">
+                                                    <span class="text-xs text-gray-500">Wird im Aufgussplan angezeigt</span>
+                                                </div>
+                                                <div class="mt-4">
+                                                    <label for="plan-text-color-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-2 text-center">
+                                                        Textfarbe für schwarze Texte (ohne Stärke-Badge)
+                                                    </label>
+                                                    <div class="flex items-center justify-center gap-4">
+                                                        <input id="plan-text-color-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="color" class="h-10 w-20 rounded border border-gray-300 bg-white shadow-sm cursor-pointer">
+                                                        <span class="text-xs text-gray-500">Nur in dieser Admin-Ansicht</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mt-4 border-t border-gray-200 pt-4 space-y-3">
                                             <h5 class="text-sm font-semibold text-gray-900">Anzeige-Optionen</h5>
                                             <label class="flex items-center gap-3 text-sm text-gray-700 cursor-pointer">
                                                 <input id="next-aufguss-highlight-enabled-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="checkbox" class="sr-only peer">
@@ -1432,20 +1433,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     </div>
                                                 </div>
                                                 <div class="border-t border-gray-200 pt-4 space-y-3">
-                                                    <div>
-                                                        <label for="plan-ad-interval-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-1">Intervall (Minuten)</label>
-                                                        <input id="plan-ad-interval-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="number" min="1" max="3600" step="1" class="block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50" value="<?php echo htmlspecialchars($plan['werbung_interval_minuten'] ?? 10); ?>">
+                                                    <div class="flex flex-col gap-3 md:flex-row md:items-end">
+                                                        <div class="flex-1">
+                                                            <label for="plan-ad-interval-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-1">Intervall (Minuten)</label>
+                                                            <input id="plan-ad-interval-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="number" min="1" max="3600" step="1" class="block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50" value="<?php echo htmlspecialchars($plan['werbung_interval_minuten'] ?? 10); ?>">
+                                                        </div>
+                                                        <div class="flex-1">
+                                                            <label for="plan-ad-duration-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-1">Anzeigedauer (Sekunden)</label>
+                                                            <input id="plan-ad-duration-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="number" min="1" max="3600" step="1" class="block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50" value="<?php echo htmlspecialchars($plan['werbung_dauer_sekunden'] ?? 10); ?>">
+                                                        </div>
+                                                        <button id="plan-ad-preview-btn-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="button" onclick="previewPlanAd(<?php echo $plan['id']; ?>)" class="w-full md:w-auto rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
+                                                            Vorschau anzeigen
+                                                        </button>
                                                     </div>
-                                                    <div>
-                                                        <label for="plan-ad-duration-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-1">Anzeigedauer (Sekunden)</label>
-                                                        <input id="plan-ad-duration-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="number" min="1" max="3600" step="1" class="block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50" value="<?php echo htmlspecialchars($plan['werbung_dauer_sekunden'] ?? 10); ?>">
-                                                    </div>
-                                                    <button id="plan-ad-preview-btn-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="button" onclick="previewPlanAd(<?php echo $plan['id']; ?>)" class="w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
-                                                        Vorschau anzeigen
-                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
+                                        
+                                            
+                                        
                                     </div>
                                 </div>
 
