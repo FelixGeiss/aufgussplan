@@ -1299,20 +1299,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         </div>
                                         <div class="mt-6 border-t border-gray-200 pt-4">
                                                 <h3 class="text-lg font-semibold text-gray-900 mb-3 text-center">Farben</h3>
-                                                <label for="next-aufguss-theme-color-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-2 text-center">
-                                                    Farbe für Uhr, Header und Row-Hervorhebung
-                                                </label>
-                                                <div class="flex items-center justify-center gap-4">
-                                                    <input id="next-aufguss-theme-color-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="color" class="h-10 w-20 rounded border border-gray-300 bg-white shadow-sm cursor-pointer">
-                                                    <span class="text-xs text-gray-500">Wird im Aufgussplan angezeigt</span>
-                                                </div>
-                                                <div class="mt-4">
-                                                    <label for="plan-text-color-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-2 text-center">
-                                                        Textfarbe für schwarze Texte (ohne Stärke-Badge)
-                                                    </label>
-                                                    <div class="flex items-center justify-center gap-4">
-                                                        <input id="plan-text-color-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="color" class="h-10 w-20 rounded border border-gray-300 bg-white shadow-sm cursor-pointer">
-                                                        <span class="text-xs text-gray-500">Nur in dieser Admin-Ansicht</span>
+                                                <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-center">
+                                                    <div class="flex-1">
+                                                        <label for="next-aufguss-theme-color-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-2 text-center">
+                                                            Farbe f&uuml;r Uhr, Header und Row-Hervorhebung
+                                                        </label>
+                                                        <div class="flex items-center justify-center gap-4">
+                                                            <input id="next-aufguss-theme-color-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="color" class="h-10 w-20 rounded border border-gray-300 bg-white shadow-sm cursor-pointer">
+                                                            <span class="text-xs text-gray-500">Wird im Aufgussplan angezeigt</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex-1">
+                                                        <label for="plan-text-color-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-2 text-center">
+                                                            Textfarbe f&uuml;r schwarze Texte (ohne St&auml;rke-Badge)
+                                                        </label>
+                                                        <div class="flex items-center justify-center gap-4">
+                                                            <input id="plan-text-color-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="color" class="h-10 w-20 rounded border border-gray-300 bg-white shadow-sm cursor-pointer">
+                                                            <span class="text-xs text-gray-500">Nur in dieser Admin-Ansicht</span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
