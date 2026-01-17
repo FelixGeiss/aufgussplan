@@ -1075,7 +1075,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <!-- Bilder hochladen -->
                                                 <div>
                                                     <h3 class="text-lg font-semibold text-gray-900 mb-4 text-center">Bilder hochladen</h3>
-                                                    <div class="space-y-4">
+                                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                         <!-- Bild der Sauna -->
                                                         <div>
                                                             <label for="sauna-bild-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-900 mb-2">Bild der Sauna</label>
