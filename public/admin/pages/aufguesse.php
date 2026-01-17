@@ -1241,55 +1241,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <?php endif; ?>
                                     </div>
 
-                                    <div class="space-y-2">
-                                        <label for="plan-background-select-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700">Vorhandenes Hintergrundbild auswählen</label>
-                                        <select id="plan-background-select-<?php echo $plan['id']; ?>" class="block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" onchange="selectPlanBackground(<?php echo $plan['id']; ?>)">
-                                            <option value="">-- Hintergrundbild wählen --</option>
-                                            <?php foreach ($hintergrundOptions as $option): ?>
-                                                <option value="<?php echo htmlspecialchars($option['path']); ?>" <?php echo ($plan['hintergrund_bild'] ?? '') === $option['path'] ? 'selected' : ''; ?>>
-                                                    <?php echo htmlspecialchars($option['label']); ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-                                    <div class="mt-4 space-y-3">
-                                        <label for="plan-bild-<?php echo $plan['id']; ?>" class="upload-area flex flex-col items-center rounded-lg border border-dashed border-gray-900/25 px-6 py-6 transition cursor-pointer">
-                                            <div class="text-center pointer-events-none">
-                                                <svg viewBox="0 0 24 24" fill="currentColor" data-slot="icon" aria-hidden="true" class="mx-auto size-8 text-gray-300">
-                                                    <path d="M1.5 6a2.25 2.25 0 0 1 2.25-2.25h16.5A2.25 2.25 0 0 1 22.5 6v12a2.25 2.25 0 0 1-2.25 2.25H3.75A2.25 2.25 0 0 1 1.5 18V6ZM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0 0 21 18v-1.94l-2.69-2.689a1.5 1.5 0 0 0-2.12 0l-.88.879.97.97a.75.75 0 1 1-1.06 1.06l-5.16-5.159a1.5 1.5 0 0 0-2.12 0L3 16.061Zm10.125-7.81a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Z" clip-rule="evenodd" fill-rule="evenodd" />
-                                                </svg>
-                                                <div class="mt-2 flex flex-col text-lg text-gray-600">
-                                                    <span class="relative rounded-md bg-transparent font-semibold text-indigo-600 hover:text-indigo-500">Hintergrundbild oder Video hochladen</span>
-                                                    <input id="plan-bild-<?php echo $plan['id']; ?>" name="plan_bild" type="file" accept="image/*,video/mp4,video/webm,video/ogg" class="sr-only" onchange="updateFileName('plan', <?php echo $plan['id']; ?>)" />
-                                                    <div id="plan-filename-<?php echo $plan['id']; ?>" class="mt-2 text-xs text-green-600 font-medium hidden flex items-center justify-between">
-                                                        <span>Ausgewählte Datei: <span id="plan-filename-text-<?php echo $plan['id']; ?>"></span></span>
-                                                        <button type="button" onclick="removeFile('plan', <?php echo $plan['id']; ?>)" class="text-red-500 hover:text-red-700 ml-2" title="Datei entfernen">
-                                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                                            </svg>
-                                                        </button>
+                                    <div class="mt-4 flex flex-col gap-4 lg:flex-row">
+                                        <div class="flex-1">
+                                            <label for="plan-bild-<?php echo $plan['id']; ?>" class="upload-area flex flex-col items-center rounded-lg border border-dashed border-gray-900/25 px-6 py-6 transition cursor-pointer">
+                                                <div class="text-center pointer-events-none">
+                                                    <svg viewBox="0 0 24 24" fill="currentColor" data-slot="icon" aria-hidden="true" class="mx-auto size-8 text-gray-300">
+                                                        <path d="M1.5 6a2.25 2.25 0 0 1 2.25-2.25h16.5A2.25 2.25 0 0 1 22.5 6v12a2.25 2.25 0 0 1-2.25 2.25H3.75A2.25 2.25 0 0 1 1.5 18V6ZM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0 0 21 18v-1.94l-2.69-2.689a1.5 1.5 0 0 0-2.12 0l-.88.879.97.97a.75.75 0 1 1-1.06 1.06l-5.16-5.159a1.5 1.5 0 0 0-2.12 0L3 16.061Zm10.125-7.81a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Z" clip-rule="evenodd" fill-rule="evenodd" />
+                                                    </svg>
+                                                    <div class="mt-2 flex flex-col text-lg text-gray-600">
+                                                        <span class="relative rounded-md bg-transparent font-semibold text-indigo-600 hover:text-indigo-500">Hintergrundbild oder Video hochladen</span>
+                                                        <input id="plan-bild-<?php echo $plan['id']; ?>" name="plan_bild" type="file" accept="image/*,video/mp4,video/webm,video/ogg" class="sr-only" onchange="updateFileName('plan', <?php echo $plan['id']; ?>)" />
+                                                        <div id="plan-filename-<?php echo $plan['id']; ?>" class="mt-2 text-xs text-green-600 font-medium hidden flex items-center justify-between">
+                                                            <span>Ausgew&auml;hlte Datei: <span id="plan-filename-text-<?php echo $plan['id']; ?>"></span></span>
+                                                            <button type="button" onclick="removeFile('plan', <?php echo $plan['id']; ?>)" class="text-red-500 hover:text-red-700 ml-2" title="Datei entfernen">
+                                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                                </svg>
+                                                            </button>
+                                                        </div>
+                                                        <p class="pl-1 flex">oder ziehen und ablegen</p>
                                                     </div>
-                                                    <p class="pl-1 flex">oder ziehen und ablegen</p>
+                                                    <p class="text-sm font-semibold text-gray-900">PNG, JPG, GIF, MP4, WEBM bis zu 10MB</p>
                                                 </div>
-                                                <p class="text-sm font-semibold text-gray-900">PNG, JPG, GIF, MP4, WEBM bis zu 10MB</p>
-                                            </div>
-                                        </label>
-                                        <div class="flex flex-col gap-3 sm:flex-row">
-                                            <button type="button" id="plan-upload-btn-<?php echo $plan['id']; ?>" onclick="uploadPlanBackgroundImage(<?php echo $plan['id']; ?>)" class="admin-btn-save flex-1 text-white px-4 py-2 rounded text-sm font-semibold inline-flex items-center justify-center gap-1 text-center">
-                                                Hochladen <span aria-hidden="true">+</span>
-                                            </button>
-
-                                            <?php if (!empty($plan['hintergrund_bild'])): ?>
-                                                <button type="button" onclick="deletePlanBackgroundImage(<?php echo $plan['id']; ?>, '<?php echo htmlspecialchars($plan['name'] ?? ''); ?>')" class="flex-1 rounded-md bg-red-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500">
-                                                    Hintergrundbild L&ouml;schen
-                                                </button>
-                                            <?php else: ?>
-                                                <button type="button" class="flex-1 rounded-md bg-red-200 px-4 py-2 text-sm font-semibold text-white shadow-sm cursor-not-allowed" disabled>
-                                                    Hintergrundbild L&ouml;schen
-                                                </button>
-                                            <?php endif; ?>
+                                            </label>
                                         </div>
-
+                                        <div class="flex-1 space-y-3">
+                                            <div class="flex flex-col gap-3">
+                                                <button type="button" id="plan-upload-btn-<?php echo $plan['id']; ?>" onclick="uploadPlanBackgroundImage(<?php echo $plan['id']; ?>)" class="admin-btn-save text-white px-4 py-2 rounded text-sm font-semibold inline-flex items-center justify-center gap-1 text-center">
+                                                    Hochladen <span aria-hidden="true">+</span>
+                                                </button>
+                                                <?php if (!empty($plan['hintergrund_bild'])): ?>
+                                                    <button type="button" onclick="deletePlanBackgroundImage(<?php echo $plan['id']; ?>, '<?php echo htmlspecialchars($plan['name'] ?? ''); ?>')" class="rounded-md bg-red-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500">
+                                                        Hintergrundbild L&ouml;schen
+                                                    </button>
+                                                <?php else: ?>
+                                                    <button type="button" class="rounded-md bg-red-200 px-4 py-2 text-sm font-semibold text-white shadow-sm cursor-not-allowed" disabled>
+                                                        Hintergrundbild L&ouml;schen
+                                                    </button>
+                                                <?php endif; ?>
+                                            </div>
+                                            <div class="space-y-2">
+                                                <h4 class="text-sm font-semibold text-gray-700">Vorhandenes Hintergrundbild ausw&auml;hlen</h4>
+                                                <select id="plan-background-select-<?php echo $plan['id']; ?>" class="block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" onchange="selectPlanBackground(<?php echo $plan['id']; ?>)">
+                                                    <option value="">-- Hintergrundbild w&auml;hlen --</option>
+                                                    <?php foreach ($hintergrundOptions as $option): ?>
+                                                        <option value="<?php echo htmlspecialchars($option['path']); ?>" <?php echo ($plan['hintergrund_bild'] ?? '') === $option['path'] ? 'selected' : ''; ?>>
+                                                            <?php echo htmlspecialchars($option['label']); ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="mt-6 border-t border-gray-200 pt-4 space-y-4" data-plan-id="<?php echo $plan['id']; ?>">
                                         <h4 class="text-base font-semibold text-gray-900 text-center">Nächster Aufguss Popup</h4>
                                         <label class="flex items-center gap-3 text-sm text-gray-700 cursor-pointer">
