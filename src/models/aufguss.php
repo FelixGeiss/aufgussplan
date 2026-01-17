@@ -144,6 +144,11 @@ class Aufguss {
                 $this->updateMitarbeiterBild($data['mitarbeiter_id'], $mitarbeiterBild);
             }
         }
+
+        // SCHRITT 3: Staerke-Bild hochladen (ohne DB-Zuordnung)
+        if (isset($_FILES['staerke_bild']) && $_FILES['staerke_bild']['error'] === UPLOAD_ERR_OK) {
+            $this->uploadImage($_FILES['staerke_bild'], 'staerke');
+        }
     }
 
     /**
@@ -801,3 +806,5 @@ class Aufguss {
     }
 }
 ?>
+
+

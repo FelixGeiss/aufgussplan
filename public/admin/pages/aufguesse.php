@@ -1101,6 +1101,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                             </label>
                                                         </div>
 
+                                                        <!-- Bild der Staerke -->
+                                                        <div>
+                                                            <label for="staerke-bild-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-900 mb-2">Bild der St&auml;rke</label>
+                                                            <label for="staerke-bild-<?php echo $plan['id']; ?>" class="upload-area mt-2 flex flex-col items-center rounded-lg border border-dashed border-gray-900/25 px-6 py-6 transition cursor-pointer">
+                                                                <div class="text-center pointer-events-none">
+                                                                    <img src="../../assets/placeholders/Platzhalter_Staerke.svg" alt="St&auml;rke Platzhalter" class="mx-auto h-10 w-10 rounded-full object-cover border border-gray-200">
+                                                                    <div class="mt-2 flex flex-col text-lg text-gray-600">
+                                                                        <span class="relative rounded-md bg-transparent font-semibold text-indigo-600 hover:text-indigo-500">St&auml;rke-Bild hochladen</span>
+                                                                        <input id="staerke-bild-<?php echo $plan['id']; ?>" name="staerke_bild" type="file" accept="image/*" class="sr-only" onchange="updateFileName('staerke', <?php echo $plan['id']; ?>)" />
+                                                                        <!-- Dateiname-Anzeige -->
+                                                                        <div id="staerke-filename-<?php echo $plan['id']; ?>" class="mt-2 text-xs text-green-600 font-medium hidden flex items-center justify-between">
+                                                                            <span>Ausgew&auml;hlte Datei: <span id="staerke-filename-text-<?php echo $plan['id']; ?>"></span></span>
+                                                                            <button type="button" onclick="removeFile('staerke', <?php echo $plan['id']; ?>)" class="text-red-500 hover:text-red-700 ml-2" title="Datei entfernen">
+                                                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                                                </svg>
+                                                                            </button>
+                                                                        </div>
+                                                                        <p class="pl-1 flex">oder ziehen und ablegen</p>
+                                                                    </div>
+                                                                    <p class="text-sm font-semibold text-gray-900">PNG, JPG, GIF bis zu 10MB</p>
+                                                                </div>
+                                                            </label>
+                                                        </div>
+
                                                         <!-- Bild des Mitarbeiters -->
                                                         <div>
                                                             <label for="mitarbeiter-bild-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-900 mb-2">Bild des Mitarbeiters</label>

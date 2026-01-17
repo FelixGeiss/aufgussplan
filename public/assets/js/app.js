@@ -1360,10 +1360,8 @@ function renderPlanRow(aufguss) {
         <tr class="bg-white/35" data-aufguss-id="${escapeHtml(aufguss.id)}" data-start-ts="${startTs || ''}">
             <td class="px-6 py-4 whitespace-normal break-words text-lg font-bold text-gray-900">${escapeHtml(timeText)}</td>
             <td class="px-6 py-4 whitespace-normal break-words text-sm font-medium text-gray-900">${escapeHtml(nameText)}</td>
-            <td class="px-6 py-4 whitespace-nowrap">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${staerke.bgClass} ${staerke.textClass}">
-                    ${escapeHtml(staerke.text)}
-                </span>
+            <td class="px-6 py-4 whitespace-normal break-words text-sm font-medium text-gray-900">
+                ${escapeHtml(staerke.text)}
             </td>
             <td class="px-6 py-4 whitespace-normal break-words text-sm text-gray-900">${aufgiesserHtml}</td>
             <td class="px-6 py-4 whitespace-normal break-words text-sm text-gray-900">${saunaHtml}</td>
@@ -1389,10 +1387,8 @@ function renderPlanRowDiv(aufguss) {
         <div class="plan-list-row" data-aufguss-id="${escapeHtml(aufguss.id)}" data-start-ts="${startTs || ''}">
             <div class="plan-list-cell text-lg font-bold text-gray-900">${timeHtml}</div>
             <div class="plan-list-cell text-sm font-bold text-gray-900">${escapeHtml(nameText)}</div>
-            <div class="plan-list-cell">
-                <span class="plan-strength-badge inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${staerke.bgClass} ${staerke.textClass}">
-                    ${escapeHtml(staerke.text)}
-                </span>
+            <div class="plan-list-cell text-sm text-gray-900">
+                ${escapeHtml(staerke.text)}
             </div>
             <div class="plan-list-cell text-sm text-gray-900"><div class="plan-list-people">${aufgiesserHtml}</div></div>
             <div class="plan-list-cell text-sm text-gray-900">${saunaHtml}</div>
