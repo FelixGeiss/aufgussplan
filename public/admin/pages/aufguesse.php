@@ -1025,10 +1025,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                             <?php endforeach; ?>
                                                         </select>
                                                     </div>
-                                                    <div class="mt-3">
-                                                        <label for="sauna-temperatur-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-1 text-center">Temperatur (C)</label>
-                                                        <input type="number" id="sauna-temperatur-<?php echo $plan['id']; ?>" name="sauna_temperatur" class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)" placeholder="z.B. 90" min="0" step="1" />
-                                                    </div>
                                                 </div>
 
                                                 <!-- Name des Aufgie?ers -->
@@ -1050,7 +1046,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     </div>
                                                 </div>
 
-<!-- Stärke des Aufgusses -->
+<!-- Temperatur (C) -->
+                                                <div class="mt-3">
+                                                    <label for="sauna-temperatur-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-1 text-center">Temperatur (C)</label>
+                                                    <input type="number" id="sauna-temperatur-<?php echo $plan['id']; ?>" name="sauna_temperatur" class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)" placeholder="z.B. 90" min="0" step="1" />
+                                                </div>
+                                                <!-- Stärke des Aufgusses -->
                                                 <div>
                                                     <label for="stärke-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-900 mb-2 text-center">Stärke des Aufgusses</label>
                                                     <select id="stärke-<?php echo $plan['id']; ?>" name="stärke" class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)">
