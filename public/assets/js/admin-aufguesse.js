@@ -1717,9 +1717,9 @@ function savePlanSettings(planId, options = {}) {
             }
             const isVideo = media.type && (media.type.startsWith('video/') || media.type === 'video');
             if (isVideo) {
-                preview.innerHTML = `<video src="${media.url}" class="w-full max-h-40 object-contain rounded border" controls loop></video>`;
+                preview.innerHTML = `<video class="w-full h-48 object-contain" autoplay muted playsinline loop><source src="${media.url}"></video>`;
             } else {
-                preview.innerHTML = `<img src="${media.url}" alt="Werbung" class="w-full max-h-40 object-contain rounded border">`;
+                preview.innerHTML = `<img src="${media.url}" alt="Werbung" class="w-full h-48 object-contain">`;
             }
         }
 

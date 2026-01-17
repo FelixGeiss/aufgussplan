@@ -114,6 +114,11 @@ select {
     padding-right: 2.5rem;               /* Rechts mehr Platz */
 }
 
+/* Utility: fixe Höhe für Previews */
+.h-48 {
+    height: 12rem;
+}
+
 /* ============================================================================
    OPTION-STYLING INNERHALB VON SELECTS
    ============================================================================

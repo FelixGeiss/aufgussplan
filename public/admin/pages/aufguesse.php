@@ -1361,11 +1361,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <div id="plan-ad-preview-<?php echo $plan['id']; ?>" class="mt-2">
                                                     <?php if (!empty($plan['werbung_media'])): ?>
                                                         <?php if (($plan['werbung_media_typ'] ?? '') === 'video'): ?>
-                                                            <video src="../../uploads/<?php echo htmlspecialchars($plan['werbung_media']); ?>" class="w-full max-h-40 object-contain rounded border" controls loop></video>
+                                                            <video class="w-full h-48 object-contain" autoplay muted loop playsinline>
+                                                                <source src="../../uploads/<?php echo htmlspecialchars($plan['werbung_media']); ?>" type="video/<?php echo htmlspecialchars($plan['werbung_media_typ'] ?? 'mp4'); ?>">
+                                                            </video>
                                                         <?php else: ?>
                                                             <img src="../../uploads/<?php echo htmlspecialchars($plan['werbung_media']); ?>"
                                                                 alt="Werbung"
-                                                                class="w-full max-h-40 object-contain rounded border">
+                                                                class="w-full h-48 object-contain">
                                                         <?php endif; ?>
                                                     <?php else: ?>
                                                         <div class="flex items-center justify-center h-48 text-sm text-gray-500 bg-gray-100">
