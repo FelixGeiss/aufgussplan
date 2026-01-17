@@ -1031,16 +1031,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     </div>
                                                 </div>
 
-                                                <!-- Name des Aufgießers -->
+                                                <!-- Name des Aufgie?ers -->
                                                 <div>
-                                                    <label for="aufgieser-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-900 mb-2 text-center">Name des Aufgießers</label>
-                                                    <input type="text" id="aufgieser-<?php echo $plan['id']; ?>" name="aufgieser" class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)" placeholder="z.B. Max Mustermann" />
-
-                                                    <!-- Select für Mitarbeiter (Datenbank) -->
-                                                    <div class="mt-3">
-                                                        <label class="block text-sm font-medium text-gray-900 mb-2 text-center">Mitarbeiter auswählen</label>
-                                                                                                                <div class="multi-select" data-placeholder="Mehrere Mitarbeiter wählen">
-                                                            <button type="button" class="multi-select-trigger">Mehrere Mitarbeiter wählen</button>
+                                                    <label for="aufgieser-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-900 mb-2 text-center">Name des Aufgie?ers</label>
+                                                    <div class="flex flex-col gap-3 md:flex-row">
+                                                        <input type="text" id="aufgieser-<?php echo $plan['id']; ?>" name="aufgieser" class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)" placeholder="z.B. Max Mustermann" />
+                                                        <div class="multi-select" data-placeholder="Mehrere Mitarbeiter w?hlen">
+                                                            <button type="button" class="multi-select-trigger">Mehrere Mitarbeiter w?hlen</button>
                                                             <div class="multi-select-panel hidden">
                                                                 <?php foreach ($mitarbeiter as $m): ?>
                                                                     <label class="multi-select-option">
@@ -1050,10 +1047,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                 <?php endforeach; ?>
                                                             </div>
                                                         </div>
-                                                                                                            </div>
+                                                    </div>
                                                 </div>
 
-                                                <!-- Stärke des Aufgusses -->
+<!-- Stärke des Aufgusses -->
                                                 <div>
                                                     <label for="stärke-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-900 mb-2 text-center">Stärke des Aufgusses</label>
                                                     <select id="stärke-<?php echo $plan['id']; ?>" name="stärke" class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)">
