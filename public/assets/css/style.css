@@ -659,6 +659,26 @@
     color: var(--plan-text-color, #111827);
 }
 
+.plan-list-staerke-icons {
+    display: flex;
+    gap: 0.25rem;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+    width: auto;
+    min-height: 1.2rem;
+    max-width: 100%;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+.plan-list-staerke-icon {
+    max-height: 1.2rem;
+    width: auto;
+    border-radius: 9999px;
+    object-fit: contain;
+}
+
 .kiosk-view .plan-list-row .plan-list-cell,
 .kiosk-view .plan-list-body .plan-list-cell,
 .kiosk-view .plan-list-row .text-sm,
@@ -886,4 +906,3 @@
         display: flex;
     }
 }
-

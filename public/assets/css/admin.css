@@ -644,6 +644,32 @@ textarea.border-green-500 {
     pointer-events: none;
 }
 
+.staerke-cell .display-mode {
+    position: relative;
+}
+
+.staerke-icons-container {
+    position: absolute;
+    top: -26px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.125rem;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.staerke-icons-container:empty {
+    display: none;
+}
+
+.staerke-icon-image {
+    width: 18px;
+    height: 18px;
+    border-radius: 9999px;
+    object-fit: cover;
+}
+
 /* Werbeflaeche im Plan */
 .plan-ad-wrap {
     position: absolute;

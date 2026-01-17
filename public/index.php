@@ -101,6 +101,10 @@ require_once __DIR__ . '/../src/auth.php';
     </div>
 
     <!-- JAVASCRIPT -->
+    <script>
+        window.APP_BASE_URL = '<?php echo rtrim(BASE_URL, '/'); ?>/';
+        window.APP_UPLOADS_URL = '<?php echo rtrim(BASE_URL, '/'); ?>/uploads/';
+    </script>
     <!-- Haupt-JavaScript für die öffentliche Anzeige -->
     <script src="assets/js/app.js"></script>
     <script>

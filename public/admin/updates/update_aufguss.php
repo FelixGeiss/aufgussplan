@@ -67,17 +67,32 @@ try {
             break;
 
         case 'staerke':
-            $staerke = $_POST['staerke'] ?? '';
+            $staerkeRaw = $_POST['staerke'] ?? '';
+            $iconRaw = $_POST['staerke_icon'] ?? '';
+            $planIdRaw = $_POST['plan_id'] ?? '';
 
-            if (empty($staerke)) {
-                // Stärke leeren erlaubt
-                $stmt = $db->prepare("UPDATE aufguesse SET staerke = NULL WHERE id = ?");
-                $stmt->execute([$aufgussId]);
-            } elseif (is_numeric($staerke) && $staerke >= 1 && $staerke <= 6) {
-                $stmt = $db->prepare("UPDATE aufguesse SET staerke = ? WHERE id = ?");
-                $stmt->execute([$staerke, $aufgussId]);
-            } else {
-                throw new Exception('Ungültige Stärke');
+            $staerkeValue = null;
+            if ($staerkeRaw !== '' && $staerkeRaw !== null) {
+                if (is_numeric($staerkeRaw) && $staerkeRaw >= 1 && $staerkeRaw <= 6) {
+                    $staerkeValue = (int)$staerkeRaw;
+                } else {
+                    throw new Exception('Ungültige Stärke');
+                }
+            }
+
+            $iconPath = trim((string)$iconRaw);
+            if ($iconPath === '') {
+                $iconPath = null;
+            }
+
+            $planId = is_numeric($planIdRaw) ? (int)$planIdRaw : null;
+
+            $stmt = $db->prepare("UPDATE aufguesse SET staerke = ?, staerke_icon = ? WHERE id = ?");
+            $stmt->execute([$staerkeValue, $iconPath, $aufgussId]);
+
+            if ($planId !== null && $staerkeValue !== null) {
+                $iconStmt = $db->prepare("UPDATE aufguesse SET staerke_icon = ? WHERE plan_id = ? AND staerke = ?");
+                $iconStmt->execute([$iconPath, $planId, $staerkeValue]);
             }
             break;
 

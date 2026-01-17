@@ -398,6 +398,10 @@ function saveEdit(aufgussId, field) {
         const formData = new FormData();
         formData.append('aufguss_id', aufgussId);
         formData.append('field', normalizedField);
+        const planId = row.getAttribute('data-plan-id');
+        if (planId) {
+            formData.append('plan_id', planId);
+        }
 
         // Sammle alle Input-Werte (auch leere Werte fuer NULL-Updates)
         const inputs = editMode.querySelectorAll('input, select');
@@ -467,6 +471,57 @@ function saveEdit(aufgussId, field) {
             });
     }
 }
+
+
+function getStaerkeIconBaseUrl() {
+    if (typeof window !== 'undefined') {
+        if (window.APP_UPLOADS_URL) {
+            return window.APP_UPLOADS_URL;
+        }
+        if (window.APP_BASE_URL) {
+            return window.APP_BASE_URL + 'uploads/';
+        }
+    }
+    return '../../uploads/';
+}
+
+function renderStaerkeIconsForRow(row) {
+    if (!row) {
+        return;
+    }
+    const iconPath = row.getAttribute('data-staerke-icon') || '';
+    const level = parseInt(row.getAttribute('data-staerke-level') || '0', 10);
+    const container = row.querySelector('.staerke-icons-container');
+    if (!container) {
+        return;
+    }
+    container.innerHTML = '';
+
+    if (!iconPath || !level || isNaN(level)) {
+        return;
+    }
+
+    const baseUrl = getStaerkeIconBaseUrl();
+    for (let i = 0; i < level; i++) {
+        const img = document.createElement('img');
+        img.alt = 'Stärke-Icon';
+        img.decoding = 'async';
+        img.src = `${baseUrl}${iconPath}`;
+        img.className = 'staerke-icon-image';
+        container.appendChild(img);
+    }
+}
+
+function updateAllStaerkeIcons() {
+    document.querySelectorAll('tr[data-aufguss-id]').forEach(row => {
+        renderStaerkeIconsForRow(row);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    updateAllStaerkeIcons();
+});
+
 function deletePlan(planId, planName) {
     // Sicherheitsabfrage vor dem Löschen
     if (!confirm(`Bist du sicher, dass du den Plan "${planName}" löschen möchtest?\n\nAlle Aufgüsse in diesem Plan bleiben erhalten, werden aber keinem Plan mehr zugeordnet.`)) {

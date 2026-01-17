@@ -146,6 +146,21 @@ if (is_dir($planUploadDir)) {
     }
 }
 
+$staerkeUploadDir = $uploadBaseDir . 'staerke' . DIRECTORY_SEPARATOR;
+$staerkeUploadFiles = [];
+if (is_dir($staerkeUploadDir)) {
+    foreach (scandir($staerkeUploadDir) as $entry) {
+        if ($entry === '.' || $entry === '..') {
+            continue;
+        }
+        $fullPath = $staerkeUploadDir . $entry;
+        if (!is_file($fullPath)) {
+            continue;
+        }
+        $staerkeUploadFiles[] = 'staerke/' . $entry;
+    }
+}
+
 // Auswahl-Optionen fuer vorhandene Dateien
 $werbungOptions = [];
 $werbungSeen = [];
@@ -217,6 +232,17 @@ foreach ($planUploadFiles as $path) {
         'typ' => 'Hintergrundbild',
         'plan_id' => null
     ];
+}
+
+$staerkeOptions = [];
+$staerkeSeen = [];
+foreach ($staerkeUploadFiles as $path) {
+    $path = trim((string)$path);
+    if ($path === '' || isset($staerkeSeen[$path])) {
+        continue;
+    }
+    $staerkeSeen[$path] = true;
+    $staerkeOptions[] = ['path' => $path, 'label' => basename($path)];
 }
 $message = '';
 $errors = [];
@@ -545,7 +571,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 </thead>
                                                 <tbody class="bg-transparent divide-y divide-gray-200">
                                                     <?php foreach ($planAufgüsse as $aufguss): ?>
-                                                        <tr class="bg-white/35" data-aufguss-id="<?php echo $aufguss['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>">
+                                                        <tr class="bg-white/35" data-aufguss-id="<?php echo $aufguss['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" data-staerke-level="<?php echo (int)($aufguss['staerke'] ?? 0); ?>" data-staerke-icon="<?php echo htmlspecialchars($aufguss['staerke_icon'] ?? ''); ?>">
                                                             <!-- Zeit -->
                                                             <td class="px-6 py-4 whitespace-normal break-words zeit-cell">
                                                                 <!-- Anzeige-Modus -->
@@ -642,7 +668,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                             <!-- Stärke -->
                                                             <td class="px-6 py-4 whitespace-nowrap stärke-cell">
                                                                 <!-- Anzeige-Modus -->
-                                                                <div class="display-mode cursor-pointer hover:bg-yellow-50 transition-colors duration-150 rounded px-2 py-1 group" onclick="toggleEdit(<?php echo $aufguss['id']; ?>, 'stärke')">
+                                                                <div class="display-mode relative cursor-pointer hover:bg-yellow-50 transition-colors duration-150 rounded px-2 py-1 group" onclick="toggleEdit(<?php echo $aufguss['id']; ?>, 'stärke')">
+                                                                    <div class="staerke-icons-container pointer-events-none" aria-hidden="true"></div>
                                                                     <?php
                                                                     $stärke = $aufguss['staerke'] ?? 0;
                                                                     $stärkeText = '';
@@ -704,6 +731,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                         <option value="5" <?php echo ($stärke == 5) ? 'selected' : ''; ?>>5 - Sehr stark</option>
                                                                         <option value="6" <?php echo ($stärke == 6) ? 'selected' : ''; ?>>6 Extrem stark</option>
                                                                     </select>
+                                                                    <div>
+                                                                        <select name="staerke_icon" class="rounded px-2 py-1 text-sm border border-gray-300 w-full">
+                                                                            <option value="">-- Kein Bild --</option>
+                                                                            <?php foreach ($staerkeOptions as $iconOption): ?>
+                                                                                <option value="<?php echo htmlspecialchars($iconOption['path']); ?>" <?php echo (($aufguss['staerke_icon'] ?? '') === $iconOption['path']) ? 'selected' : ''; ?>>
+                                                                                    <?php echo htmlspecialchars($iconOption['label']); ?>
+                                                                                </option>
+                                                                            <?php endforeach; ?>
+                                                                        </select>
+                                                                    </div>
                                                                     <div class="flex items-center gap-2 mt-2">
                                                                         <button onclick="saveEdit(<?php echo $aufguss['id']; ?>, 'stärke')" class="admin-btn-save text-white px-3 py-1 rounded text-sm">✓ Speichern</button>
                                                                         <button onclick="cancelEdit(<?php echo $aufguss['id']; ?>, 'stärke')" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">✕ Abbrechen</button>
@@ -1642,6 +1679,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
+    <script>
+        window.APP_BASE_URL = '<?php echo rtrim(BASE_URL, '/'); ?>/';
+        window.APP_UPLOADS_URL = '<?php echo rtrim(BASE_URL, '/'); ?>/uploads/';
+    </script>
     <script src="../../assets/js/admin.js?v=<?php echo filemtime(__DIR__ . '/../../assets/js/admin.js'); ?>"></script>
     <script src="../../assets/js/admin-db-overview.js?v=<?php echo filemtime(__DIR__ . '/../../assets/js/admin-db-overview.js'); ?>"></script>
     <script src="../../assets/js/admin-aufguesse.js?v=<?php echo filemtime(__DIR__ . '/../../assets/js/admin-aufguesse.js'); ?>"></script>

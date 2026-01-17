@@ -1350,7 +1350,7 @@ function clearPlanAdTimers() {
 function renderPlanRow(aufguss) {
     const timeText = formatAufgussTime(aufguss);
     const nameText = aufguss.name || aufguss.aufguss_name || 'Aufguss';
-    const staerke = formatStaerke(aufguss.staerke);
+    const staerke = formatStaerke(aufguss);
     const aufgiesserHtml = formatAufgiesserHtml(aufguss);
     const saunaHtml = formatSaunaHtml(aufguss);
     const duftmittelHtml = formatDuftmittelHtml(aufguss);
@@ -1374,7 +1374,7 @@ function renderPlanRow(aufguss) {
 function renderPlanRowDiv(aufguss) {
     const timeParts = formatAufgussTimeParts(aufguss);
     const nameText = aufguss.name || aufguss.aufguss_name || 'Aufguss';
-    const staerke = formatStaerke(aufguss.staerke);
+    const staerke = formatStaerke(aufguss);
     const aufgiesserHtml = formatAufgiesserHtml(aufguss);
     const saunaHtml = formatSaunaHtmlStacked(aufguss);
     const duftmittelHtml = formatDuftmittelHtml(aufguss, true);
@@ -1388,7 +1388,7 @@ function renderPlanRowDiv(aufguss) {
             <div class="plan-list-cell text-lg font-bold text-gray-900">${timeHtml}</div>
             <div class="plan-list-cell text-sm font-bold text-gray-900">${escapeHtml(nameText)}</div>
             <div class="plan-list-cell text-sm text-gray-900">
-                ${escapeHtml(staerke.text)}
+                ${staerke.iconHtml || escapeHtml(staerke.text)}
             </div>
             <div class="plan-list-cell text-sm text-gray-900"><div class="plan-list-people">${aufgiesserHtml}</div></div>
             <div class="plan-list-cell text-sm text-gray-900">${saunaHtml}</div>
@@ -1495,8 +1495,20 @@ function formatPlanDate(value) {
 }
 
 // Formatiert Staerke-Anzeige.
-function formatStaerke(value) {
-    const level = Number(value) || 0;
+function getStaerkeIconBaseUrl() {
+    if (typeof window !== 'undefined') {
+        if (window.APP_UPLOADS_URL) {
+            return window.APP_UPLOADS_URL;
+        }
+        if (window.APP_BASE_URL) {
+            return window.APP_BASE_URL + 'uploads/';
+        }
+    }
+    return 'uploads/';
+}
+
+function formatStaerke(aufguss) {
+    const level = Number(aufguss?.staerke) || 0;
     const map = {
         1: { text: '1 Sehr leicht', bgClass: 'bg-green-100', textClass: 'text-green-800' },
         2: { text: '2 Leicht', bgClass: 'bg-green-200', textClass: 'text-green-800' },
@@ -1505,7 +1517,16 @@ function formatStaerke(value) {
         5: { text: '5 Stark+', bgClass: 'bg-red-100', textClass: 'text-red-800' },
         6: { text: '6 Extrem', bgClass: 'bg-red-200', textClass: 'text-red-900' }
     };
-    return map[level] || { text: 'Unbekannt', bgClass: 'bg-gray-100', textClass: 'text-gray-800' };
+    const entry = map[level] || { text: 'Unbekannt', bgClass: 'bg-gray-100', textClass: 'text-gray-800' };
+    const iconPath = (aufguss?.staerke_icon || '').trim();
+    let iconHtml = '';
+    if (iconPath && level > 0) {
+        const safePath = escapeHtml(iconPath);
+        const baseUrl = getStaerkeIconBaseUrl();
+        const icons = Array.from({ length: level }).map(() => `<img src="${baseUrl}${safePath}" alt="Stärke-Icon" decoding="async" class="plan-list-staerke-icon">`).join('');
+        iconHtml = `<div class="plan-list-staerke-icons">${icons}</div>`;
+    }
+    return { ...entry, iconHtml };
 }
 
 // Formatiert Aufgiesser-Text.
