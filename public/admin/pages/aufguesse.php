@@ -1374,65 +1374,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     <?php endif; ?>
                                                 </div>
 
-                                                <div class="space-y-2">
-                                                    <label for="plan-ad-select-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700">Vorhandene Werbung auswählen</label>
-                                                    <select id="plan-ad-select-<?php echo $plan['id']; ?>" class="block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" onchange="selectPlanAdMedia(<?php echo $plan['id']; ?>)">
-                                                        <option value="">-- Werbung wählen --</option>
-                                                        <?php foreach ($werbungOptions as $option): ?>
-                                                            <option value="<?php echo htmlspecialchars($option['path']); ?>" data-type="<?php echo htmlspecialchars($option['type']); ?>" <?php echo ($plan['werbung_media'] ?? '') === $option['path'] ? 'selected' : ''; ?>>
-                                                                <?php echo htmlspecialchars($option['label']); ?>
-                                                            </option>
-                                                        <?php endforeach; ?>
-                                                    </select>
-                                                </div>
-                                                <div class="space-y-3">
-                                                    <label for="plan-ad-file-<?php echo $plan['id']; ?>" class="upload-area flex flex-col items-center rounded-lg border border-dashed border-gray-900/25 px-6 py-6 transition cursor-pointer">
-                                                        <div class="text-center pointer-events-none">
-                                                            <svg viewBox="0 0 24 24" fill="currentColor" data-slot="icon" aria-hidden="true" class="mx-auto size-8 text-gray-300">
-                                                                <path d="M1.5 6a2.25 2.25 0 0 1 2.25-2.25h16.5A2.25 2.25 0 0 1 22.5 6v12a2.25 2.25 0 0 1-2.25 2.25H3.75A2.25 2.25 0 0 1 1.5 18V6ZM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0 0 21 18v-1.94l-2.69-2.689a1.5 1.5 0 0 0-2.12 0l-.88.879.97.97a.75.75 0 1 1-1.06 1.06l-5.16-5.159a1.5 1.5 0 0 0-2.12 0L3 16.061Zm10.125-7.81a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Z" clip-rule="evenodd" fill-rule="evenodd" />
-                                                            </svg>
-                                                            <div class="mt-2 flex flex-col text-lg text-gray-600">
-                                                                <span class="relative rounded-md bg-transparent font-semibold text-indigo-600 hover:text-indigo-500">Werbung hochladen</span>
-                                                                <input id="plan-ad-file-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="file" accept="image/*,video/*" class="sr-only" onchange="updateAdFileName(<?php echo $plan['id']; ?>)" />
-                                                                <div id="plan-ad-filename-<?php echo $plan['id']; ?>" class="mt-2 text-xs text-green-600 font-medium hidden flex items-center justify-between">
-                                                                    <span>Ausgewählte Datei: <span id="plan-ad-filename-text-<?php echo $plan['id']; ?>"></span></span>
-                                                                    <button type="button" onclick="removeAdFile(<?php echo $plan['id']; ?>)" class="text-red-500 hover:text-red-700 ml-2" title="Datei entfernen">
-                                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                                                        </svg>
-                                                                    </button>
+                                                <div class="mt-4 flex flex-col gap-4 lg:flex-row">
+                                                    <div class="flex-1">
+                                                        <label for="plan-ad-file-<?php echo $plan['id']; ?>" class="upload-area flex flex-col items-center rounded-lg border border-dashed border-gray-900/25 px-6 py-6 transition cursor-pointer">
+                                                            <div class="text-center pointer-events-none">
+                                                                <svg viewBox="0 0 24 24" fill="currentColor" data-slot="icon" aria-hidden="true" class="mx-auto size-8 text-gray-300">
+                                                                    <path d="M1.5 6a2.25 2.25 0 0 1 2.25-2.25h16.5A2.25 2.25 0 0 1 22.5 6v12a2.25 2.25 0 0 1-2.25 2.25H3.75A2.25 2.25 0 0 1 1.5 18V6ZM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0 0 21 18v-1.94l-2.69-2.689a1.5 1.5 0 0 0-2.12 0l-.88.879.97.97a.75.75 0 1 1-1.06 1.06l-5.16-5.159a1.5 1.5 0 0 0-2.12 0L3 16.061Zm10.125-7.81a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Z" clip-rule="evenodd" fill-rule="evenodd" />
+                                                                </svg>
+                                                                <div class="mt-2 flex flex-col text-lg text-gray-600">
+                                                                    <span class="relative rounded-md bg-transparent font-semibold text-indigo-600 hover:text-indigo-500">Werbung hochladen</span>
+                                                                    <input id="plan-ad-file-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="file" accept="image/*,video/*" class="sr-only" onchange="updateAdFileName(<?php echo $plan['id']; ?>)" />
+                                                                    <div id="plan-ad-filename-<?php echo $plan['id']; ?>" class="mt-2 text-xs text-green-600 font-medium hidden flex items-center justify-between">
+                                                                        <span>Ausgew&auml;hlte Datei: <span id="plan-ad-filename-text-<?php echo $plan['id']; ?>"></span></span>
+                                                                        <button type="button" onclick="removeAdFile(<?php echo $plan['id']; ?>)" class="text-red-500 hover:text-red-700 ml-2" title="Datei entfernen">
+                                                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                                            </svg>
+                                                                        </button>
+                                                                    </div>
+                                                                    <p class="pl-1 flex">oder ziehen und ablegen</p>
                                                                 </div>
-                                                                <p class="pl-1 flex">oder ziehen und ablegen</p>
+                                                                <p class="text-sm font-semibold text-gray-900">PNG, JPG, GIF, MP4, WEBM, OGG bis zu 50MB</p>
                                                             </div>
-                                                            <p class="text-sm font-semibold text-gray-900">PNG, JPG, GIF, MP4, WEBM, OGG bis zu 50MB</p>
-                                                        </div>
-                                                    </label>
-                                                    <?php if (!empty($plan['werbung_media'])): ?>
-                                                        <div id="plan-ad-file-info-<?php echo $plan['id']; ?>" class="text-sm font-semibold text-gray-900">
-                                                            Aktuelle Datei: <?php echo htmlspecialchars(basename($plan['werbung_media'])); ?>
-                                                        </div>
-                                                    <?php else: ?>
-                                                        <div id="plan-ad-file-info-<?php echo $plan['id']; ?>" class="text-xs text-gray-500">
-                                                            Keine Datei gespeichert.
-                                                        </div>
-                                                    <?php endif; ?>
-                                                    <div class="flex flex-col gap-3 sm:flex-row">
-                                                        <button type="button" id="plan-ad-upload-btn-<?php echo $plan['id']; ?>" onclick="uploadPlanAdMedia(<?php echo $plan['id']; ?>)" class="admin-btn-save flex-1 text-white px-4 py-2 rounded text-sm font-semibold inline-flex items-center justify-center gap-1 text-center">
-                                                            Hochladen <span aria-hidden="true">+</span>
-                                                        </button>
+                                                        </label>
+                                                    </div>
+                                                    <div class="flex-1 space-y-3">
+                                                        <div class="flex flex-col gap-3">
+                                                            <button type="button" id="plan-ad-upload-btn-<?php echo $plan['id']; ?>" onclick="uploadPlanAdMedia(<?php echo $plan['id']; ?>)" class="admin-btn-save text-white px-4 py-2 rounded text-sm font-semibold inline-flex items-center justify-center gap-1 text-center">
+                                                                Hochladen <span aria-hidden="true">+</span>
+                                                            </button>
 
-                                                        <?php if (!empty($plan['werbung_media'])): ?>
-                                                            <button type="button" id="plan-ad-delete-btn-<?php echo $plan['id']; ?>" onclick="deletePlanAdMedia(<?php echo $plan['id']; ?>, '<?php echo htmlspecialchars($plan['name'] ?? ''); ?>')" class="flex-1 rounded-md bg-red-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500">
-                                                                Werbung L&ouml;schen
-                                                            </button>
-                                                        <?php else: ?>
-                                                            <button type="button" id="plan-ad-delete-btn-<?php echo $plan['id']; ?>" class="flex-1 rounded-md bg-red-200 px-4 py-2 text-sm font-semibold text-white shadow-sm cursor-not-allowed" disabled>
-                                                                Werbung L&ouml;schen
-                                                            </button>
-                                                        <?php endif; ?>
+                                                            <?php if (!empty($plan['werbung_media'])): ?>
+                                                                <button type="button" id="plan-ad-delete-btn-<?php echo $plan['id']; ?>" onclick="deletePlanAdMedia(<?php echo $plan['id']; ?>, '<?php echo htmlspecialchars($plan['name'] ?? ''); ?>')" class="rounded-md bg-red-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500">
+                                                                    Werbung L&ouml;schen
+                                                                </button>
+                                                            <?php else: ?>
+                                                                <button type="button" id="plan-ad-delete-btn-<?php echo $plan['id']; ?>" class="rounded-md bg-red-200 px-4 py-2 text-sm font-semibold text-white shadow-sm cursor-not-allowed" disabled>
+                                                                    Werbung L&ouml;schen
+                                                                </button>
+                                                            <?php endif; ?>
+                                                        </div>
+                                                        <div class="space-y-2">
+                                                            <h4 class="text-sm font-semibold text-gray-700">Vorhandene Werbung ausw&auml;hlen</h4>
+                                                            <select id="plan-ad-select-<?php echo $plan['id']; ?>" class="block w-full rounded-md bg-white px-3 py-2 text-sm text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" onchange="selectPlanAdMedia(<?php echo $plan['id']; ?>)">
+                                                                <option value="">-- Werbung w&auml;hlen --</option>
+                                                                <?php foreach ($werbungOptions as $option): ?>
+                                                                    <option value="<?php echo htmlspecialchars($option['path']); ?>" data-type="<?php echo htmlspecialchars($option['type']); ?>" <?php echo ($plan['werbung_media'] ?? '') === $option['path'] ? 'selected' : ''; ?>>
+                                                                        <?php echo htmlspecialchars($option['label']); ?>
+                                                                    </option>
+                                                                <?php endforeach; ?>
+                                                            </select>
+                                                        </div>
                                                     </div>
                                                 </div>
-
                                                 <div class="border-t border-gray-200 pt-4 space-y-3">
                                                     <div>
                                                         <label for="plan-ad-interval-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-1">Intervall (Minuten)</label>
