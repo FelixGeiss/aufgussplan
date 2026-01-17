@@ -1531,8 +1531,8 @@ function formatAufgiesserHtml(aufguss) {
         const name = person.name || 'Unbekannt';
         if (!person.image) {
             return `
-                <div class="flex flex-col items-center">
-                    <div class="mt-2 text-sm font-bold text-gray-900 text-center">${escapeHtml(name)}</div>
+                <div class="flex flex-col items-center justify-center">
+                    <div class="text-sm font-bold text-gray-900 text-center">${escapeHtml(name)}</div>
                 </div>
             `;
         }
