@@ -954,11 +954,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <!-- Name des Aufgusses -->
                                                 <div>
                                                     <label for="aufguss-name-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-900 mb-2 text-center">Name des Aufgusses</label>
-                                                    <input type="text" id="aufguss-name-<?php echo $plan['id']; ?>" name="aufguss_name" class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)" placeholder="z.B. Wellness-Aufguss" />
+                                                    <div class="flex flex-col gap-3 md:flex-row">
+                                                        <input type="text" id="aufguss-name-<?php echo $plan['id']; ?>" name="aufguss_name" class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)" placeholder="z.B. Wellness-Aufguss" />
 
-                                                    <!-- Select für vorhandene Aufgüsse -->
-                                                    <div class="mt-3">
-                                                        <label for="aufguss-select-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-1 text-center">Oder vorhandenen Aufguss auswählen:</label>
+                                                        <!-- Select fuer vorhandene Aufguesse -->
                                                         <select id="aufguss-select-<?php echo $plan['id']; ?>" name="select_aufguss_id" class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)">
                                                             <option class="border-2 border-solid text-center" style="border-color: var(--border-color)" value="">-- Aufguss auswählen --</option>
                                                             <?php foreach ($aufguss_optionen as $a): ?>
@@ -997,13 +996,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <!-- Verwendete Duftmittel -->
                                                 <div>
                                                     <label for="duftmittel-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-900 mb-2 text-center">Verwendete Duftmittel</label>
-                                                    <input type="text" id="duftmittel-<?php echo $plan['id']; ?>" name="duftmittel" class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)" placeholder="z.B. Eukalyptus, Minze" />
+                                                    <div class="flex flex-col gap-3 md:flex-row">
+                                                        <input type="text" id="duftmittel-<?php echo $plan['id']; ?>" name="duftmittel" class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)" placeholder="z.B. Eukalyptus, Minze" />
 
-                                                    <!-- Select für vorhandene Duftmittel -->
-                                                    <div class="mt-3">
-                                                        <label for="duftmittel-select-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-1 text-center"></label>
+                                                        <!-- Select fuer vorhandene Duftmittel -->
                                                         <select id="duftmittel-select-<?php echo $plan['id']; ?>" name="duftmittel_id" class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)">
-                                                            <option class="border-2 border-solid text-center" style="border-color: var(--border-color)" value="">-- Duftmittel auswählen --</option>
+                                                            <option class="border-2 border-solid text-center" style="border-color: var(--border-color)" value="">-- Duftmittel ausw&auml;hlen --</option>
                                                             <?php foreach ($duftmittel as $d): ?>
                                                                 <option class="text-center" value="<?php echo $d['id']; ?>">
                                                                     <?php echo htmlspecialchars($d['name'] ?? ''); ?>
