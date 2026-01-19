@@ -13,6 +13,26 @@ session_start();
 require_once __DIR__ . '/../../../src/config/config.php';
 require_once __DIR__ . '/../../../src/db/connection.php';
 
+function normalizeStaerkeLevel($value) {
+    if ($value === '' || $value === null) {
+        return null;
+    }
+    if (!is_numeric($value)) {
+        return null;
+    }
+    $level = (int)$value;
+    if ($level <= 0) {
+        return null;
+    }
+    if ($level === 1) {
+        return 1;
+    }
+    if ($level === 2) {
+        return 2;
+    }
+    return 3;
+}
+
 $response = ['success' => false, 'error' => ''];
 
 try {
@@ -73,11 +93,11 @@ try {
 
             $staerkeValue = null;
             if ($staerkeRaw !== '' && $staerkeRaw !== null) {
-                if (is_numeric($staerkeRaw) && $staerkeRaw >= 1 && $staerkeRaw <= 6) {
-                    $staerkeValue = (int)$staerkeRaw;
-                } else {
+                $normalized = normalizeStaerkeLevel($staerkeRaw);
+                if ($normalized === null) {
                     throw new Exception('Ungültige Stärke');
                 }
+                $staerkeValue = $normalized;
             }
 
             $iconPath = trim((string)$iconRaw);

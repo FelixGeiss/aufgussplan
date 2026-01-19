@@ -1509,24 +1509,30 @@ function getStaerkeIconBaseUrl() {
 
 function formatStaerke(aufguss) {
     const level = Number(aufguss?.staerke) || 0;
+    const category = getStaerkeBadgeCategory(level);
     const map = {
-        1: { text: '1 Sehr leicht', bgClass: 'bg-green-100', textClass: 'text-green-800' },
-        2: { text: '2 Leicht', bgClass: 'bg-green-200', textClass: 'text-green-800' },
-        3: { text: '3 Mittel', bgClass: 'bg-yellow-100', textClass: 'text-yellow-800' },
-        4: { text: '4 Stark', bgClass: 'bg-orange-100', textClass: 'text-orange-800' },
-        5: { text: '5 Stark+', bgClass: 'bg-red-100', textClass: 'text-red-800' },
-        6: { text: '6 Extrem', bgClass: 'bg-red-200', textClass: 'text-red-900' }
+        1: { text: 'Leicht', bgClass: 'bg-green-100', textClass: 'text-green-800' },
+        2: { text: 'Mittel', bgClass: 'bg-yellow-100', textClass: 'text-yellow-800' },
+        3: { text: 'Stark', bgClass: 'bg-red-100', textClass: 'text-red-900' }
     };
-    const entry = map[level] || { text: 'Unbekannt', bgClass: 'bg-gray-100', textClass: 'text-gray-800' };
+    const entry = map[category] || { text: 'Unbekannt', bgClass: 'bg-gray-100', textClass: 'text-gray-800' };
     const iconPath = (aufguss?.staerke_icon || '').trim();
     let iconHtml = '';
-    if (iconPath && level > 0) {
+    if (iconPath && category > 0) {
         const safePath = escapeHtml(iconPath);
         const baseUrl = getStaerkeIconBaseUrl();
-        const icons = Array.from({ length: level }).map(() => `<img src="${baseUrl}${safePath}" alt="Stärke-Icon" decoding="async" class="plan-list-staerke-icon">`).join('');
+        const icons = Array.from({ length: category }).map(() => `<img src="${baseUrl}${safePath}" alt="Stärke-Icon" decoding="async" class="plan-list-staerke-icon">`).join('');
         iconHtml = `<div class="plan-list-staerke-icons">${icons}</div>`;
     }
     return { ...entry, iconHtml };
+}
+
+function getStaerkeBadgeCategory(level) {
+    const staerke = Number(level) || 0;
+    if (staerke <= 0) return 0;
+    if (staerke === 1) return 1;
+    if (staerke === 2) return 2;
+    return 3;
 }
 
 // Formatiert Aufgiesser-Text.

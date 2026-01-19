@@ -661,22 +661,22 @@
 
 .plan-list-staerke-icons {
     display: flex;
-    gap: 0.25rem;
+    gap: 0.35rem;
     justify-content: center;
     align-items: center;
     flex-wrap: nowrap;
-    width: auto;
-    min-height: 1.2rem;
-    max-width: 100%;
+    width: min(100%, clamp(10rem, 10vw, 18rem));
+    min-height: 2.75rem;
     margin: 0 auto;
-    overflow: hidden;
+    padding: 0.35rem 0;
 }
 
 .plan-list-staerke-icon {
-    max-height: 1.2rem;
-    width: auto;
+    width: min(90px, clamp(2.5rem, 5vw, 5rem));
+    height: min(90px, clamp(2.5rem, 5vw, 5rem));
     border-radius: 9999px;
     object-fit: contain;
+    flex: 0 1 auto;
 }
 
 .kiosk-view .plan-list-row .plan-list-cell,

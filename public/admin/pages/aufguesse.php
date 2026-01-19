@@ -39,6 +39,39 @@ require_once __DIR__ . '/../../../src/db/connection.php';
 // Aufguss-Model für Plan-Operationen
 require_once __DIR__ . '/../../../src/models/aufguss.php';
 
+/**
+ * Gruppiert numerische Stärkeeinstellungen auf drei Badge-Kategorien.
+ *
+ * @param int|null $level
+ * @return int
+ */
+function getStaerkeCategory($level) {
+    $value = (int)($level ?? 0);
+    if ($value <= 0) {
+        return 0;
+    }
+    if ($value === 1) {
+        return 1;
+    }
+    if ($value === 2) {
+        return 2;
+    }
+    return 3;
+}
+
+function getStaerkeBadgeInfo($level) {
+    switch (getStaerkeCategory($level)) {
+        case 1:
+            return ['text' => 'Leicht', 'bgColor' => 'bg-green-100', 'textColor' => 'text-green-800'];
+        case 2:
+            return ['text' => 'Mittel', 'bgColor' => 'bg-yellow-100', 'textColor' => 'text-yellow-800'];
+        case 3:
+            return ['text' => 'Stark', 'bgColor' => 'bg-red-100', 'textColor' => 'text-red-900'];
+        default:
+            return ['text' => 'Unbekannt', 'bgColor' => 'bg-gray-100', 'textColor' => 'text-gray-800'];
+    }
+}
+
 $aufgussModel = new Aufguss();
 
 // Pläne aus Datenbank laden
@@ -672,45 +705,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                     <div class="staerke-icons-container pointer-events-none" aria-hidden="true"></div>
                                                                     <?php
                                                                     $stärke = $aufguss['staerke'] ?? 0;
-                                                                    $stärkeText = '';
-                                                                    $bgColor = 'bg-gray-100';
-                                                                    $textColor = 'text-gray-800';
-
-                                                                    switch ($stärke) {
-                                                                        case 1:
-                                                                            $stärkeText = '1 Leicht';
-                                                                            $bgColor = 'bg-green-100';
-                                                                            $textColor = 'text-green-800';
-                                                                            break;
-                                                                        case 2:
-                                                                            $stärkeText = '2 Leicht+';
-                                                                            $bgColor = 'bg-green-200';
-                                                                            $textColor = 'text-green-800';
-                                                                            break;
-                                                                        case 3:
-                                                                            $stärkeText = '3 Mittel';
-                                                                            $bgColor = 'bg-yellow-100';
-                                                                            $textColor = 'text-yellow-800';
-                                                                            break;
-                                                                        case 4:
-                                                                            $stärkeText = '4 Stark';
-                                                                            $bgColor = 'bg-orange-100';
-                                                                            $textColor = 'text-orange-800';
-                                                                            break;
-                                                                        case 5:
-                                                                            $stärkeText = '5 Stark+';
-                                                                            $bgColor = 'bg-red-100';
-                                                                            $textColor = 'text-red-800';
-                                                                            break;
-                                                                        case 6:
-                                                                            $stärkeText = '6 Extrem';
-                                                                            $bgColor = 'bg-red-200';
-                                                                            $textColor = 'text-red-900';
-                                                                            break;
-                                                                        default:
-                                                                            $stärkeText = 'Unbekannt';
-                                                                            break;
-                                                                    }
+                                                                    $badgeInfo = getStaerkeBadgeInfo($stärke);
+                                                                    $stärkeText = $badgeInfo['text'];
+                                                                    $bgColor = $badgeInfo['bgColor'];
+                                                                    $textColor = $badgeInfo['textColor'];
                                                                     ?>
                                                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <?php echo $bgColor; ?> <?php echo $textColor; ?>">
                                                                         <?php echo $stärkeText; ?>
@@ -722,14 +720,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                                                 <!-- Bearbeitungs-Modus -->
                                                                 <div class="edit-mode hidden flex flex-col gap-2">
+                                                                    <?php $currentCategory = getStaerkeCategory($stärke); ?>
                                                                     <select name="stärke" class="rounded px-2 py-1 text-sm border border-gray-300">
                                                                         <option value="">-- Stärke wählen --</option>
-                                                                        <option value="1" <?php echo ($stärke == 1) ? 'selected' : ''; ?>>1 - Sehr leicht</option>
-                                                                        <option value="2" <?php echo ($stärke == 2) ? 'selected' : ''; ?>>2 Leicht</option>
-                                                                        <option value="3" <?php echo ($stärke == 3) ? 'selected' : ''; ?>>3 Mittel</option>
-                                                                        <option value="4" <?php echo ($stärke == 4) ? 'selected' : ''; ?>>4 Stark</option>
-                                                                        <option value="5" <?php echo ($stärke == 5) ? 'selected' : ''; ?>>5 - Sehr stark</option>
-                                                                        <option value="6" <?php echo ($stärke == 6) ? 'selected' : ''; ?>>6 Extrem stark</option>
+                                                                        <option value="1" <?php echo ($currentCategory === 1) ? 'selected' : ''; ?>>1 Leicht</option>
+                                                                        <option value="2" <?php echo ($currentCategory === 2) ? 'selected' : ''; ?>>2 Mittel</option>
+                                                                        <option value="3" <?php echo ($currentCategory === 3) ? 'selected' : ''; ?>>3 Stark</option>
                                                                     </select>
                                                                     <div>
                                                                         <select name="staerke_icon" class="rounded px-2 py-1 text-sm border border-gray-300 w-full">
@@ -1072,12 +1068,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     <label for="stärke-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-900 mb-2 text-center">Stärke des Aufgusses</label>
                                                     <select id="stärke-<?php echo $plan['id']; ?>" name="stärke" class="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 border-2 border-solid text-center" style="border-color: var(--border-color)">
                                                         <option class="border-2 border-solid text-center" style="border-color: var(--border-color)" value="">-- Stärke wählen --</option>
-                                                        <option class="text-center" value="1">1 - Sehr leicht</option>
-                                                        <option class="text-center" value="2">2 Leicht</option>
-                                                        <option class="text-center" value="3">3 Mittel</option>
-                                                        <option class="text-center" value="4">4 Stark</option>
-                                                        <option class="text-center" value="5">5 - Sehr stark</option>
-                                                        <option class="text-center" value="6">6 Extrem stark</option>
+                                                        <option class="text-center" value="1">1 Leicht</option>
+                                                        <option class="text-center" value="2">2 Mittel</option>
+                                                        <option class="text-center" value="3">3 Stark</option>
                                                     </select>
                                                 </div>
                                                 <div class="text-center mt-4">
