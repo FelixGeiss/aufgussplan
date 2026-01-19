@@ -100,6 +100,8 @@ if (is_dir(UPLOAD_PATH)) {
 $uploadBaseDir = rtrim(UPLOAD_PATH, '/\\') . DIRECTORY_SEPARATOR;
 $werbungUploadDir = $uploadBaseDir . 'werbung' . DIRECTORY_SEPARATOR;
 $planUploadDir = $uploadBaseDir . 'plan' . DIRECTORY_SEPARATOR;
+$staerkeUploadDir = $uploadBaseDir . 'staerke' . DIRECTORY_SEPARATOR;
+$staerkeUploadFiles = [];
 if (is_dir($werbungUploadDir)) {
     foreach (scandir($werbungUploadDir) as $entry) {
         if ($entry === '.' || $entry === '..') {
@@ -137,6 +139,18 @@ if (is_dir($planUploadDir)) {
                 'typ' => 'Hintergrundbild',
                 'plan_id' => null
             ];
+        }
+    }
+}
+
+if (is_dir($staerkeUploadDir)) {
+    foreach (scandir($staerkeUploadDir) as $entry) {
+        if ($entry === '.' || $entry === '..') {
+            continue;
+        }
+        $fullPath = $staerkeUploadDir . $entry;
+        if (is_file($fullPath)) {
+            $staerkeUploadFiles[] = 'staerke/' . $entry;
         }
     }
 }

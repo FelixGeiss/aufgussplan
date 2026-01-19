@@ -1,3 +1,6 @@
+<?php
+$staerkeUploadFiles = isset($staerkeUploadFiles) && is_array($staerkeUploadFiles) ? $staerkeUploadFiles : [];
+?>
 <div class="bg-white rounded-lg shadow-md mt-8">
             <div class="p-6">
                 <h2 class="text-3xl font-bold text-gray-900 mb-6">Datenbank-Übersicht</h2>
