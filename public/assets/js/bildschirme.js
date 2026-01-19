@@ -243,7 +243,7 @@ function renderSelectedOrderBadges(order) {
     return list
         .map(value => Number(value))
         .filter(value => Number.isFinite(value) && value > 0)
-        .map(value => `<span class="inline-flex items-center rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-0.5">Bildschirm ${value}</span>`)
+        .map(value => `<span class="inline-flex items-center rounded-full bg-indigo-50 px-2 py-1 text-xs font-semibold text-indigo-700">Bildschirm ${value}</span>`)
         .join('');
 }
 

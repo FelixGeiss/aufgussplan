@@ -26,6 +26,26 @@ if (is_admin_logged_in()) {
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!empty($_POST['guest_login'])) {
+        session_regenerate_id(true);
+        $_SESSION['admin_logged_in'] = true;
+        $_SESSION['admin_user_id'] = 0;
+        $_SESSION['admin_user_name'] = 'Gast';
+        $_SESSION['admin_username'] = 'guest';
+        $_SESSION['admin_is_admin'] = true;
+        $_SESSION['admin_permissions'] = [
+            'aufguesse' => true,
+            'statistik' => true,
+            'umfragen' => true,
+            'mitarbeiter' => true,
+            'bildschirme' => true,
+            'backup' => true,
+        ];
+
+        header('Location: ' . BASE_URL . 'admin/pages/index.php');
+        exit;
+    }
+
     $username = trim((string)($_POST['username'] ?? ''));
     $password = (string)($_POST['password'] ?? '');
 
@@ -92,6 +112,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="password" name="password" class="w-full rounded border px-3 py-2" autocomplete="current-password" required>
                 </div>
                 <button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Login</button>
+            </form>
+            <form method="post" class="mt-4">
+                <input type="hidden" name="guest_login" value="1">
+                <button type="submit" class="w-full text-white px-4 py-2 rounded hover:opacity-90" style="background: var(--admin-color-success-600);">
+                    Gast-Login
+                </button>
             </form>
         </div>
     </div>
