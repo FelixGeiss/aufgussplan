@@ -30,6 +30,7 @@
     --admin-color-border-strong: #4240a7ab;
     --admin-color-surface: #ffffff;
     --admin-color-text-900: #111827;
+    --admin-color-text-800: #1f2937;
     --admin-color-text-700: #374151;
     --admin-color-text-700-strong: #1d4ed8;
     --admin-color-danger-700: #be123c;
@@ -395,6 +396,10 @@ button.bg-indigo-600 {
     background-color: var(--admin-color-primary-600);
 }
 
+button.bg-indigo-500 {
+    background-color: var(--admin-color-primary-500);
+}
+
 button.hover\:bg-indigo-500:hover {
     background-color: var(--admin-color-primary-500);
 }
@@ -413,6 +418,10 @@ button.bg-indigo-100 {
 
 button.bg-blue-600 {
     background-color: var(--admin-color-primary-600);
+}
+
+button.bg-blue-700 {
+    background-color: var(--admin-color-primary-700);
 }
 
 button.bg-blue-500 {
@@ -439,8 +448,20 @@ button.bg-green-500 {
     background-color: var(--admin-color-success-500);
 }
 
+button.bg-green-600 {
+    background-color: var(--admin-color-success-600);
+}
+
 button.hover\:bg-green-600:hover {
     background-color: var(--admin-color-success-600);
+}
+
+button.bg-red-700 {
+    background-color: var(--admin-color-danger-700);
+}
+
+button.bg-red-600 {
+    background-color: var(--admin-color-danger-600);
 }
 
 button.bg-red-500 {
@@ -451,8 +472,20 @@ button.hover\:bg-red-600:hover {
     background-color: var(--admin-color-danger-700);
 }
 
+button.hover\:bg-red-700:hover {
+    background-color: var(--admin-color-danger-700);
+}
+
 button.bg-red-200 {
     background-color: var(--admin-color-danger-100);
+}
+
+button.bg-gray-300 {
+    background-color: var(--admin-color-muted-300);
+}
+
+button.bg-gray-200 {
+    background-color: var(--admin-color-muted-200);
 }
 
 button.bg-gray-50 {
@@ -461,6 +494,10 @@ button.bg-gray-50 {
 
 button.bg-gray-100 {
     background-color: var(--admin-color-muted-100);
+}
+
+button.bg-white {
+    background-color: var(--admin-color-surface);
 }
 
 button.hover\:bg-gray-50:hover {
@@ -473,6 +510,10 @@ button.hover\:bg-gray-100:hover {
 
 button.hover\:bg-gray-200:hover {
     background-color: var(--admin-color-muted-200);
+}
+
+button.hover\:bg-gray-300:hover {
+    background-color: var(--admin-color-muted-300);
 }
 
 button.text-white {
@@ -489,6 +530,10 @@ button.text-blue-700 {
 
 button.text-gray-900 {
     color: var(--admin-color-text-900);
+}
+
+button.text-gray-800 {
+    color: var(--admin-color-text-800);
 }
 
 button.text-gray-700 {
@@ -528,7 +573,7 @@ button.hover\:text-gray-700:hover {
 }
 
 button.hover\:text-gray-800:hover {
-    color: var(--admin-color-text-900);
+    color: var(--admin-color-text-800);
 }
 
 button.hover\:text-gray-600:hover {
