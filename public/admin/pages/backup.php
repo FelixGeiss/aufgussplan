@@ -594,7 +594,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </span>
                         Ich bestätige, dass die aktuelle Datenbank überschrieben wird.
                     </label>
-                    <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Backup einspielen</button>
+                    <button type="submit" class="text-white px-4 py-2 rounded hover:opacity-90" style="background: var(--admin-color-success-600);">Backup einspielen</button>
                 </form>
             </div>
         </div>
