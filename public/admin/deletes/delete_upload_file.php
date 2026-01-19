@@ -24,7 +24,7 @@ try {
     $type = trim((string)($payload['type'] ?? ''));
     $path = trim((string)($payload['path'] ?? ''));
 
-    if (!in_array($type, ['plan', 'werbung'], true)) {
+    if (!in_array($type, ['plan', 'werbung', 'staerke'], true)) {
         throw new Exception('Ungueltiger Dateityp');
     }
 

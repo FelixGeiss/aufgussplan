@@ -5,6 +5,11 @@ function showTab(tabName) {
         content.classList.add('hidden');
     });
 
+    // Verstecke alle Upload-Bereiche
+    document.querySelectorAll('.tab-upload').forEach(upload => {
+        upload.classList.add('hidden');
+    });
+
     // Entferne aktive Tab-Stile
     document.querySelectorAll('.tab-button').forEach(button => {
         button.classList.remove('border-indigo-500', 'text-indigo-600');
@@ -17,6 +22,12 @@ function showTab(tabName) {
     // Setze aktiven Tab-Stil
     document.getElementById('tab-' + tabName).classList.remove('border-transparent', 'text-gray-500');
     document.getElementById('tab-' + tabName).classList.add('border-indigo-500', 'text-indigo-600');
+
+    // Zeige Upload-Bereich fuer den aktiven Tab, falls vorhanden
+    const activeUpload = document.querySelector(`.tab-upload[data-tab="${tabName}"]`);
+    if (activeUpload) {
+        activeUpload.classList.remove('hidden');
+    }
 }
 
 // Umfragen-Tabelle filtern
@@ -38,6 +49,60 @@ function initUmfragenSearch() {
 }
 
 document.addEventListener('DOMContentLoaded', initUmfragenSearch);
+document.addEventListener('DOMContentLoaded', () => {
+    showTab('aufguesse');
+});
+
+async function uploadOverviewFile(type, file, button) {
+    if (!file) {
+        return;
+    }
+    const originalText = button.dataset.originalText || button.textContent;
+    button.dataset.originalText = originalText;
+    button.disabled = true;
+    button.textContent = 'Lädt...';
+
+    const formData = new FormData();
+    formData.append('type', type);
+    formData.append('file', file);
+
+    try {
+        const response = await fetch('../uploads/upload_misc_image.php', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await response.json();
+        if (!data.success) {
+            throw new Error(data.error || 'Upload fehlgeschlagen');
+        }
+        location.reload();
+    } catch (error) {
+        alert(error.message || 'Upload fehlgeschlagen');
+    } finally {
+        button.disabled = false;
+        button.textContent = button.dataset.originalText || 'Hochladen';
+    }
+}
+
+function handleOverviewUpload(event, type) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    if (!form) {
+        return;
+    }
+    const input = form.querySelector('input[type="file"]');
+    const button = form.querySelector('button[type="submit"]');
+    if (!input || !input.files || input.files.length === 0) {
+        alert('Bitte eine Datei auswählen.');
+        return;
+    }
+    if (!button) {
+        return;
+    }
+    uploadOverviewFile(type, input.files[0], button);
+}
+
+window.handleOverviewUpload = handleOverviewUpload;
 
 // Loeschfunktion fuer Datenbank-Eintraege
 function deleteDatenbankEintrag(type, id, name) {

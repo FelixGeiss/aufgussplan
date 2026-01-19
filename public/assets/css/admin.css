@@ -302,12 +302,20 @@ table tbody tr:hover {
 }
 
 .db-overview-table th,
-.db-overview-table td {
-    text-align: center;
-    vertical-align: middle;
-}
+  .db-overview-table td {
+      text-align: center;
+      vertical-align: middle;
+  }
 
-.display-mode {
+  .db-overview-table .display-mode {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.15rem;
+  }
+  
+  .display-mode {
     position: relative;
     padding-bottom: 1.1rem;
     transition: box-shadow 150ms ease;
