@@ -5,6 +5,7 @@ require_once __DIR__ . '/../../../src/config/config.php';
 require_once __DIR__ . '/../../../src/db/connection.php';
 require_once __DIR__ . '/../../../src/auth.php';
 
+// Stellt sicher, dass die Spalte can_backup existiert.
 function ensureBackupPermissionColumn(PDO $db) {
     try {
         $stmt = $db->prepare("SHOW COLUMNS FROM mitarbeiter LIKE 'can_backup'");

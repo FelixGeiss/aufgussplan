@@ -155,6 +155,7 @@ if (is_dir($staerkeUploadDir)) {
     }
 }
 
+// Konvertiert PHP-Werte in SQL-konforme Literalwerte.
 function sql_value(PDO $db, $value) {
     if ($value === null) {
         return 'NULL';
@@ -168,6 +169,7 @@ function sql_value(PDO $db, $value) {
     return $db->quote((string)$value);
 }
 
+// Streamt ein SQL-Backup direkt in die Ausgabe.
 function stream_sql_backup(PDO $db, $dbName) {
     $timestamp = date('c');
     echo "-- Aufgussplan DB backup\n";
@@ -224,12 +226,14 @@ function stream_sql_backup(PDO $db, $dbName) {
     echo "SET FOREIGN_KEY_CHECKS=1;\n";
 }
 
+// Baut ein SQL-Backup als String.
 function build_sql_backup(PDO $db, $dbName) {
     ob_start();
     stream_sql_backup($db, $dbName);
     return ob_get_clean();
 }
 
+// Formatiert Bytes als lesbare Groesse.
 function format_bytes($bytes) {
     $bytes = (float)$bytes;
     if ($bytes <= 0) {
@@ -242,6 +246,7 @@ function format_bytes($bytes) {
     return number_format($value, $value < 10 ? 2 : 1, '.', '') . ' ' . $units[$pow];
 }
 
+// Fuegt einen Ordner rekursiv in ein ZIP-Archiv ein.
 function add_folder_to_zip(ZipArchive $zip, $sourcePath, $zipRoot) {
     $sourcePath = rtrim($sourcePath, DIRECTORY_SEPARATOR);
     if (!is_dir($sourcePath)) {
@@ -263,6 +268,7 @@ function add_folder_to_zip(ZipArchive $zip, $sourcePath, $zipRoot) {
     }
 }
 
+// Erstellt ein ZIP-Backup mit SQL und Uploads.
 function create_backup_zip(PDO $db, $destinationPath, $localStorageJson = null) {
     $zip = new ZipArchive();
     if ($zip->open($destinationPath, ZipArchive::OVERWRITE) !== true) {
@@ -277,6 +283,7 @@ function create_backup_zip(PDO $db, $destinationPath, $localStorageJson = null) 
     $zip->close();
 }
 
+// Entpackt ZIP sicher und blockt Pfad-Traversal.
 function safe_extract_zip(ZipArchive $zip, $dest) {
     if (!is_dir($dest) && !mkdir($dest, 0775, true)) {
         throw new RuntimeException('Konnte Temp-Ordner nicht erstellen.');
@@ -315,6 +322,7 @@ function safe_extract_zip(ZipArchive $zip, $dest) {
     }
 }
 
+// Fuehrt ein SQL-Dump-String statementweise aus.
 function execute_sql_dump(PDO $db, $sql) {
     $length = strlen($sql);
     $buffer = '';
@@ -384,6 +392,7 @@ function execute_sql_dump(PDO $db, $sql) {
     }
 }
 
+// Kopiert ein Verzeichnis rekursiv.
 function copy_directory($source, $dest) {
     if (!is_dir($source)) {
         return;

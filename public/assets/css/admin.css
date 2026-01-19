@@ -824,28 +824,6 @@ textarea.border-green-500 {
     height: 2rem;
 }
 
-/* Anzeigezustand in Zellen */
-.display-mode {
-    position: relative;
-    padding-bottom: 1.1rem;
-    transition: box-shadow 150ms ease;
-    text-align: center;
-}
-
-.display-mode:hover {
-    background-color: rgba(255, 255, 255, 0.35) !important;
-    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
-}
-
-.display-mode > svg {
-    position: absolute;
-    left: 50%;
-    bottom: 0.15rem;
-    transform: translateX(-50%);
-    margin: 0;
-    color: #000000;
-}
-
 .container input:focus,
 .container textarea:focus,
 .container select:focus {

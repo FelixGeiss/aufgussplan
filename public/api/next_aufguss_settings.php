@@ -18,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 $storageDir = __DIR__ . '/../../storage';
 $storageFile = $storageDir . '/next_aufguss_settings.json';
 
+// Sendet eine JSON-Antwort mit Statuscode.
 function sendResponse($success, $message, $data = null, $statusCode = 200) {
     http_response_code($statusCode);
 
@@ -34,6 +35,7 @@ function sendResponse($success, $message, $data = null, $statusCode = 200) {
     exit;
 }
 
+// Laedt alle gespeicherten Next-Aufguss-Settings.
 function loadSettings($storageFile) {
     if (!file_exists($storageFile)) {
         return [];
@@ -46,6 +48,7 @@ function loadSettings($storageFile) {
     return is_array($data) ? $data : [];
 }
 
+// Speichert die Next-Aufguss-Settings als JSON.
 function writeSettings($storageDir, $storageFile, $data) {
     if (!is_dir($storageDir)) {
         mkdir($storageDir, 0775, true);

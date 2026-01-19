@@ -18,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 $storageDir = __DIR__ . '/../../storage';
 $storageFile = $storageDir . '/selected_plan.json';
 
+// Sendet eine JSON-Antwort mit Statuscode.
 function sendResponse($success, $message, $data = null, $statusCode = 200) {
     http_response_code($statusCode);
 
@@ -34,6 +35,7 @@ function sendResponse($success, $message, $data = null, $statusCode = 200) {
     exit;
 }
 
+// Laedt die zuletzt gespeicherte Plan-Auswahl.
 function readSelectedPlanData($storageFile) {
     if (!file_exists($storageFile)) {
         return ['plan_id' => null, 'updated_at' => null];
@@ -61,6 +63,7 @@ function readSelectedPlanData($storageFile) {
     ];
 }
 
+// Speichert die aktuelle Plan-Auswahl als JSON.
 function writeSelectedPlanId($storageDir, $storageFile, $planId) {
     if (!is_dir($storageDir)) {
         mkdir($storageDir, 0775, true);

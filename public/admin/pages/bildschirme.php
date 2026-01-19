@@ -13,6 +13,7 @@ require_once __DIR__ . '/../../../src/auth.php';
 require_login();
 require_permission('bildschirme');
 
+// Listet Upload-Dateien im Unterordner (optional nach Endung gefiltert).
 function listUploadFiles($subDir, $allowedExtensions = []) {
     $files = [];
     $uploadDir = UPLOAD_PATH . $subDir . DIRECTORY_SEPARATOR;

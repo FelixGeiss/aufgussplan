@@ -95,6 +95,7 @@ try {
     echo json_encode(['success' => false, 'error' => 'Interner Serverfehler']);
 }
 
+// Laedt die Bildschirm-Konfiguration inkl. globaler Werbung.
 function readScreenConfig($storageFile) {
     $config = ['screens' => [], 'global_ad' => [
         'path' => null,
@@ -120,6 +121,7 @@ function readScreenConfig($storageFile) {
     return $config;
 }
 
+// Speichert die Bildschirm-Konfiguration als JSON.
 function writeScreenConfig($storageDir, $storageFile, $config) {
     if (!is_dir($storageDir)) {
         mkdir($storageDir, 0775, true);

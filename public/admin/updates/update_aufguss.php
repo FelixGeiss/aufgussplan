@@ -13,6 +13,7 @@ session_start();
 require_once __DIR__ . '/../../../src/config/config.php';
 require_once __DIR__ . '/../../../src/db/connection.php';
 
+// Normalisiert Staerke-Werte auf die Kategorien 1-3 oder null.
 function normalizeStaerkeLevel($value) {
     if ($value === '' || $value === null) {
         return null;

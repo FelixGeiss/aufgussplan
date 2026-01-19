@@ -80,6 +80,7 @@ $stmt->execute($params);
 
 sendResponse(true, 'Bewertungen geloescht', ['deleted' => $stmt->rowCount()]);
 
+// JSON-Antwort senden und Request beenden.
 function sendResponse($success, $message, $data = null, $statusCode = 200) {
     http_response_code($statusCode);
 

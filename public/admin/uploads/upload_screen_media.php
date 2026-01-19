@@ -104,6 +104,7 @@ try {
     echo json_encode(['success' => false, 'error' => 'Interner Serverfehler']);
 }
 
+// Laedt die Bildschirm-Konfiguration aus der JSON-Datei.
 function readScreenConfig($storageFile) {
     $config = ['screens' => []];
     if (file_exists($storageFile)) {
@@ -117,6 +118,7 @@ function readScreenConfig($storageFile) {
     return $config;
 }
 
+// Speichert die Bildschirm-Konfiguration als JSON.
 function writeScreenConfig($storageDir, $storageFile, $config) {
     if (!is_dir($storageDir)) {
         mkdir($storageDir, 0775, true);
@@ -124,6 +126,7 @@ function writeScreenConfig($storageDir, $storageFile, $config) {
     file_put_contents($storageFile, json_encode($config, JSON_PRETTY_PRINT), LOCK_EX);
 }
 
+// Liefert Default-Werte fuer einen Bildschirm.
 function defaultScreen($screenId) {
     return [
         'id' => (int)$screenId,

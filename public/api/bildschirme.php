@@ -47,6 +47,7 @@ try {
     sendResponse(false, 'Interner Serverfehler', null, 500);
 }
 
+// Konfiguration fuer einen oder alle Bildschirme liefern.
 function handleGetScreens($storageFile, $screenCount) {
     $screenId = isset($_GET['screen_id']) ? (int)$_GET['screen_id'] : 0;
     if ($screenId <= 0) {
@@ -78,6 +79,7 @@ function handleGetScreens($storageFile, $screenCount) {
     ]);
 }
 
+// Bildschirm- oder Global-Ad-Konfiguration speichern.
 function handleSaveScreen($storageDir, $storageFile, $screenCount) {
     $input = json_decode(file_get_contents('php://input'), true);
     if (!$input) {
@@ -158,6 +160,7 @@ function handleSaveScreen($storageDir, $storageFile, $screenCount) {
     ]);
 }
 
+// Konfiguration laden und fehlende Defaults auffuellen.
 function readScreenConfig($storageFile, $screenCount) {
     $config = ['screens' => [], 'global_ad' => defaultGlobalAd($screenCount)];
 
@@ -182,6 +185,7 @@ function readScreenConfig($storageFile, $screenCount) {
     return $config;
 }
 
+// Konfiguration als JSON persistieren.
 function writeScreenConfig($storageDir, $storageFile, $config) {
     if (!is_dir($storageDir)) {
         mkdir($storageDir, 0775, true);
@@ -189,6 +193,7 @@ function writeScreenConfig($storageDir, $storageFile, $config) {
     file_put_contents($storageFile, json_encode($config, JSON_PRETTY_PRINT), LOCK_EX);
 }
 
+// Standardwerte fuer einen Bildschirm liefern.
 function defaultScreen($screenId) {
     return [
         'id' => (int)$screenId,
@@ -201,6 +206,7 @@ function defaultScreen($screenId) {
     ];
 }
 
+// Standardwerte fuer die globale Werbung liefern.
 function defaultGlobalAd($screenCount = 5) {
     $order = [];
     for ($i = 1; $i <= $screenCount; $i++) {
@@ -217,6 +223,7 @@ function defaultGlobalAd($screenCount = 5) {
     ];
 }
 
+// Pfade absichern und auf relative Form bringen.
 function sanitizePath($path) {
     if ($path === null) {
         return null;
@@ -231,6 +238,7 @@ function sanitizePath($path) {
     return ltrim($path, "/\\");
 }
 
+// Medientyp aus Dateiendung ableiten.
 function inferAdType($path) {
     if (!$path) {
         return 'image';
@@ -239,6 +247,7 @@ function inferAdType($path) {
     return in_array($clean, ['mp4', 'webm', 'ogg'], true) ? 'video' : 'image';
 }
 
+// Werberichtung auf erlaubte Werte begrenzen.
 function sanitizeDirection($value) {
     if (!is_string($value)) {
         return 'right';
@@ -250,6 +259,7 @@ function sanitizeDirection($value) {
     return 'right';
 }
 
+// Reihenfolge der Bildschirme bereinigen und validieren.
 function sanitizeScreenOrder($order, $screenCount) {
     if (is_string($order)) {
         $order = array_map('trim', explode(',', $order));
@@ -271,6 +281,7 @@ function sanitizeScreenOrder($order, $screenCount) {
     return $clean;
 }
 
+// JSON-Antwort senden und Request beenden.
 function sendResponse($success, $message, $data = null, $statusCode = 200) {
     http_response_code($statusCode);
 

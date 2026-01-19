@@ -51,6 +51,7 @@ try {
     sendResponse(false, 'Interner Serverfehler', null, 500);
 }
 
+// Liefert die Mitarbeiterliste.
 function handleGetMitarbeiter($db) {
     $stmt = $db->query(
         "SELECT id, name, position, username, aktiv, can_aufguesse, can_statistik, can_umfragen, can_mitarbeiter, can_bildschirme, can_backup, is_admin
@@ -61,6 +62,7 @@ function handleGetMitarbeiter($db) {
     sendResponse(true, 'Mitarbeiter erfolgreich abgerufen', ['mitarbeiter' => $mitarbeiter]);
 }
 
+// Legt einen neuen Mitarbeiter an.
 function handleCreateMitarbeiter($db) {
     $input = json_decode(file_get_contents('php://input'), true);
     if (!$input) {
@@ -118,6 +120,7 @@ function handleCreateMitarbeiter($db) {
     sendResponse(true, 'Mitarbeiter erfolgreich erstellt', ['mitarbeiter_id' => $mitarbeiterId]);
 }
 
+// Aktualisiert einen Mitarbeiter.
 function handleUpdateMitarbeiter($db) {
     $input = json_decode(file_get_contents('php://input'), true);
 
@@ -196,6 +199,7 @@ function handleUpdateMitarbeiter($db) {
     sendResponse(true, 'Mitarbeiter erfolgreich aktualisiert');
 }
 
+// Loescht einen Mitarbeiter.
 function handleDeleteMitarbeiter($db) {
     $mitarbeiterId = $_GET['id'] ?? null;
 
@@ -215,6 +219,7 @@ function handleDeleteMitarbeiter($db) {
     sendResponse(true, 'Mitarbeiter erfolgreich geloescht');
 }
 
+// Normalisiert Bool-Werte fuer Datenbankfelder.
 function normalizeBool($value) {
     if (is_bool($value)) {
         return $value ? 1 : 0;
@@ -226,6 +231,7 @@ function normalizeBool($value) {
     return in_array($value, ['1', 'true', 'on', 'yes'], true) ? 1 : 0;
 }
 
+// Stellt sicher, dass die Spalte can_backup existiert.
 function ensureBackupPermissionColumn(PDO $db) {
     try {
         $stmt = $db->prepare("SHOW COLUMNS FROM mitarbeiter LIKE 'can_backup'");
@@ -239,6 +245,7 @@ function ensureBackupPermissionColumn(PDO $db) {
     }
 }
 
+// Sendet eine JSON-Antwort mit Statuscode.
 function sendResponse($success, $message, $data = null, $statusCode = 200) {
     http_response_code($statusCode);
 

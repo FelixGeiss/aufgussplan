@@ -5,6 +5,7 @@
 const placeholderMitarbeiter = '../../assets/placeholders/Platzhalter_Mitarbeiter.svg';
 const placeholderSauna = '../../assets/placeholders/Platzhalter_Sauna.svg';
 
+// Baut ein IMG-Tag mit Fallback fuer fehlende Bilder.
 function buildImageTag(src, fallbackSrc, alt, className) {
     const safeAlt = String(alt || '');
     const safeSrc = src || fallbackSrc;
@@ -1109,6 +1110,7 @@ function buildImageTag(src, fallbackSrc, alt, className) {
         }
 
 // Funktion: savePlanSettings
+// Speichert Plan-Einstellungen inkl. Uploads und UI-Status.
 function savePlanSettings(planId, options = {}) {
             const enabledInput = document.getElementById(`next-aufguss-enabled-${planId}`);
             const leadInput = document.getElementById(`next-aufguss-lead-${planId}`);

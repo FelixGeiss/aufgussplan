@@ -18,6 +18,7 @@ require_permission('statistik');
 
 $db = Database::getInstance()->getConnection();
 
+// Kombiniert Labels und Werte fuer Balkendiagramm-Daten.
 function buildBarItems(array $labels, array $counts) {
     $items = [];
     foreach ($labels as $index => $label) {
@@ -29,6 +30,7 @@ function buildBarItems(array $labels, array $counts) {
     return $items;
 }
 
+// Mappt Ergebniszeilen auf key => count.
 function mapCountsByKey(array $rows, $keyField, $valueField) {
     $map = [];
     foreach ($rows as $row) {
@@ -37,6 +39,7 @@ function mapCountsByKey(array $rows, $keyField, $valueField) {
     return $map;
 }
 
+// Baut SQL-Filter fuer ausgewaehlte Plaene.
 function buildPlanFilter(array $selectedPlanIds, $alias = 'a') {
     if (empty($selectedPlanIds)) {
         return ['sql' => '', 'params' => []];
@@ -45,6 +48,7 @@ function buildPlanFilter(array $selectedPlanIds, $alias = 'a') {
     return ['sql' => $alias . '.plan_id IN (' . $placeholders . ')', 'params' => $selectedPlanIds];
 }
 
+// Setzt WHERE-Teile fuer Statistikabfragen zusammen.
 function buildStatsWhere($periodCondition, $planFilterSql) {
     $parts = [];
     if ($periodCondition) {
@@ -56,6 +60,7 @@ function buildStatsWhere($periodCondition, $planFilterSql) {
     return implode(' AND ', $parts);
 }
 
+// Laedt Statistikzeilen (Label/Count) mit optionalen Filtern.
 function fetchStatsItems(PDO $db, $labelExpr, $joinSql, $whereSql, array $params) {
     $sql = "SELECT " . $labelExpr . " AS label, COALESCE(SUM(s.anzahl), 0) AS cnt
             FROM statistik s " . $joinSql;
@@ -74,6 +79,7 @@ function fetchStatsItems(PDO $db, $labelExpr, $joinSql, $whereSql, array $params
     return $items;
 }
 
+// Liefert Staerke-Verteilung als Diagramm-Items.
 function fetchStaerkeItems(PDO $db, $whereSql, array $params) {
     $sql = "SELECT s.staerke, COALESCE(SUM(s.anzahl), 0) AS cnt
             FROM statistik s";
@@ -104,6 +110,7 @@ function fetchStaerkeItems(PDO $db, $whereSql, array $params) {
     return $items;
 }
 
+// Holt Zeitreihen-Counts als Map.
 function fetchTimeSeriesMap(PDO $db, $labelExpr, $whereSql, array $params) {
     $sql = "SELECT " . $labelExpr . " AS label, COALESCE(SUM(s.anzahl), 0) AS cnt
             FROM statistik s";
@@ -117,6 +124,7 @@ function fetchTimeSeriesMap(PDO $db, $labelExpr, $whereSql, array $params) {
     return mapCountsByKey($stmt->fetchAll(), 'label', 'cnt');
 }
 
+// Baut Zeitreihen-Items aus Labels und Map.
 function buildTimeSeriesItems(array $labels, array $keys, array $map) {
     $counts = [];
     foreach ($keys as $key) {
