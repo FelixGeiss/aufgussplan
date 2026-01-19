@@ -28,7 +28,6 @@ $dbOverview = [
     'umfragen' => 0,
     'werbung_medien' => 0,
     'hintergrund_bilder' => 0,
-    'staerke_icons' => 0,
     'uploads_count' => 0,
     'uploads_size' => 0
 ];
@@ -41,7 +40,6 @@ $mitarbeiter = [];
 $umfrage_bewertungen = [];
 $werbungTabFiles = [];
 $hintergrundTabFiles = [];
-$staerkeTabFiles = [];
 
 if (is_file($backupMetaPath)) {
     $metaRaw = file_get_contents($backupMetaPath);
@@ -140,27 +138,6 @@ if (is_dir($planUploadDir)) {
                 'plan_id' => null
             ];
         }
-    }
-}
-
-$staerkeUploadDir = $uploadBaseDir . 'staerke' . DIRECTORY_SEPARATOR;
-if (is_dir($staerkeUploadDir)) {
-    foreach (scandir($staerkeUploadDir) as $entry) {
-        if ($entry === '.' || $entry === '..') {
-            continue;
-        }
-        $fullPath = $staerkeUploadDir . $entry;
-        if (!is_file($fullPath)) {
-            continue;
-        }
-        $dbOverview['staerke_icons']++;
-        $path = 'staerke/' . $entry;
-        $staerkeTabFiles[] = [
-            'bereich' => 'Staerke-Icon',
-            'name' => $entry,
-            'datei' => $path,
-            'typ' => 'Stärke-Icon'
-        ];
     }
 }
 
