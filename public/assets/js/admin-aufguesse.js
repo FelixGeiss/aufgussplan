@@ -592,6 +592,30 @@ function formatStaerke(aufguss) {
         let currentEntityType = '';
         let currentEntityId = '';
 
+        function populateModalExistingImages(entityType) {
+            const select = document.getElementById('modalExistingImage');
+            if (!select) {
+                return;
+            }
+            const optionsByType = window.MODAL_IMAGE_OPTIONS || {};
+            const files = optionsByType[entityType] || [];
+            select.innerHTML = '';
+
+            const placeholder = document.createElement('option');
+            placeholder.value = '';
+            placeholder.textContent = '-- Bitte waehlen --';
+            select.appendChild(placeholder);
+
+            files.forEach((fileName) => {
+                const option = document.createElement('option');
+                option.value = fileName;
+                option.textContent = fileName;
+                select.appendChild(option);
+            });
+
+            select.disabled = files.length === 0;
+        }
+
         // Funktion: openImageModal
         function openImageModal(entityType, entityId, entityName) {
             currentEntityType = entityType;
@@ -621,6 +645,7 @@ function formatStaerke(aufguss) {
             document.getElementById('modalLoadingBar').classList.add('hidden');
             document.getElementById('modalSubmitBtn').disabled = false;
             document.getElementById('modalSubmitBtn').textContent = 'Speichern';
+            populateModalExistingImages(entityType);
         }
 
         // Funktion: deleteUploadFile
@@ -742,8 +767,12 @@ function formatStaerke(aufguss) {
             const input = document.getElementById('modalImageInput');
             const filenameDiv = document.getElementById('modalFilename');
             const filenameText = document.getElementById('modalFilenameText');
+            const existingSelect = document.getElementById('modalExistingImage');
 
             if (input.files && input.files[0]) {
+                if (existingSelect) {
+                    existingSelect.value = '';
+                }
                 const fileName = input.files[0].name;
                 const fileSize = (input.files[0].size / 1024 / 1024).toFixed(2);
 
@@ -770,6 +799,15 @@ function formatStaerke(aufguss) {
             document.getElementById('modalFilename').classList.add('hidden');
         }
 
+        const modalExistingImage = document.getElementById('modalExistingImage');
+        if (modalExistingImage) {
+            modalExistingImage.addEventListener('change', function() {
+                if (this.value) {
+                    removeModalFile();
+                }
+            });
+        }
+
         // Modal Form Submit
         // Formular-Upload im Modal abfangen
         document.getElementById('imageUploadForm').addEventListener('submit', async function(e) {
@@ -779,18 +817,30 @@ function formatStaerke(aufguss) {
             const submitBtn = document.getElementById('modalSubmitBtn');
             const loadingBar = document.getElementById('modalLoadingBar');
             const progressBar = loadingBar.querySelector('div');
+            const existingSelect = document.getElementById('modalExistingImage');
+            const selectedExisting = existingSelect ? existingSelect.value : '';
+            const selectedFile = formData.get('bild');
 
             // Validierung
-            if (!formData.get('bild') || !formData.get('bild').name) {
+            if ((!selectedFile || !selectedFile.name) && !selectedExisting) {
                 alert('Bitte wählen Sie ein Bild aus.');
                 return;
             }
 
+            if (selectedExisting) {
+                formData.set('existing_bild', selectedExisting);
+                if (selectedFile && selectedFile.name) {
+                    formData.delete('bild');
+                }
+            }
+
             // Dateigröße prüfen
-            const fileSize = formData.get('bild').size / 1024 / 1024;
-            if (fileSize > 10) {
-                alert('Die Datei ist zu groß. Maximale Größe: 10MB');
-                return;
+            if (selectedFile && selectedFile.name) {
+                const fileSize = selectedFile.size / 1024 / 1024;
+                if (fileSize > 10) {
+                    alert('Die Datei ist zu groß. Maximale Größe: 10MB');
+                    return;
+                }
             }
 
             // Ladezustand aktivieren

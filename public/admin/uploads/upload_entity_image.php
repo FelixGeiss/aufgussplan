@@ -39,31 +39,6 @@ try {
         throw new Exception('Invalid entity ID');
     }
 
-    // Datei-Upload prüfen
-    if (!isset($_FILES['bild']) || $_FILES['bild']['error'] !== UPLOAD_ERR_OK) {
-        throw new Exception('Keine Datei hochgeladen');
-    }
-
-    $file = $_FILES['bild'];
-
-    // Dateigröße prüfen (10MB)
-    if ($file['size'] > 10 * 1024 * 1024) {
-        throw new Exception('Datei ist zu groß (max. 10MB)');
-    }
-
-    // Dateityp pruefen
-    $imageTypes = ['image/jpeg', 'image/png', 'image/gif'];
-    $videoTypes = ['video/mp4', 'video/webm', 'video/ogg'];
-    $allowedTypes = $entityType === 'plan'
-        ? array_merge($imageTypes, $videoTypes)
-        : $imageTypes;
-    if (!in_array($file['type'], $allowedTypes, true)) {
-        $allowedLabel = $entityType === 'plan'
-            ? 'nur JPG, PNG, GIF, MP4, WEBM, OGG erlaubt'
-            : 'nur JPG, PNG, GIF erlaubt';
-        throw new Exception('Ungueltiger Dateityp (' . $allowedLabel . ')');
-    }
-
     // Tabelle und Spalte basierend auf Entity-Type bestimmen
     switch ($entityType) {
         case 'sauna':
@@ -102,15 +77,60 @@ try {
         mkdir($uploadDir, 0755, true);
     }
 
-    // Altes Bild nur Löschen, wenn es kein Plan-Hintergrund ist
-    if ($entityType !== 'plan') {
-        $stmt = $db->prepare("SELECT {$column} FROM {$table} WHERE id = ?");
-        $stmt->execute([$entityId]);
-        $oldImage = $stmt->fetchColumn();
-
-        if ($oldImage && file_exists($uploadBaseDir . $oldImage)) {
-            unlink($uploadBaseDir . $oldImage);
+    // Vorhandenes Bild auswaehlen (Upload ueberspringen)
+    $existingImage = trim($_POST['existing_bild'] ?? '');
+    if ($existingImage !== '') {
+        $existingImage = basename($existingImage);
+        $extension = strtolower(pathinfo($existingImage, PATHINFO_EXTENSION));
+        $imageExts = ['jpg', 'jpeg', 'png', 'gif'];
+        $videoExts = ['mp4', 'webm', 'ogg'];
+        $allowedExts = $entityType === 'plan'
+            ? array_merge($imageExts, $videoExts)
+            : $imageExts;
+        if (!in_array($extension, $allowedExts, true)) {
+            throw new Exception('Ungueltiger Dateityp');
         }
+
+        $existingPath = $uploadDir . $existingImage;
+        if (!is_file($existingPath)) {
+            throw new Exception('Ausgewaehlte Datei nicht gefunden');
+        }
+
+        $relativePath = $uploadSubDir . '/' . $existingImage;
+        $stmt = $db->prepare("UPDATE {$table} SET {$column} = ? WHERE id = ?");
+        $success = $stmt->execute([$relativePath, $entityId]);
+
+        if (!$success) {
+            throw new Exception('Fehler beim Aktualisieren der Datenbank');
+        }
+
+        echo json_encode(['success' => true]);
+        exit;
+    }
+
+    // Datei-Upload pruefen
+    if (!isset($_FILES['bild']) || $_FILES['bild']['error'] !== UPLOAD_ERR_OK) {
+        throw new Exception('Keine Datei hochgeladen');
+    }
+
+    $file = $_FILES['bild'];
+
+    // Dateigroesse pruefen (10MB)
+    if ($file['size'] > 10 * 1024 * 1024) {
+        throw new Exception('Datei ist zu gross (max. 10MB)');
+    }
+
+    // Dateityp pruefen
+    $imageTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    $videoTypes = ['video/mp4', 'video/webm', 'video/ogg'];
+    $allowedTypes = $entityType === 'plan'
+        ? array_merge($imageTypes, $videoTypes)
+        : $imageTypes;
+    if (!in_array($file['type'], $allowedTypes, true)) {
+        $allowedLabel = $entityType === 'plan'
+            ? 'nur JPG, PNG, GIF, MP4, WEBM, OGG erlaubt'
+            : 'nur JPG, PNG, GIF erlaubt';
+        throw new Exception('Ungueltiger Dateityp (' . $allowedLabel . ')');
     }
 
     // Neues Bild speichern

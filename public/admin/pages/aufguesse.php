@@ -1627,6 +1627,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="hidden" id="modalEntityType" name="entity_type" value="">
                     <input type="hidden" id="modalEntityId" name="entity_id" value="">
 
+                    <!-- Vorhandenes Bild auswaehlen -->
+                    <?php
+                    $modalImageOptions = [];
+                    $modalImageDirs = [
+                        'sauna' => [
+                            'path' => __DIR__ . '/../../uploads/sauna',
+                            'exts' => ['jpg', 'jpeg', 'png', 'gif']
+                        ],
+                        'mitarbeiter' => [
+                            'path' => __DIR__ . '/../../uploads/mitarbeiter',
+                            'exts' => ['jpg', 'jpeg', 'png', 'gif']
+                        ],
+                        'duftmittel' => [
+                            'path' => __DIR__ . '/../../uploads/duftmittel',
+                            'exts' => ['jpg', 'jpeg', 'png', 'gif']
+                        ],
+                        'plan' => [
+                            'path' => __DIR__ . '/../../uploads/plan',
+                            'exts' => ['jpg', 'jpeg', 'png', 'gif', 'mp4', 'webm', 'ogg']
+                        ]
+                    ];
+
+                    foreach ($modalImageDirs as $type => $info) {
+                        $files = [];
+                        if (is_dir($info['path'])) {
+                            foreach ($info['exts'] as $ext) {
+                                $files = array_merge($files, glob($info['path'] . '/*.' . $ext));
+                            }
+                        }
+                        $files = array_map('basename', $files);
+                        sort($files);
+                        $modalImageOptions[$type] = $files;
+                    }
+                    ?>
+                    <div>
+                        <label for="modalExistingImage" class="block text-sm font-medium text-gray-900 mb-2">Bild aus Ordner auswaehlen</label>
+                        <select id="modalExistingImage" name="existing_bild" class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-indigo-500 focus:ring-indigo-500">
+                            <option value="">-- Bitte waehlen --</option>
+                        </select>
+                    </div>
+
                     <!-- Bild hochladen -->
                     <div>
                         <label class="block text-sm font-medium text-gray-900 mb-2">Neues Bild auswählen</label>
@@ -1695,6 +1736,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script>
         window.APP_BASE_URL = '<?php echo rtrim(BASE_URL, '/'); ?>/';
         window.APP_UPLOADS_URL = '<?php echo rtrim(BASE_URL, '/'); ?>/uploads/';
+        window.MODAL_IMAGE_OPTIONS = <?php echo json_encode($modalImageOptions); ?>;
     </script>
     <script src="../../assets/js/admin.js?v=<?php echo filemtime(__DIR__ . '/../../assets/js/admin.js'); ?>"></script>
     <script src="../../assets/js/admin-db-overview.js?v=<?php echo filemtime(__DIR__ . '/../../assets/js/admin-db-overview.js'); ?>"></script>
