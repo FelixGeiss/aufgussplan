@@ -405,19 +405,19 @@
 #next-aufguss-overlay.next-aufguss-admin-style {
     --popup-card-max-width: 2600px;
     --popup-card-radius: clamp(12px, 1.2vw, 48px);
-    --popup-card-pad-x: clamp(1.25rem, 2.2vw, 4.8rem);
-    --popup-card-pad-y: clamp(1rem, 1.8vw, 3.6rem);
+    --popup-card-pad-x: clamp(0.9rem, 1.8vw, 3.6rem);
+    --popup-card-pad-y: clamp(0.7rem, 1.4vw, 2.8rem);
     --popup-header-size: clamp(1rem, 1.6vw, 5.6rem);
     --popup-title-size: clamp(1.1rem, 1.9vw, 5.2rem);
     --popup-subtitle-size: clamp(0.95rem, 1.2vw, 4.8rem);
     --popup-meta-size: clamp(0.875rem, 1.1vw, 4.2rem);
     --popup-countdown-size: clamp(2.4rem, 3.8vw, 12rem);
-    --popup-countdown-pad-x: clamp(1.6rem, 2.4vw, 4.8rem);
-    --popup-countdown-pad-y: clamp(0.6rem, 1.2vw, 2.2rem);
+    --popup-countdown-pad-x: clamp(1.1rem, 1.8vw, 3.6rem);
+    --popup-countdown-pad-y: clamp(0.45rem, 0.9vw, 1.6rem);
     --popup-image-max: clamp(140px, 3.8vw, 300px);
     --popup-image-max-large: clamp(180px, 4.6vw, 360px);
     --popup-icon-size: clamp(28px, 2.2vw, 120px);
-    --popup-gap: clamp(0.5rem, 1vw, 2.4rem);
+    --popup-gap: clamp(0.35rem, 0.8vw, 1.8rem);
 }
 
 @media (min-width: 3840px) {
@@ -452,13 +452,14 @@
 #next-aufguss-overlay.next-aufguss-admin-style > div {
     width: min(94vw, var(--popup-card-max-width));
     max-width: none;
+    max-height: 92vh;
     margin-left: clamp(0.75rem, 2vw, 4rem);
     margin-right: clamp(0.75rem, 2vw, 4rem);
     border-radius: var(--popup-card-radius);
 }
 
 #next-aufguss-overlay.next-aufguss-admin-style > div > .flex {
-    padding: var(--popup-card-pad-y) var(--popup-card-pad-x);
+    padding: clamp(0.5rem, 1vw, 1.6rem) clamp(0.75rem, 1.4vw, 2.6rem);
 }
 
 #next-aufguss-overlay.next-aufguss-admin-style > div > .flex h3 {
@@ -467,7 +468,7 @@
 }
 
 #next-aufguss-overlay.next-aufguss-admin-style #next-aufguss-body {
-    padding: clamp(1.25rem, 2.2vw, 4.5rem);
+    padding: clamp(0.9rem, 1.6vw, 3.2rem);
     overflow: auto;
 }
 
@@ -505,9 +506,9 @@
 }
 
 #next-aufguss-overlay.next-aufguss-admin-style #next-aufguss-body .next-aufguss-info-grid {
-    column-gap: clamp(1rem, 1.6vw, 3.6rem);
-    row-gap: clamp(0.8rem, 1.2vw, 2.8rem);
-    margin-top: clamp(0.4rem, 0.9vw, 2rem);
+    column-gap: clamp(0.7rem, 1.2vw, 2.6rem);
+    row-gap: clamp(0.55rem, 0.9vw, 2rem);
+    margin-top: clamp(0.3rem, 0.7vw, 1.4rem);
 }
 
 #next-aufguss-overlay.next-aufguss-admin-style #next-aufguss-body .plan-list-staerke-icon,
@@ -527,11 +528,19 @@
 }
 
 #next-aufguss-overlay.next-aufguss-admin-style #next-aufguss-body .gap-6 {
-    gap: clamp(1rem, 1.6vw, 3.2rem) !important;
+    gap: clamp(0.75rem, 1.2vw, 2.6rem) !important;
 }
 
 #next-aufguss-overlay.next-aufguss-admin-style #next-aufguss-body .relative.z-10.flex.flex-col.gap-6 {
-    gap: clamp(1.4rem, 2.4vw, 5rem) !important;
+    gap: clamp(1rem, 1.8vw, 3.6rem) !important;
+    min-height: auto !important;
+}
+
+@media (max-width: 2200px) {
+    #next-aufguss-overlay.next-aufguss-admin-style {
+        --popup-image-max: clamp(120px, 3vw, 240px);
+        --popup-image-max-large: clamp(160px, 3.6vw, 320px);
+    }
 }
 
 /* ============================================================================
