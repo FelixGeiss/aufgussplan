@@ -677,6 +677,32 @@ textarea.border-green-500 {
     background-color: rgba(255, 255, 255, 0.8);
 }
 
+#next-aufguss-body .next-aufguss-info-grid {
+    display: grid;
+    grid-template-columns: max-content max-content;
+    align-items: center;
+    justify-content: center;
+    column-gap: 0.75rem;
+    row-gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+#next-aufguss-body .next-aufguss-info-label {
+    text-align: left;
+    white-space: nowrap;
+    justify-self: start;
+}
+
+#next-aufguss-body .next-aufguss-info-grid > * {
+    justify-self: start;
+}
+
+#next-aufguss-body .next-aufguss-staerke-icons,
+#next-aufguss-body .next-aufguss-staerke-icons .plan-list-staerke-icons {
+    display: flex;
+    justify-content: flex-start;
+}
+
 .plan-list-staerke-icons {
     display: flex;
     gap: 0.35rem;
@@ -702,9 +728,17 @@ textarea.border-green-500 {
     min-height: 0;
     padding: 0;
     gap: 0.4rem;
+    margin: 0;
+    justify-content: flex-start;
 }
 
 #next-aufguss-body .next-aufguss-staerke-icons .plan-list-staerke-icon {
+    width: min(90px, 3rem);
+    height: min(90px, 3rem);
+    object-fit: cover;
+}
+
+#next-aufguss-body .plan-list-staerke-icon {
     width: min(90px, 3rem);
     height: min(90px, 3rem);
     object-fit: cover;
