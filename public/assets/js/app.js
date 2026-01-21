@@ -652,6 +652,8 @@ function renderPlanView(planId, Pläene, aufguesse) {
     const bannerHeight = planSettings ? planSettings.bannerHeight : 160;
     const textColor = planSettings ? planSettings.textColor : '';
     const themeColor = planSettings ? planSettings.themeColor : '';
+    const rowColor = planSettings ? planSettings.rowColor : '';
+    const rowAlpha = planSettings ? planSettings.rowAlpha : 0.35;
     const clockBlockHeight = 96;
     const clockClass = (clockEnabled || bannerEnabled) ? ' plan-view-with-clock' : '';
     const bannerImagePath = bannerEnabled && bannerMode === 'image'
@@ -676,8 +678,11 @@ function renderPlanView(planId, Pläene, aufguesse) {
         : '';
     const textVars = textColor ? `--plan-text-color: ${textColor};` : '';
     const accentVars = themeColor ? `--plan-accent-color: ${themeColor};` : '';
-    const wrapperStyle = (clockVars || accentVars || textVars)
-        ? ` style="${clockVars}${accentVars ? ` ${accentVars}` : ''}${textVars ? ` ${textVars}` : ''}"`
+    const rowVars = rowColor
+        ? `--plan-row-bg: ${hexToRgba(rowColor, rowAlpha)}; --plan-row-bg-highlight: ${hexToRgba(rowColor, Math.min(1, rowAlpha + 0.15))};`
+        : '';
+    const wrapperStyle = (clockVars || accentVars || textVars || rowVars)
+        ? ` style="${clockVars}${accentVars ? ` ${accentVars}` : ''}${textVars ? ` ${textVars}` : ''}${rowVars ? ` ${rowVars}` : ''}"`
         : '';
     const outerStyle = textVars ? ` style="${textVars}"` : '';
     const clockStackStyle = clockVars ? ` style="${clockVars}"` : '';
@@ -1357,7 +1362,7 @@ function renderPlanRow(aufguss) {
     const startTs = getDisplayAufgussStartTimestamp(aufguss);
 
     return `
-        <tr class="bg-white/35" data-aufguss-id="${escapeHtml(aufguss.id)}" data-start-ts="${startTs || ''}">
+        <tr class="plan-row" data-aufguss-id="${escapeHtml(aufguss.id)}" data-start-ts="${startTs || ''}">
             <td class="px-6 py-4 whitespace-normal break-words text-lg font-bold text-gray-900">${escapeHtml(timeText)}</td>
             <td class="px-6 py-4 whitespace-normal break-words text-sm font-medium text-gray-900">${escapeHtml(nameText)}</td>
             <td class="px-6 py-4 whitespace-normal break-words text-sm font-medium text-gray-900">
@@ -1384,7 +1389,7 @@ function renderPlanRowDiv(aufguss) {
         : `<div class="plan-list-time"><span>${escapeHtml(timeParts.start)}</span></div>`;
 
     return `
-        <div class="plan-list-row" data-aufguss-id="${escapeHtml(aufguss.id)}" data-start-ts="${startTs || ''}">
+        <div class="plan-list-row plan-row" data-aufguss-id="${escapeHtml(aufguss.id)}" data-start-ts="${startTs || ''}">
             <div class="plan-list-cell text-lg font-bold text-gray-900">${timeHtml}</div>
             <div class="plan-list-cell text-sm font-bold text-gray-900">${escapeHtml(nameText)}</div>
             <div class="plan-list-cell text-sm text-gray-900">
@@ -1700,6 +1705,33 @@ function escapeHtml(value) {
         .replace(/'/g, '&#39;');
 }
 
+function clampAlpha(value, fallback) {
+    const parsed = Number.parseFloat(value);
+    if (Number.isNaN(parsed)) return fallback;
+    return Math.min(1, Math.max(0.1, parsed));
+}
+
+function hexToRgba(hex, alpha) {
+    const clean = String(hex || '').trim().replace('#', '');
+    let r;
+    let g;
+    let b;
+    if (clean.length === 3) {
+        r = parseInt(clean[0] + clean[0], 16);
+        g = parseInt(clean[1] + clean[1], 16);
+        b = parseInt(clean[2] + clean[2], 16);
+    } else if (clean.length === 6) {
+        r = parseInt(clean.slice(0, 2), 16);
+        g = parseInt(clean.slice(2, 4), 16);
+        b = parseInt(clean.slice(4, 6), 16);
+    } else {
+        r = 255;
+        g = 255;
+        b = 255;
+    }
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
 function buildImageTag(src, fallbackSrc, alt, className) {
     const safeAlt = escapeHtml(alt || '');
     const safeSrc = src || fallbackSrc;
@@ -1977,6 +2009,8 @@ function getNextAufgussSettings(planId) {
     const bannerHeightKey = `nextAufgussBannerHeight_${planId}`;
     const bannerWidthKey = `nextAufgussBannerWidth_${planId}`;
     const themeColorKey = `nextAufgussThemeColor_${planId}`;
+    const rowAlphaKey = `planRowAlpha_${planId}`;
+    const rowColorKey = `planRowColor_${planId}`;
 
     const serverSettings = serverNextAufgussSettings.get(String(planId)) || null;
     const enabledStored = localStorage.getItem(enabledKey);
@@ -1991,6 +2025,8 @@ function getNextAufgussSettings(planId) {
     const bannerWidthStored = localStorage.getItem(bannerWidthKey);
     const themeColorStored = localStorage.getItem(themeColorKey);
     const textColorStored = localStorage.getItem(`nextAufgussTextColor_${planId}`);
+    const rowColorStored = localStorage.getItem(rowColorKey);
+    const rowAlphaStored = localStorage.getItem(rowAlphaKey);
 
     const enabled = serverSettings && typeof serverSettings.enabled === 'boolean'
         ? serverSettings.enabled
@@ -2028,6 +2064,12 @@ function getNextAufgussSettings(planId) {
     const textColor = serverSettings && typeof serverSettings.text_color === 'string'
         ? serverSettings.text_color
         : (textColorStored || '#111827');
+    const rowColor = serverSettings && typeof serverSettings.row_color === 'string'
+        ? serverSettings.row_color
+        : (rowColorStored || '#ffffff');
+    const rowAlpha = serverSettings && Number.isFinite(Number(serverSettings.row_alpha))
+        ? clampAlpha(serverSettings.row_alpha, 0.35)
+        : (rowAlphaStored ? clampAlpha(rowAlphaStored, 0.35) : 0.35);
 
     return {
         enabled,
@@ -2041,7 +2083,9 @@ function getNextAufgussSettings(planId) {
         bannerHeight,
         bannerWidth,
         themeColor,
-        textColor
+        textColor,
+        rowColor,
+        rowAlpha
     };
 }
 

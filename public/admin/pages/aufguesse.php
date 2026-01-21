@@ -634,7 +634,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 </thead>
                                                 <tbody class="bg-transparent divide-y divide-gray-200">
                                                     <?php foreach ($planAufgüsse as $aufguss): ?>
-                                                        <tr class="bg-white/35" data-aufguss-id="<?php echo $aufguss['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" data-staerke-level="<?php echo (int)($aufguss['staerke'] ?? 0); ?>" data-staerke-icon="<?php echo htmlspecialchars($aufguss['staerke_icon'] ?? ''); ?>">
+                                                        <tr class="plan-row" data-aufguss-id="<?php echo $aufguss['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" data-staerke-level="<?php echo (int)($aufguss['staerke'] ?? 0); ?>" data-staerke-icon="<?php echo htmlspecialchars($aufguss['staerke_icon'] ?? ''); ?>">
                                                             <!-- Zeit -->
                                                             <td class="px-6 py-4 whitespace-normal break-words zeit-cell">
                                                                 <!-- Anzeige-Modus -->
@@ -1369,6 +1369,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                         </label>
                                                         <div class="flex items-center justify-center gap-4">
                                                             <input id="plan-text-color-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="color" class="h-10 w-20 rounded border border-gray-300 bg-white shadow-sm cursor-pointer">
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex-1">
+                                                        <label for="plan-row-color-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-2 text-center">
+                                                            Zeilenfarbe
+                                                        </label>
+                                                        <div class="flex items-center justify-center gap-4">
+                                                            <input id="plan-row-color-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="color" class="h-10 w-20 rounded border border-gray-300 bg-white shadow-sm cursor-pointer">
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex-1">
+                                                        <label for="plan-row-alpha-<?php echo $plan['id']; ?>" class="block text-sm font-medium text-gray-700 mb-2 text-center">
+                                                            Transparenz
+                                                        </label>
+                                                        <div class="flex items-center justify-center gap-3">
+                                                            <input id="plan-row-alpha-<?php echo $plan['id']; ?>" data-plan-id="<?php echo $plan['id']; ?>" type="range" min="0.1" max="1" step="0.05" class="plan-row-alpha w-32 cursor-pointer">
+                                                            <span id="plan-row-alpha-value-<?php echo $plan['id']; ?>" class="plan-row-alpha-value text-xs font-semibold text-gray-600">35%</span>
                                                         </div>
                                                     </div>
                                                 </div>

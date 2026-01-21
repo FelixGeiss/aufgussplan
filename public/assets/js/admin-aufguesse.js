@@ -1121,6 +1121,48 @@ function formatStaerke(aufguss) {
             }
         }
 
+        function clampAlpha(value, fallback) {
+            const parsed = Number.parseFloat(value);
+            if (Number.isNaN(parsed)) return fallback;
+            return Math.min(1, Math.max(0.1, parsed));
+        }
+
+        function updateRowAlphaLabel(planId, value) {
+            const label = document.getElementById(`plan-row-alpha-value-${planId}`);
+            if (!label) return;
+            const percent = Math.round(clampAlpha(value, 0.35) * 100);
+            label.textContent = `${percent}%`;
+        }
+
+        function updateRowAlphaThumb(planId, value) {
+            const input = document.getElementById(`plan-row-alpha-${planId}`);
+            if (!input) return;
+            const alpha = clampAlpha(value, 0.35);
+            input.style.setProperty('--plan-row-alpha-thumb', `rgba(0, 0, 0, ${alpha})`);
+        }
+
+
+        function hexToRgba(hex, alpha) {
+            const clean = String(hex || '').trim().replace('#', '');
+            let r;
+            let g;
+            let b;
+            if (clean.length === 3) {
+                r = parseInt(clean[0] + clean[0], 16);
+                g = parseInt(clean[1] + clean[1], 16);
+                b = parseInt(clean[2] + clean[2], 16);
+            } else if (clean.length === 6) {
+                r = parseInt(clean.slice(0, 2), 16);
+                g = parseInt(clean.slice(2, 4), 16);
+                b = parseInt(clean.slice(4, 6), 16);
+            } else {
+                r = 255;
+                g = 255;
+                b = 255;
+            }
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        }
+
         // Funktion: getPlanSettings
         function getPlanSettings(planId) {
             const keyEnabled = `nextAufgussEnabled_${planId}`;
@@ -1135,6 +1177,8 @@ function formatStaerke(aufguss) {
             const keyBannerWidth = `nextAufgussBannerWidth_${planId}`;
             const keyThemeColor = `nextAufgussThemeColor_${planId}`;
             const keyTextColor = `nextAufgussTextColor_${planId}`;
+            const keyRowColor = `planRowColor_${planId}`;
+            const keyRowAlpha = `planRowAlpha_${planId}`;
             const enabled = localStorage.getItem(keyEnabled);
             const leadSeconds = localStorage.getItem(keyLead);
             const highlightEnabled = localStorage.getItem(keyHighlight);
@@ -1147,6 +1191,8 @@ function formatStaerke(aufguss) {
             const bannerWidth = localStorage.getItem(keyBannerWidth);
             const themeColor = localStorage.getItem(keyThemeColor);
             const textColor = localStorage.getItem(keyTextColor);
+            const rowColor = localStorage.getItem(keyRowColor);
+            const rowAlpha = localStorage.getItem(keyRowAlpha);
             const settings = {
                 enabled: enabled === null ? true : enabled === 'true',
                 leadSeconds: leadSeconds ? Math.max(1, parseInt(leadSeconds, 10)) : 5,
@@ -1159,7 +1205,9 @@ function formatStaerke(aufguss) {
                 bannerHeight: bannerHeight ? Math.max(40, parseInt(bannerHeight, 10)) : 160,
                 bannerWidth: bannerWidth ? Math.max(160, parseInt(bannerWidth, 10)) : 220,
                 themeColor: themeColor ? String(themeColor) : '#ffffff',
-                textColor: textColor ? String(textColor) : '#111827'
+                textColor: textColor ? String(textColor) : '#111827',
+                rowColor: rowColor ? String(rowColor) : '#ffffff',
+                rowAlpha: clampAlpha(rowAlpha, 0.35)
             };
             nextAufgussSettings.set(String(planId), settings);
             return settings;
@@ -1175,6 +1223,8 @@ function formatStaerke(aufguss) {
             const bannerInput = document.getElementById(`next-aufguss-banner-enabled-${planId}`);
             const themeColorInput = document.getElementById(`next-aufguss-theme-color-${planId}`);
             const textColorInput = document.getElementById(`plan-text-color-${planId}`);
+            const rowColorInput = document.getElementById(`plan-row-color-${planId}`);
+            const rowAlphaInput = document.getElementById(`plan-row-alpha-${planId}`);
             if (enabledInput) enabledInput.checked = settings.enabled;
             if (leadInput) leadInput.value = settings.leadSeconds;
             if (highlightInput) highlightInput.checked = settings.highlightEnabled;
@@ -1182,10 +1232,16 @@ function formatStaerke(aufguss) {
             if (bannerInput) bannerInput.checked = settings.bannerEnabled;
             if (themeColorInput) themeColorInput.value = settings.themeColor || '#ffffff';
             if (textColorInput) textColorInput.value = settings.textColor || '#111827';
+            if (rowColorInput) rowColorInput.value = settings.rowColor || '#ffffff';
+            if (rowAlphaInput) rowAlphaInput.value = settings.rowAlpha;
+            updateRowAlphaLabel(planId, settings.rowAlpha);
+            updateRowAlphaThumb(planId, settings.rowAlpha);
             const planTableScope = document.getElementById(`plan-table-wrap-${planId}`);
             if (planTableScope) {
                 planTableScope.style.setProperty('--plan-accent-color', settings.themeColor || '#ffffff');
                 planTableScope.style.setProperty('--plan-text-color', settings.textColor || '#111827');
+                planTableScope.style.setProperty('--plan-row-bg', hexToRgba(settings.rowColor || '#ffffff', settings.rowAlpha));
+                planTableScope.style.setProperty('--plan-row-bg-highlight', hexToRgba(settings.rowColor || '#ffffff', Math.min(1, settings.rowAlpha + 0.15)));
             }
             const planClock = document.getElementById(`plan-clock-admin-${planId}`);
             if (planClock) {
@@ -1235,6 +1291,8 @@ function savePlanSettings(planId, options = {}) {
             const bannerInput = document.getElementById(`next-aufguss-banner-enabled-${planId}`);
             const themeColorInput = document.getElementById(`next-aufguss-theme-color-${planId}`);
             const textColorInput = document.getElementById(`plan-text-color-${planId}`);
+            const rowColorInput = document.getElementById(`plan-row-color-${planId}`);
+            const rowAlphaInput = document.getElementById(`plan-row-alpha-${planId}`);
             if (!enabledInput || !leadInput) return;
             const persist = !!options.persist;
 
@@ -1255,7 +1313,15 @@ function savePlanSettings(planId, options = {}) {
             const textColor = textColorInput && textColorInput.value
                 ? textColorInput.value
                 : (currentSettings ? String(currentSettings.textColor || '#111827') : '#111827');
+            const rowColor = rowColorInput && rowColorInput.value
+                ? rowColorInput.value
+                : (currentSettings ? String(currentSettings.rowColor || '#ffffff') : '#ffffff');
+            const rowAlpha = rowAlphaInput && rowAlphaInput.value
+                ? clampAlpha(rowAlphaInput.value, 0.35)
+                : (currentSettings ? clampAlpha(currentSettings.rowAlpha, 0.35) : 0.35);
             leadInput.value = leadSeconds;
+            updateRowAlphaLabel(planId, rowAlpha);
+            updateRowAlphaThumb(planId, rowAlpha);
 
             localStorage.setItem(`nextAufgussEnabled_${planId}`, String(enabled));
             localStorage.setItem(`nextAufgussLeadSeconds_${planId}`, String(leadSeconds));
@@ -1264,6 +1330,8 @@ function savePlanSettings(planId, options = {}) {
             localStorage.setItem(`nextAufgussBannerEnabled_${planId}`, String(bannerEnabled));
             localStorage.setItem(`nextAufgussThemeColor_${planId}`, String(themeColor));
             localStorage.setItem(`nextAufgussTextColor_${planId}`, String(textColor));
+            localStorage.setItem(`planRowColor_${planId}`, String(rowColor));
+            localStorage.setItem(`planRowAlpha_${planId}`, String(rowAlpha));
             nextAufgussSettings.set(String(planId), {
                 enabled,
                 leadSeconds,
@@ -1276,12 +1344,16 @@ function savePlanSettings(planId, options = {}) {
                 bannerHeight,
                 bannerWidth,
                 themeColor,
-                textColor
+                textColor,
+                rowColor,
+                rowAlpha
             });
             const planTableScope = document.getElementById(`plan-table-wrap-${planId}`);
             if (planTableScope) {
                 planTableScope.style.setProperty('--plan-accent-color', themeColor);
                 planTableScope.style.setProperty('--plan-text-color', textColor);
+                planTableScope.style.setProperty('--plan-row-bg', hexToRgba(rowColor, rowAlpha));
+                planTableScope.style.setProperty('--plan-row-bg-highlight', hexToRgba(rowColor, Math.min(1, rowAlpha + 0.15)));
             }
             const planClock = document.getElementById(`plan-clock-admin-${planId}`);
             if (planClock) {
@@ -1305,7 +1377,9 @@ function savePlanSettings(planId, options = {}) {
                     bannerHeight,
                     bannerWidth,
                     themeColor,
-                    textColor
+                    textColor,
+                    rowColor,
+                    rowAlpha
                 );
                 if (isSelectedPlan(planId)) {
                     notifyPublicPlanChange(planId);
@@ -1326,7 +1400,7 @@ function savePlanSettings(planId, options = {}) {
         }
 
         // Funktion: syncNextAufgussSettings
-        function syncNextAufgussSettings(planId, enabled, leadSeconds, highlightEnabled, clockEnabled, bannerEnabled, bannerMode, bannerText, bannerImage, bannerHeight, bannerWidth, themeColor, textColor) {
+function syncNextAufgussSettings(planId, enabled, leadSeconds, highlightEnabled, clockEnabled, bannerEnabled, bannerMode, bannerText, bannerImage, bannerHeight, bannerWidth, themeColor, textColor, rowColor, rowAlpha) {
             fetch('../../api/next_aufguss_settings.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -1343,7 +1417,9 @@ function savePlanSettings(planId, options = {}) {
                     banner_height: Number(bannerHeight || 160),
                     banner_width: Number(bannerWidth || 220),
                     theme_color: String(themeColor || '#ffffff'),
-                    text_color: String(textColor || '#111827')
+                    text_color: String(textColor || '#111827'),
+                    row_color: String(rowColor || '#ffffff'),
+                    row_alpha: Number(rowAlpha || 0.35)
                 })
             }).catch(() => {});
         }
@@ -1374,7 +1450,13 @@ function savePlanSettings(planId, options = {}) {
                         : String(currentSettings.themeColor || '#ffffff'),
                     text_color: serverSettings && typeof serverSettings.text_color === 'string'
                         ? serverSettings.text_color
-                        : String(currentSettings.textColor || '#111827')
+                        : String(currentSettings.textColor || '#111827'),
+                    row_color: serverSettings && typeof serverSettings.row_color === 'string'
+                        ? serverSettings.row_color
+                        : String(currentSettings.rowColor || '#ffffff'),
+                    row_alpha: serverSettings && Number.isFinite(Number(serverSettings.row_alpha))
+                        ? Number(serverSettings.row_alpha)
+                        : Number(currentSettings.rowAlpha || 0.35)
                 };
                 syncNextAufgussSettings(
                     planId,
@@ -1389,7 +1471,9 @@ function savePlanSettings(planId, options = {}) {
                     payload.banner_height,
                     payload.banner_width,
                     payload.theme_color,
-                    payload.text_color
+                    payload.text_color,
+                    payload.row_color,
+                    payload.row_alpha
                 );
                 if (isSelectedPlan(planId)) {
                     notifyPublicPlanChange(planId);
@@ -1429,7 +1513,9 @@ function savePlanSettings(planId, options = {}) {
                     theme_color: String(currentSettings.themeColor || '#ffffff'),
                     text_color: serverSettings && typeof serverSettings.text_color === 'string'
                         ? serverSettings.text_color
-                        : String(currentSettings.textColor || '#111827')
+                        : String(currentSettings.textColor || '#111827'),
+                    row_color: String(currentSettings.rowColor || '#ffffff'),
+                    row_alpha: Number(currentSettings.rowAlpha || 0.35)
                 };
                 syncNextAufgussSettings(
                     planId,
@@ -1444,7 +1530,9 @@ function savePlanSettings(planId, options = {}) {
                     payload.banner_height,
                     payload.banner_width,
                     payload.theme_color,
-                    payload.text_color
+                    payload.text_color,
+                    payload.row_color,
+                    payload.row_alpha
                 );
                 if (isSelectedPlan(planId)) {
                     notifyPublicPlanChange(planId);
@@ -2006,6 +2094,8 @@ function savePlanSettings(planId, options = {}) {
                 const bannerInput = document.getElementById(`next-aufguss-banner-enabled-${planId}`);
                 const themeColorInput = document.getElementById(`next-aufguss-theme-color-${planId}`);
                 const textColorInput = document.getElementById(`plan-text-color-${planId}`);
+                const rowColorInput = document.getElementById(`plan-row-color-${planId}`);
+                const rowAlphaInput = document.getElementById(`plan-row-alpha-${planId}`);
                 const planForm = document.querySelector(`#form-${planId} form`);
                 const adEnabledInput = document.getElementById(`plan-ad-enabled-${planId}`);
                 const adIntervalInput = document.getElementById(`plan-ad-interval-${planId}`);
@@ -2038,6 +2128,18 @@ function savePlanSettings(planId, options = {}) {
                 }
                 if (textColorInput) {
                     textColorInput.addEventListener('change', () => savePlanSettings(planId));
+                }
+                if (rowColorInput) {
+                    rowColorInput.addEventListener('change', () => {
+                        savePlanSettings(planId, { persist: true });
+                    });
+                }
+                if (rowAlphaInput) {
+                    rowAlphaInput.addEventListener('input', () => {
+                        updateRowAlphaLabel(planId, rowAlphaInput.value);
+                        updateRowAlphaThumb(planId, rowAlphaInput.value);
+                    });
+                    rowAlphaInput.addEventListener('change', () => savePlanSettings(planId, { persist: true }));
                 }
                 if (planForm) {
                     planForm.addEventListener('submit', () => savePlanSettings(planId));
@@ -2240,7 +2342,10 @@ function savePlanSettings(planId, options = {}) {
                 bannerImage,
                 bannerHeight,
                 bannerWidth,
-                updatedSettings.themeColor
+                updatedSettings.themeColor,
+                updatedSettings.textColor,
+                updatedSettings.rowColor,
+                updatedSettings.rowAlpha
             );
             if (isSelectedPlan(planId)) {
                 notifyPublicPlanChange(planId);

@@ -138,7 +138,7 @@
    ============================================================================ */
 
 .next-aufguss-row {
-    background-color: rgba(255, 255, 255, 0.6);
+    background-color: var(--plan-row-bg-highlight, rgba(255, 255, 255, 0.6));
     outline: none;
 }
 
@@ -830,6 +830,10 @@
     border-bottom-width: clamp(1px, 0.05vw, 2px);
 }
 
+.plan-row {
+    background: var(--plan-row-bg, rgba(255, 255, 255, 0.35));
+}
+
 .plan-list-head .plan-list-cell {
     white-space: nowrap;
     overflow: hidden;
@@ -837,14 +841,14 @@
 }
 
 .plan-list-row {
-    background: rgba(255, 255, 255, 0.35);
+    background: var(--plan-row-bg, rgba(255, 255, 255, 0.35));
     border-bottom: 1px solid #e5e7eb;
     border-bottom-width: clamp(1px, 0.05vw, 2px);
     scroll-margin-top: clamp(80px, 4vw, 200px);
 }
 
 .plan-list-row.next-aufguss-row {
-    background: rgba(255, 255, 255, 0.5);
+    background: var(--plan-row-bg-highlight, rgba(255, 255, 255, 0.5));
     box-shadow: 0 12px 24px rgba(17, 24, 39, 0.18), 0 2px 6px rgba(17, 24, 39, 0.12);
     border: 1px solid rgba(255, 255, 255, 0.8);
     border-width: clamp(1px, 0.05vw, 2px);
@@ -1036,6 +1040,8 @@
 
 .plan-color-scope {
     --plan-text-color: #111827;
+    --plan-row-bg: rgba(255, 255, 255, 0.35);
+    --plan-row-bg-highlight: rgba(255, 255, 255, 0.5);
 }
 
 .plan-color-scope .text-gray-900 {

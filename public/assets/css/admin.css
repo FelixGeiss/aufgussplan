@@ -639,7 +639,7 @@ textarea.border-green-500 {
 
 /* Highlight fuer den naechsten Aufguss in der Tabelle */
 .next-aufguss-row {
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: var(--plan-row-bg-highlight, rgba(255, 255, 255, 0.5));
     box-shadow: 0 12px 24px rgba(17, 24, 39, 0.18), 0 2px 6px rgba(17, 24, 39, 0.12);
     border: 1px solid rgba(255, 255, 255, 0.8);
     transform: translateY(-1px);
@@ -908,10 +908,35 @@ textarea.border-green-500 {
 .plan-table-scope {
     --plan-accent-color: #ffffff;
     --plan-text-color: #111827;
+    --plan-row-bg: rgba(255, 255, 255, 0.35);
+    --plan-row-bg-highlight: rgba(255, 255, 255, 0.5);
 }
 
 .plan-table-scope .text-gray-900 {
     color: var(--plan-text-color, #111827) !important;
+}
+
+.plan-table-scope .plan-row {
+    background-color: var(--plan-row-bg, rgba(255, 255, 255, 0.35));
+}
+
+.plan-row-alpha {
+    accent-color: var(--plan-row-alpha-thumb, rgba(0, 0, 0, 0.35));
+}
+
+.plan-row-alpha::-webkit-slider-thumb {
+    background-color: var(--plan-row-alpha-thumb, rgba(0, 0, 0, 0.35));
+}
+
+.plan-row-alpha::-moz-range-thumb {
+    background-color: var(--plan-row-alpha-thumb, rgba(0, 0, 0, 0.35));
+    border: none;
+}
+
+.plan-row-alpha-value {
+    display: inline-block;
+    width: 3.5rem;
+    text-align: right;
 }
 
 .plan-table-scope .mitarbeiter-cell .display-mode > .flex {
