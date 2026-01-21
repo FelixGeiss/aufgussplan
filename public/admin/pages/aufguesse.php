@@ -72,6 +72,16 @@ function getStaerkeBadgeInfo($level) {
     }
 }
 
+function buildUploadsUrl($relativePath) {
+    $relativePath = ltrim((string)$relativePath, '/');
+    $urlPath = '../../uploads/' . $relativePath;
+    $filePath = UPLOAD_PATH . str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $relativePath);
+    if ($relativePath !== '' && is_file($filePath)) {
+        $urlPath .= '?v=' . filemtime($filePath);
+    }
+    return $urlPath;
+}
+
 $aufgussModel = new Aufguss();
 
 // Pläne aus Datenbank laden
@@ -576,10 +586,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <?php if (!empty($backgroundPath)): ?>
                                 <?php if ($backgroundIsVideo): ?>
                                     <video class="absolute inset-0 w-full h-full object-cover" autoplay muted loop playsinline>
-                                        <source src="../../uploads/<?php echo htmlspecialchars($backgroundPath); ?>" type="video/<?php echo htmlspecialchars($backgroundExt); ?>">
+                                        <source src="<?php echo htmlspecialchars(buildUploadsUrl($backgroundPath)); ?>" type="video/<?php echo htmlspecialchars($backgroundExt); ?>">
                                     </video>
                                 <?php else: ?>
-                                    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('../../uploads/<?php echo htmlspecialchars($backgroundPath); ?>');"></div>
+                                    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<?php echo htmlspecialchars(buildUploadsUrl($backgroundPath)); ?>');"></div>
                                 <?php endif; ?>
                             <?php endif; ?>
                             <div class="relative">
@@ -1254,10 +1264,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             ?>
                                             <?php if ($bgIsVideo): ?>
                                                 <video class="w-full h-48 object-cover" autoplay muted loop playsinline>
-                                                    <source src="../../uploads/<?php echo htmlspecialchars($bgPath); ?>" type="video/<?php echo htmlspecialchars($bgExt); ?>">
+                                                    <source src="<?php echo htmlspecialchars(buildUploadsUrl($bgPath)); ?>" type="video/<?php echo htmlspecialchars($bgExt); ?>">
                                                 </video>
                                             <?php else: ?>
-                                                <img src="../../uploads/<?php echo htmlspecialchars($bgPath); ?>"
+                                                <img src="<?php echo htmlspecialchars(buildUploadsUrl($bgPath)); ?>"
                                                     alt="Plan Hintergrundbild"
                                                     class="w-full h-48 object-cover">
                                             <?php endif; ?>
