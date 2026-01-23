@@ -189,7 +189,7 @@ input[type="radio"] {
 }
 
 .apexcharts-toolbar .apexcharts-menu-icon {
-    transform: scale(1.35);
+    transform: scale(1);
 }
 
 /* Legenden-Filter: Text im Button zentrieren, Checkbox links fixieren */

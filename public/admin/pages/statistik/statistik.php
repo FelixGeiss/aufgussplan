@@ -187,7 +187,7 @@ $dayKeys = [];
 $dayStart = new DateTime('today');
 $dayStart->modify('-6 days');
 for ($i = 0; $i < 7; $i++) {
-    $label = $dayStart->format('d.m');
+    $label = $dayStart->format('d.m.Y');
     $key = $dayStart->format('Y-m-d');
     $dayLabels[] = $label;
     $dayKeys[] = $key;
@@ -214,7 +214,7 @@ $weekStart = new DateTime('monday this week');
 $weekStart->modify('-7 weeks');
 for ($i = 0; $i < 8; $i++) {
     $key = $weekStart->format('oW');
-    $weekLabels[] = 'KW ' . $weekStart->format('W');
+    $weekLabels[] = 'KW ' . $weekStart->format('W') . '/' . $weekStart->format('o');
     $weekKeys[] = $key;
     $weekCounts[] = $byWeekMap[$key] ?? 0;
     $weekStart->modify('+1 week');
@@ -733,26 +733,7 @@ if (defined('STATISTIK_JSON')) {
     <div class="container mx-auto px-4 py-8">
         <h2 class="text-2xl font-bold mb-6">Statistiken</h2>
 
-        <div class="mb-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-3">Zeitreihen</h3>
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <div class="flex flex-wrap items-center gap-4" style="min-height:46px;">
-                    <span class="text-sm font-semibold text-gray-700">Zeitreihen anzeigen:</span>
-                <button type="button" class="plan-select-btn" data-toggle-target="period-days" data-toggle-group="period" aria-pressed="true">
-                    Tage
-                </button>
-                <button type="button" class="plan-select-btn" data-toggle-target="period-weeks" data-toggle-group="period" aria-pressed="false">
-                    Wochen
-                </button>
-                <button type="button" class="plan-select-btn" data-toggle-target="period-months" data-toggle-group="period" aria-pressed="false">
-                    Monate
-                </button>
-                <button type="button" class="plan-select-btn" data-toggle-target="period-years" data-toggle-group="period" aria-pressed="false">
-                    Jahre
-                </button>
-                </div>
-            </div>
-        </div>
+        <div class="mb-6"></div>
 
         <div class="mb-6">
             <h3 class="text-lg font-semibold text-gray-900 mb-3">Legende filtern</h3>
@@ -779,54 +760,54 @@ if (defined('STATISTIK_JSON')) {
         </div>
 
         <div id="period-days" class="mb-8" data-period="days">
-            <div class="flex items-center gap-4 mb-4">
-                <h3 class="text-lg font-semibold text-gray-900">Tage</h3>
-                <div class="flex-1 border-t border-gray-200"></div>
-            </div>
             <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center gap-4 mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Tage</h3>
+                    <div class="flex-1 border-t border-gray-200"></div>
+                </div>
                 <div id="apex-chart-days" class="apex-chart apex-chart-line"></div>
             </div>
         </div>
 
-        <div id="period-weeks" class="mb-8 hidden" data-period="weeks">
-            <div class="flex items-center gap-4 mb-4">
-                <h3 class="text-lg font-semibold text-gray-900">Wochen</h3>
-                <div class="flex-1 border-t border-gray-200"></div>
-            </div>
+        <div id="period-weeks" class="mb-8" data-period="weeks">
             <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center gap-4 mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Wochen</h3>
+                    <div class="flex-1 border-t border-gray-200"></div>
+                </div>
                 <div id="apex-chart-weeks" class="apex-chart apex-chart-line"></div>
             </div>
         </div>
 
-        <div id="period-months" class="mb-8 hidden" data-period="months">
-            <div class="flex items-center gap-4 mb-4">
-                <h3 class="text-lg font-semibold text-gray-900">Monate</h3>
-                <div class="flex-1 border-t border-gray-200"></div>
-            </div>
+        <div id="period-months" class="mb-8" data-period="months">
             <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center gap-4 mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Monate</h3>
+                    <div class="flex-1 border-t border-gray-200"></div>
+                </div>
                 <div id="apex-chart-months" class="apex-chart apex-chart-line"></div>
             </div>
         </div>
 
-        <div id="period-years" class="mb-8 hidden" data-period="years">
-            <div class="flex items-center gap-4 mb-4">
-                <h3 class="text-lg font-semibold text-gray-900">Jahre</h3>
-                <div class="flex-1 border-t border-gray-200"></div>
-            </div>
+        <div id="period-years" class="mb-8" data-period="years">
             <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center gap-4 mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Jahre</h3>
+                    <div class="flex-1 border-t border-gray-200"></div>
+                </div>
                 <div id="apex-chart-years" class="apex-chart apex-chart-line"></div>
             </div>
         </div>
 
         <div class="my-8 border-t border-gray-200"></div>
 
-        <h3 id="more-stats" class="text-lg font-semibold text-gray-900 mb-4">Weitere Statistiken (immer sichtbar)</h3>
+        <h3 id="more-stats" class="text-lg font-semibold text-gray-900 mb-4">Weitere Statistiken</h3>
         <?php if (!empty($planRows)) : ?>
         <div class="mb-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-3">Pläene (ein-/ausblenden)</h3>
+            <h4 class="text-sm font-semibold text-gray-700 mb-3">Pläne (ein-/ausblenden)</h4>
             <div class="bg-white rounded-lg shadow-md p-6">
                 <div class="flex flex-wrap items-center gap-4">
-                    <span class="text-sm font-semibold text-gray-700">Pläene anzeigen:</span>
+                    <span class="text-sm font-semibold text-gray-700">Pläne anzeigen:</span>
                     <?php foreach ($planRows as $planRow) :
                         $planId = (int)$planRow['id'];
                         $isActive = empty($selectedPlanIds) || in_array($planId, $selectedPlanIds, true);
@@ -1048,7 +1029,6 @@ if (defined('STATISTIK_JSON')) {
                 'data' => array_map(function ($item) { return (int)$item['value']; }, $saunaItems)
             ]
         ], JSON_UNESCAPED_UNICODE); ?>;
-        let currentPeriod = 'days';
         const chartInstances = {};
         const barChartInstances = {};
         const seriesNameByKey = {};
@@ -1082,10 +1062,6 @@ if (defined('STATISTIK_JSON')) {
                             btn.classList.toggle('is-active', isActive);
                         }
                     });
-                    if (group === 'period') {
-                        const period = target.getAttribute('data-period') || 'days';
-                        currentPeriod = period;
-                    }
                     return;
                 }
 
@@ -1135,14 +1111,15 @@ if (defined('STATISTIK_JSON')) {
                     height: 420,
                     toolbar: {
                         show: true,
+                        offsetY: 0,
                         tools: {
                             download: true,
-                            selection: false,
-                            zoom: false,
-                            zoomin: false,
-                            zoomout: false,
-                            pan: false,
-                            reset: false
+                            selection: true,
+                            zoom: true,
+                            zoomin: true,
+                            zoomout: true,
+                            pan: true,
+                            reset: true
                         },
                         export: {
                             csv: {
@@ -1158,7 +1135,11 @@ if (defined('STATISTIK_JSON')) {
                             }
                         }
                     },
-                    zoom: { enabled: false },
+                    zoom: {
+                        enabled: true,
+                        type: 'x',
+                        autoScaleYaxis: true
+                    },
                     animations: { enabled: true }
                 },
                 series: series.map((item) => ({ name: item.name, data: item.data })),
@@ -1173,6 +1154,7 @@ if (defined('STATISTIK_JSON')) {
                 legend: {
                     show: true,
                     position: 'top',
+                    offsetY: 22,
                     onItemClick: { toggleDataSeries: true }
                 },
                 tooltip: { shared: true, intersect: false }
