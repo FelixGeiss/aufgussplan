@@ -266,7 +266,7 @@ function renderScreenImage() {
     applyPlanBackground(backgroundPath);
 
     if (!imagePath) {
-        container.innerHTML = '<p class="text-center text-gray-500 py-8">Kein Bildschirm-Bild hinterlegt.</p>';
+        container.innerHTML = '';
         return;
     }
 

@@ -381,7 +381,7 @@ function buildScreenCard(screenId, screen, plans) {
                     </select>
                     <input type="file" name="background_upload" data-kind="background" class="w-full text-sm">
                     <div class="mt-2" data-preview="background">
-                        ${buildPreview(backgroundPath)}
+                        ${buildMediaPreview(backgroundPath)}
                     </div>
                 </div>
                 <div class="md:col-span-2">
@@ -480,7 +480,7 @@ function getCardConfig(card) {
 function updatePreview(card, kind, path) {
     const preview = card.querySelector(`[data-preview="${kind}"]`);
     if (!preview) return;
-    preview.innerHTML = buildPreview(path);
+    preview.innerHTML = kind === 'background' ? buildMediaPreview(path) : buildPreview(path);
 }
 
 // Aktualisiert die Global-Ad-Vorschau.

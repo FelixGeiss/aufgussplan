@@ -41,7 +41,7 @@ function listUploadFiles($subDir, $allowedExtensions = []) {
 }
 
 $screenImages = listUploadFiles('screens', ['jpg', 'jpeg', 'png', 'gif']);
-$backgroundImages = listUploadFiles('plan', ['jpg', 'jpeg', 'png', 'gif']);
+$backgroundImages = listUploadFiles('plan', ['jpg', 'jpeg', 'png', 'gif', 'mp4', 'webm', 'ogg']);
 $werbungFiles = listUploadFiles('werbung');
 ?>
 <!DOCTYPE html>
