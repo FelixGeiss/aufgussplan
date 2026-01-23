@@ -735,9 +735,10 @@ if (defined('STATISTIK_JSON')) {
 
         <div class="mb-6"></div>
 
-        <div class="mb-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-3">Legende filtern</h3>
+        <div class="mb-8">
+            <div class="mb-6 sticky top-4 z-30">
             <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3">Legende filtern</h3>
                 <div class="flex flex-wrap items-center gap-4 text-sm text-gray-700">
                     <label class="plan-select-btn legend-filter">
                         <input type="checkbox" class="rounded border-gray-300" data-legend-group="aufguss" checked>
@@ -797,6 +798,8 @@ if (defined('STATISTIK_JSON')) {
                 </div>
                 <div id="apex-chart-years" class="apex-chart apex-chart-line"></div>
             </div>
+        </div>
+
         </div>
 
         <div class="my-8 border-t border-gray-200"></div>
