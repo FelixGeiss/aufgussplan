@@ -1292,8 +1292,14 @@ if (defined('STATISTIK_JSON')) {
 
         legendGroupInputs.forEach((input) => {
             input.addEventListener('change', () => {
+                const savedScroll = window.scrollY;
                 destroyLineCharts();
                 initCharts();
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        window.scrollTo({ top: savedScroll, behavior: 'auto' });
+                    });
+                });
             });
         });
 
