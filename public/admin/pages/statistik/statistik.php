@@ -101,11 +101,11 @@ function fetchStaerkeItems(PDO $db, $whereSql, array $params) {
         $map[(int)$row['staerke']] = (int)$row['cnt'];
     }
     $items = [];
-    for ($s = 1; $s <= 6; $s++) {
+    for ($s = 1; $s <= 3; $s++) {
         $items[] = ['label' => 'St ' . $s, 'value' => $map[$s] ?? 0];
     }
     if ($ohne > 0) {
-        $items[] = ['label' => 'Ohne Staerke', 'value' => $ohne];
+        $items[] = ['label' => 'Ohne Stärke', 'value' => $ohne];
     }
     return $items;
 }
@@ -340,11 +340,11 @@ foreach ($staerkeRows as $row) {
     $staerkeMap[(int)$row['staerke']] = (int)$row['cnt'];
 }
 $staerkeItems = [];
-for ($s = 1; $s <= 6; $s++) {
+for ($s = 1; $s <= 3; $s++) {
     $staerkeItems[] = ['label' => 'St ' . $s, 'value' => $staerkeMap[$s] ?? 0];
 }
 if ($ohneStaerkeCount > 0) {
-    $staerkeItems[] = ['label' => 'Ohne Staerke', 'value' => $ohneStaerkeCount];
+    $staerkeItems[] = ['label' => 'Ohne Stärke', 'value' => $ohneStaerkeCount];
 }
 if ($noPlansSelected) {
     $staerkeItems = [];
@@ -431,7 +431,7 @@ $staerkeDayItemsByLevel = [];
 $staerkeWeekItemsByLevel = [];
 $staerkeMonthItemsByLevel = [];
 $staerkeYearItemsByLevel = [];
-for ($level = 1; $level <= 6; $level++) {
+for ($level = 1; $level <= 3; $level++) {
     $staerkeDayMap = fetchTimeSeriesMap(
         $db,
         "DATE(datum)",
@@ -535,10 +535,10 @@ foreach ($saunaList as $sauna) {
         'strokeClass' => 'stroke-emerald-500'
     ];
 }
-for ($level = 1; $level <= 6; $level++) {
+for ($level = 1; $level <= 3; $level++) {
     $seriesDays[] = [
         'key' => 'staerke-' . $level,
-        'label' => 'Staerke ' . $level,
+        'label' => 'Stärke ' . $level,
         'items' => $staerkeDayItemsByLevel[$level],
         'strokeClass' => 'stroke-slate-' . (300 + ($level * 100))
     ];
@@ -564,10 +564,10 @@ foreach ($saunaList as $sauna) {
         'strokeClass' => 'stroke-emerald-600'
     ];
 }
-for ($level = 1; $level <= 6; $level++) {
+for ($level = 1; $level <= 3; $level++) {
     $seriesWeeks[] = [
         'key' => 'staerke-' . $level,
-        'label' => 'Staerke ' . $level,
+        'label' => 'Stärke ' . $level,
         'items' => $staerkeWeekItemsByLevel[$level],
         'strokeClass' => 'stroke-slate-' . (300 + ($level * 100))
     ];
@@ -593,10 +593,10 @@ foreach ($saunaList as $sauna) {
         'strokeClass' => 'stroke-emerald-700'
     ];
 }
-for ($level = 1; $level <= 6; $level++) {
+for ($level = 1; $level <= 3; $level++) {
     $seriesMonths[] = [
         'key' => 'staerke-' . $level,
-        'label' => 'Staerke ' . $level,
+        'label' => 'Stärke ' . $level,
         'items' => $staerkeMonthItemsByLevel[$level],
         'strokeClass' => 'stroke-slate-' . (300 + ($level * 100))
     ];
@@ -622,10 +622,10 @@ foreach ($saunaList as $sauna) {
         'strokeClass' => 'stroke-emerald-800'
     ];
 }
-for ($level = 1; $level <= 6; $level++) {
+for ($level = 1; $level <= 3; $level++) {
     $seriesYears[] = [
         'key' => 'staerke-' . $level,
-        'label' => 'Staerke ' . $level,
+        'label' => 'Stärke ' . $level,
         'items' => $staerkeYearItemsByLevel[$level],
         'strokeClass' => 'stroke-slate-' . (300 + ($level * 100))
     ];
@@ -753,7 +753,7 @@ if (defined('STATISTIK_JSON')) {
                         <span>Sauna</span>
                     </label>
                     <label class="plan-select-btn legend-filter">
-                        <input type="checkbox" class="rounded border-gray-300" data-legend-group="stärke">
+                        <input type="checkbox" class="rounded border-gray-300" data-legend-group="staerke">
                         <span>Stärke</span>
                     </label>
                 </div>
