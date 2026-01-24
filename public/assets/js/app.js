@@ -1130,8 +1130,9 @@ function computeGlobalAdState() {
 
     const displayMs = Math.max(1, Number(globalAdConfig.displaySeconds) || 10) * 1000;
     const pauseMs = Math.max(0, Number(globalAdConfig.pauseSeconds) || 10) * 1000;
-    const sequenceMs = displayMs * order.length;
-    const cycleMs = sequenceMs + pauseMs;
+    const pausePerSlotMs = order.length > 0 ? pauseMs / order.length : 0;
+    const slotMs = displayMs + pausePerSlotMs;
+    const cycleMs = slotMs * order.length;
     if (!cycleMs) {
         return { show: false };
     }
@@ -1141,10 +1142,12 @@ function computeGlobalAdState() {
         ? Date.parse(globalAdConfig.rotationStartedAt)
         : nowMs;
     const elapsed = ((nowMs - startMs) % cycleMs + cycleMs) % cycleMs;
-    if (elapsed >= sequenceMs) {
+    const slotIndex = Math.floor(elapsed / slotMs);
+    const slotElapsed = elapsed - (slotIndex * slotMs);
+    if (slotElapsed >= displayMs) {
         return { show: false };
     }
-    const index = Math.floor(elapsed / displayMs);
+    const index = Math.min(slotIndex, order.length - 1);
     const activeScreenId = order[index];
     const shouldShow = Number(activeScreenId) === Number(screenId);
     if (!shouldShow) {
