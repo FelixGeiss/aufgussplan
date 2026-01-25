@@ -17,7 +17,7 @@ require_login();
 require_permission('umfragen');
 
 $aufgussModel = new Aufguss();
-$Pläene = $aufgussModel->getAllPlans();
+$plaene = $aufgussModel->getAllPlans();
 
 $planId = isset($_GET['plan_id']) ? (int)$_GET['plan_id'] : 0;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -26,12 +26,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $planId = $postedPlanId;
     }
 }
-if ($planId <= 0 && !empty($Pläene)) {
-    $planId = (int)$Pläene[0]['id'];
+if ($planId <= 0 && !empty($plaene)) {
+    $planId = (int)$plaene[0]['id'];
 }
 
 $selectedPlan = null;
-foreach ($Pläene as $plan) {
+foreach ($plaene as $plan) {
     if ((int)$plan['id'] === $planId) {
         $selectedPlan = $plan;
         break;
@@ -39,8 +39,8 @@ foreach ($Pläene as $plan) {
 }
 
 $fallbackPlan = $selectedPlan;
-if ($planId > 0 && !$selectedPlan && !empty($Pläene)) {
-    $fallbackPlan = $Pläene[0];
+if ($planId > 0 && !$selectedPlan && !empty($plaene)) {
+    $fallbackPlan = $plaene[0];
     $planId = (int)$fallbackPlan['id'];
 }
 if (!$selectedPlan) {
@@ -149,16 +149,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $planId > 0) {
 
         <div class="bg-white rounded-lg p-6 mb-6">
             <h3 class="text-lg font-semibold mb-4">Plan auswählen</h3>
-            <?php if (empty($Pläene)): ?>
+            <?php if (empty($plaene)): ?>
                 <div class="rounded-md border border-dashed border-gray-300 bg-white px-4 py-6 text-center text-sm text-gray-500">
                     Noch keine Pläene vorhanden. Erstelle zuerst einen Plan in der Planung.
                 </div>
             <?php else: ?>
                 <div class="flex flex-wrap gap-3">
-                    <?php foreach ($Pläene as $plan): ?>
-                        <button type="button" class="plan-select-btn" data-plan-id="<?php echo (int)$plan['id']; ?>" data-plan-name="<?php echo htmlspecialchars($plan['name'] ?? 'Plan', ENT_QUOTES, 'UTF-8'); ?>">
+                    <?php foreach ($plaene as $plan): ?>
+                        <?php $isActive = (int)$plan['id'] === $planId; ?>
+                        <a
+                            href="umfragen.php?plan_id=<?php echo (int)$plan['id']; ?>"
+                            class="plan-select-btn<?php echo $isActive ? ' is-active' : ''; ?>"
+                            data-plan-id="<?php echo (int)$plan['id']; ?>"
+                            data-plan-name="<?php echo htmlspecialchars($plan['name'] ?? 'Plan', ENT_QUOTES, 'UTF-8'); ?>"
+                            aria-pressed="<?php echo $isActive ? 'true' : 'false'; ?>"
+                        >
                             <?php echo htmlspecialchars($plan['name'] ?? 'Plan'); ?>
-                        </button>
+                        </a>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
@@ -231,7 +238,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $planId > 0) {
 
     <script>
         (function() {
-            const planButtons = document.querySelectorAll('[data-plan-id]');
+            const planButtons = document.querySelectorAll('.plan-select-btn[data-plan-id]');
             if (!planButtons.length) return;
 
             const storageKey = 'aufgussplanSelectedPlan';

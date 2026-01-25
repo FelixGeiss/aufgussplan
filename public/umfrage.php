@@ -18,10 +18,22 @@ $rawCriteria = $_POST['criteria'] ?? ($_POST['criteria_labels'] ?? []);
 $isSubmit = isset($_POST['submit_ratings']) && $_POST['submit_ratings'] === '1';
 
 $aufgussModel = new Aufguss();
+$plaene = $aufgussModel->getAllPlans();
+
 if ($planId <= 0) {
-    $Pläene = $aufgussModel->getAllPlans();
-    if (!empty($Pläene)) {
-        $planId = (int)$Pläene[0]['id'];
+    $storageFile = __DIR__ . '/../storage/selected_plan.json';
+    if (is_file($storageFile)) {
+        $data = json_decode(file_get_contents($storageFile), true);
+        if (is_array($data) && !empty($data['plan_id'])) {
+            $planId = (int)$data['plan_id'];
+        }
+    }
+}
+
+if (!empty($plaene)) {
+    $validPlanIds = array_map('intval', array_column($plaene, 'id'));
+    if ($planId <= 0 || !in_array($planId, $validPlanIds, true)) {
+        $planId = (int)$plaene[0]['id'];
     }
 }
 
@@ -285,6 +297,44 @@ if ($isSubmit && !$clearSurvey) {
             border-top: 1px solid #e5e7eb;
             background: #f8fafc;
         }
+        .toast-stack {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            width: min(92vw, 420px);
+        }
+        .toast {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            color: #ffffff;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.15);
+            opacity: 0;
+            transform: translateY(-8px);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .toast-success { background: #16a34a; }
+        .toast-error { background: #dc2626; }
+        .toast button {
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: 1.1rem;
+            line-height: 1;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -321,15 +371,7 @@ if ($planBackground !== '') {
     <div class="survey-screen">
         <main class="survey-content px-4 md:px-10 py-6">
             <div class="max-w-6xl mx-auto space-y-6">
-                <?php if ($saveMessage): ?>
-                    <div class="survey-card p-4 border border-green-200 bg-green-50 text-green-800">
-                        <?php echo htmlspecialchars($saveMessage); ?>
-                    </div>
-                <?php elseif ($saveError): ?>
-                    <div class="survey-card p-4 border border-red-200 bg-red-50 text-red-700">
-                        <?php echo htmlspecialchars($saveError); ?>
-                    </div>
-                <?php endif; ?>
+                <div id="toast-stack" class="toast-stack" aria-live="polite" aria-atomic="true"></div>
 
                 <?php if (empty($surveyItems)): ?>
                     <div class="survey-card p-6">
@@ -442,6 +484,38 @@ if ($planBackground !== '') {
                     });
                 });
             });
+        })();
+    </script>
+    <script>
+        (function() {
+            const stack = document.getElementById('toast-stack');
+            if (!stack) return;
+
+            const showToast = (message, type) => {
+                if (!message) return;
+                const toast = document.createElement('div');
+                toast.className = `toast toast-${type || 'success'}`;
+                toast.setAttribute('data-toast', '');
+                toast.innerHTML = `
+                    <div>${message}</div>
+                    <button type="button" aria-label="Meldung schliessen" data-toast-close>&times;</button>
+                `;
+                stack.appendChild(toast);
+                requestAnimationFrame(() => toast.classList.add('show'));
+                const removeToast = () => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 200);
+                };
+                const closeBtn = toast.querySelector('[data-toast-close]');
+                if (closeBtn) closeBtn.addEventListener('click', removeToast);
+                setTimeout(removeToast, 4500);
+            };
+
+            <?php if ($saveMessage): ?>
+                showToast(<?php echo json_encode($saveMessage, JSON_UNESCAPED_UNICODE); ?>, 'success');
+            <?php elseif ($saveError): ?>
+                showToast(<?php echo json_encode($saveError, JSON_UNESCAPED_UNICODE); ?>, 'error');
+            <?php endif; ?>
         })();
     </script>
 </body>
